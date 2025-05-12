@@ -271,7 +271,7 @@ export function SpinAndEarn() {
     if (!address || !fid || isBuying) return;
   
     setIsBuying(true);
-    switchChain({ chainId: monadTestnet.id })
+    // switchChain({ chainId: monadTestnet.id })
     sendTransaction({
       to: CONTRACT_ADDRESS as `0x${string}`,
       data: "0x2df08a70",
