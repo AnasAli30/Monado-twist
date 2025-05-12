@@ -62,7 +62,7 @@ export function Leaderboard() {
             )} */}
                 <div className="user-info">
                 
-                  <div className="fid"> {String(entry.name)}</div>
+                 { entry.name!=null && <div className="fid"> {String(entry.name)}</div>}
                   <div className="address">{`${entry.address.slice(0, 6)}...${entry.address.slice(-4)}`}</div>
                 </div>
                 <div className="winnings">{parseFloat(entry.totalWinnings).toFixed(2)} MON</div>
