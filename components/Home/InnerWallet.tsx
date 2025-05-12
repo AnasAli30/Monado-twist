@@ -4,9 +4,11 @@ import { parseAbi } from 'viem'
 import {
   useAccount,
   useSendTransaction,
-  useReadContract
+  useReadContract,
+  useSwitchChain
 } from "wagmi";
 import { FaCheckCircle } from "react-icons/fa";
+import { monadTestnet } from "viem/chains";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS!;
 
@@ -19,6 +21,7 @@ const ABI = [
 ];
 
 export function InnerWallet() {
+  const { switchChain } = useSwitchChain();
   const { data: hash, sendTransaction, isPending,isSuccess } = useSendTransaction();
   const { address, isConnected } = useAccount();
   const [balance, setBalance] = useState("0");
@@ -60,6 +63,7 @@ export function InnerWallet() {
     setLoading(true);
     
     try {
+     switchChain({ chainId: monadTestnet.id })
       sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
         data: "0x3ccfd60b",
