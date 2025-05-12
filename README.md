@@ -87,14 +87,6 @@ Visit [http://localhost:3000](http://localhost:3000) to use the app.
 - **UI Theme**: Tweak Tailwind and CSS-in-JS styles for your own look.
 - **Contract**: Use your own WinnerVault contract if needed.
 
-## Deployment
-
-- Deploy to Vercel, Netlify, or your preferred Next.js host.
-- Set all environment variables in your deployment dashboard.
-
-## Screenshots
-
-- Place your screenshots in `public/images/` and reference them here.
 
 ## License
 
