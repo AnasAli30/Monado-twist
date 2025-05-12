@@ -63,6 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       amount: parseFloat(amount),
       fid: fid,
       timestamp: new Date(),
+      name: user?.name,
       txHash: tx.hash,
       walletAddress: wallet.address
     });

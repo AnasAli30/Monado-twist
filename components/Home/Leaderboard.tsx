@@ -53,13 +53,13 @@ export function Leaderboard() {
                     <span>{index + 1}</span>
                   )}
                 </div>
-                {context?.user?.pfpUrl && (
+                {/* {context?.user?.pfpUrl && (
               <img
                 src={context?.user?.pfpUrl}
                 className="w-10 h-10 rounded-full border border-white mr-2"
                 alt="User Profile Picture"
               />
-            )}
+            )} */}
                 <div className="user-info">
                 
                   <div className="fid"> {String(entry.name)}</div>
