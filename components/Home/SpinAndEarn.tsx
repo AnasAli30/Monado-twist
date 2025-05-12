@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
-import { useAccount, useSendTransaction, usePublicClient } from "wagmi";
+import { useAccount, useSendTransaction, usePublicClient,useSwitchChain } from "wagmi";
+import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
 import { FaHome, FaWallet, FaTicketAlt, FaTrophy } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
@@ -50,7 +51,7 @@ export function SpinAndEarn() {
   const { context ,actions} = useMiniAppContext();
   const fid = context?.user?.fid;
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
-
+  const { switchChain } = useSwitchChain(); 
   const [totalSpins, setTotalSpins] = useState<number>(0);
   const { sendTransaction, isPending: isConfirming ,data} = useSendTransaction();
   const publicClient = usePublicClient();
@@ -270,6 +271,7 @@ export function SpinAndEarn() {
     if (!address || !fid || isBuying) return;
   
     setIsBuying(true);
+    switchChain({ chainId: monadTestnet.id })
     sendTransaction({
       to: CONTRACT_ADDRESS as `0x${string}`,
       data: "0x2df08a70",
