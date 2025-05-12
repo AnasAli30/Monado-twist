@@ -161,7 +161,9 @@ export function SpinAndEarn() {
       // Compose cast as before
 
        await actions?.composeCast({
-          text: "🎰 Just won some MON tokens in the Monado Spin game! Come join the fun and earn tokens! 🎉",
+          text: `Just crushed it on Monado Twist and racked up MON tokens like a boss! 💸💪
+- Think you’ve got what it takes to beat me? 🎰 Step up, spin the wheel, and join the #BreakTheMonad challenge!
+- Only the bold survive — let’s see who the real MON master is! ⚔️`,
           embeds: [`${window.location.href}`],
         });
       
