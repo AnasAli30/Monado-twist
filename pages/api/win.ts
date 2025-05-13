@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!to || !amount || !fid) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
-    if(amount>5) return res.status(400).json({ error: 'Amount too high' });
+    if(amount>2) return res.status(400).json({ error: 'Amount too high' });
     const { db } = await connectToDatabase();
     const user = await db.collection('monad-users').findOne({ fid });
     if(user?.spinsLeft<0) return res.status(400).json({ error: 'No spins left' });
