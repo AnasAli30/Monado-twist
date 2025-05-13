@@ -665,7 +665,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               const contract = new ethers.Contract(CONTRACT_ADDRESS as string, ABI, provider);
               const balance = await contract.balances(address);
               const balanceinMon = ethers.formatEther(balance);
-              if(balanceinMon > "0") {
+              if(Number(balanceinMon) > 0) {
                 handleShare(balanceinMon.toString())
               } else {
                 handleShare("10")
