@@ -70,9 +70,9 @@ export function SpinAndEarn() {
   const segments: Segment[] = [
     { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 60, degrees: 104 },   // 40%
     { text: "0.3", value: 0.3, color: "#7B68EE", probability: 20, degrees: 138 },   // 30%
-    { text: "0.5", value: 0.5, color: "#8A2BE2", probability: 1, degrees: 54 },        // 15%
-    { text: "1", value: 1, color: "#9370DB", probability: -1, degrees: 39 },    // 10%
-    { text: "2", value: 2, color: "#800080", probability: -10, degrees: 25.4 },       // 4%
+    { text: "0.5", value: 0.5, color: "#8A2BE2", probability: 10, degrees: 54 },        // 15%
+    { text: "1", value: 1, color: "#9370DB", probability: 1, degrees: 39 },    // 10%
+    { text: "2", value: 2, color: "#800080", probability: 0, degrees: 25.4 },       // 4%
     { text: "10", value: 10, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
   ];
 
@@ -164,7 +164,7 @@ export function SpinAndEarn() {
       // Compose cast as before
 
        await actions?.composeCast({
-          text: `Just won ${mon} $MON for free — and you can earn upto 10 mon free!
+          text: `Just won ${mon} $MON for free — and you can earn upto 10 mon free !
   
 It’s seriously fun , addictive, and totally worth it.
 
@@ -284,9 +284,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   };
   
   // SVG wheel constants
-  const size = 420;
+  const size = 370;
   const center = size / 2;
-  const radius = center - 10;
+  const radius = center - 5;
 
   // Calculate SVG paths for each segment
   let startAngle = 0;
@@ -429,10 +429,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         }
         .half-wheel-container {
           position: relative;
-          width: 100vw;
+          width: 95%;
           height: 25vh;
           z-index: 100;
           overflow: visible;
+          display: flex;
+          justify-content: center;
         }
         .wheel-spin-anim {
           animation: wheelIdle 12s linear infinite;
@@ -570,8 +572,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               style={{
                 display: "block",
                 position: "absolute",
-                left: 0,
-                top: `-${size / 2}px` // This shifts the SVG up by half its height
+                top: `-${size / 2.1}px` // This shifts the SVG up by half its height
               }}
             >
               <g
@@ -580,6 +581,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               >
                 {svgSegments}
               </g>
+              
             </svg>
             <div className="pointer"></div>
           </div>

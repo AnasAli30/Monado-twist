@@ -152,7 +152,7 @@ export function Leaderboard() {
 
         .winnings {
           font-weight: 600;
-          color: #b9aaff;
+          color: #b9ffff;
         }
 
         .loading {
