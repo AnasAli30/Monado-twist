@@ -33,7 +33,7 @@ export function Leaderboard() {
   }, []);
 
   return (
-    <div className="leaderboard-glass-card fade-in">
+    <div className="leaderboard-glass-card  fade-in">
       <div className="leaderboard-header">
         <FaTrophy className="trophy-icon" />
         <h2>Top Winners</h2>
@@ -159,6 +159,7 @@ export function Leaderboard() {
           text-align: center;
           color: #fff;
           padding: 20px;
+          height: 100vh;
         }
 
         .fade-in {

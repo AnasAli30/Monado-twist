@@ -479,10 +479,11 @@ export function SpinAndEarn() {
           transform: translateY(-2px);
         }
         .switch-bar {
-          position: fixed;
+          position: sticky;
           bottom: 0;
           left: 0;
           right: 0;
+          width: 100%;
           display: flex;
           justify-content: space-around;
           padding: 12px;
