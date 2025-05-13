@@ -328,7 +328,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           height: 100%;
         }
         .spin-ui-card {
-          background: linear-gradient(135deg, #b9aaff 0%, #6C5CE7 100%);
+          background: linear-gradient(135deg, #b9aaff 0%, #6C5CE7 70%);
           border-radius: 24px;
           box-shadow: 0 4px 24px #6C5CE7aa;
           padding: 24px 18px 32px 18px;
@@ -463,7 +463,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           z-index: 2;
         }
         .result {
-          // margin-top: 20px;
+          margin-bottom: 20px;
           padding: 12px 24px;
           background: rgba(255,255,255,0.1);
           border-radius: 12px;
