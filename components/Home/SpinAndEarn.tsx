@@ -71,8 +71,8 @@ export function SpinAndEarn() {
     { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 60, degrees: 104 },   // 40%
     { text: "1", value: 1, color: "#7B68EE", probability: 40, degrees: 138 },   // 30%
     { text: "2", value: 2, color: "#8A2BE2", probability: 15, degrees: 54 },        // 15%
-    { text: "5", value: 5, color: "#9370DB", probability: 5, degrees: 39 },    // 10%
-    { text: "10", value: 10, color: "#800080", probability: 1, degrees: 25.4 },       // 4%
+    { text: "5", value: 5, color: "#9370DB", probability: 1, degrees: 39 },    // 10%
+    { text: "10", value: 10, color: "#800080", probability: 0, degrees: 25.4 },       // 4%
     { text: "50", value: 50, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
   ];
 
