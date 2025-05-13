@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongo';
 
-const SPINS_PER_DAY = 5;
+const SPINS_PER_DAY = 3;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -44,6 +44,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft });
   }
 
+  if (mode === "follow") {
+    if (user?.follow) {
+      return res.status(400).json({ error: "You have already followed." });
+    }
+    spinsLeft += 1;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset,follow:true } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft });
+  }
+
   if (mode === "buy") {
     spinsLeft += 1;
     await users.updateOne(
@@ -55,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (checkOnly) {
-    return res.status(200).json({ spinsLeft ,lastSpinReset:user?.lastSpinReset,lastShareSpin:user?.lastShareSpin});
+    return res.status(200).json({ spinsLeft ,lastSpinReset:user?.lastSpinReset,lastShareSpin:user?.lastShareSpin,follow:user?.follow});
   }
 
   if (spinsLeft <= 0) {

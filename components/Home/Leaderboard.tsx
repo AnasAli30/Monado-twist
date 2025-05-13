@@ -44,6 +44,7 @@ export function Leaderboard() {
       ) : (
         <div className="leaderboard-list">
           {leaders.map((entry, index) => (
+            console.log(entry),
             <div key={entry.address} className="leaderboard-item"  onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}>
                 <div className="rank">
                

@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           $group: {
             _id: '$address',
             totalWinnings: { $sum: '$amount' },
-            name: { $first: '$username' },
+            name: { $first: '$name' },
             fid: { $first: '$fid' }  // Get the FID for each address
           }
         },
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           $sort: { totalWinnings: -1 }
         },
         {
-          $limit: 10
+          $limit: 100
         },
         {
           $project: {

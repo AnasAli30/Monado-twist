@@ -7,6 +7,7 @@ import { FaHome, FaWallet, FaTicketAlt, FaTrophy } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { ethers } from "ethers";
+import { setFips } from "crypto";
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -47,6 +48,7 @@ function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
 }
 
 export function SpinAndEarn() {
+  const [follow, SetFollow] = useState(false);
   const { address, chainId } = useAccount();
   const { context ,actions} = useMiniAppContext();
   const fid = context?.user?.fid;
@@ -66,12 +68,12 @@ export function SpinAndEarn() {
 
   // All segments are equal
   const segments: Segment[] = [
-    { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 40, degrees: 104 },   // 40%
-    { text: "1", value: 1, color: "#7B68EE", probability: 30, degrees: 138 },   // 30%
+    { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 60, degrees: 104 },   // 40%
+    { text: "1", value: 1, color: "#7B68EE", probability: 40, degrees: 138 },   // 30%
     { text: "2", value: 2, color: "#8A2BE2", probability: 15, degrees: 54 },        // 15%
-    { text: "5", value: 5, color: "#9370DB", probability: 5, degrees: 36 },    // 10%
-    { text: "10", value: 10, color: "#800080", probability: 1, degrees: 24.4 },       // 4%
-    { text: "50", value: 50, color: "#4B0082", probability: 0, degrees: 9.6 }         // 1%
+    { text: "5", value: 5, color: "#9370DB", probability: 5, degrees: 39 },    // 10%
+    { text: "10", value: 10, color: "#800080", probability: 1, degrees: 25.4 },       // 4%
+    { text: "50", value: 50, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
   ];
 
   // Fetch spins and timer data from backend
@@ -86,7 +88,7 @@ export function SpinAndEarn() {
           });
           const data = await res.json();
           setSpinsLeft(data.spinsLeft);
-          console.log(data);
+          SetFollow(data.follow)
           // Update timers
           if (data.lastSpinReset) {
             const resetTime = new Date(data.lastSpinReset).getTime() + 24 * 60 * 60 * 1000;
@@ -163,8 +165,8 @@ export function SpinAndEarn() {
 
        await actions?.composeCast({
           text: `Just crushed it on Monado Twist and racked up MON like a boss! 💸💪
-- Think you’ve got what it takes to beat me? 🎰 Step up, spin the wheel, and join the #BreakTheMonad challenge!
-- Only the bold survive — let’s see who the real MON master is! ⚔️`,
+- Think you've got what it takes to beat me? 🎰 Step up, spin the wheel, and join the #BreakTheMonad challenge!
+- Only the bold survive — let's see who the real MON master is! ⚔️`,
           embeds: [`${window.location.href}`],
         });
       
@@ -533,6 +535,21 @@ export function SpinAndEarn() {
           opacity: 0.7;
           cursor: not-allowed;
         }
+        .follow-button {
+          margin-top: 12px;
+          padding: 12px 24px;
+          background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
+          color: #fff;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .follow-button:hover {
+          transform: translateY(-2px);
+        }
       `}</style>
       {view === 'spin' ? (
         <>
@@ -592,6 +609,27 @@ export function SpinAndEarn() {
                   <div className="timer-text">Resets in: {timeUntilReset}</div>
                 )}
             </button>
+        { !follow && <button
+            className="follow-button"
+            onClick={async () => {
+              await actions?.viewProfile({ fid: 249702 });
+              if (fid) {
+                const res = await fetch('/api/spin', {
+                  method: 'POST',
+                  body: JSON.stringify({ fid, mode: "follow" }),
+                  headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setSpinsLeft(data.spinsLeft);
+                  setResult("You got 1 extra spin for following! 🎁");
+                  SetFollow(true)
+                }
+              }
+            }}
+          >
+            Follow to get 1 extra spin! 🎁
+          </button>}
             {spinsLeft === 0 && (
               <button
                 className="buy-spin-btn"
@@ -611,6 +649,7 @@ export function SpinAndEarn() {
           >
             {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}
           </button>
+         
         </>
       ) : view === 'wallet' ? (
         <InnerWallet />
