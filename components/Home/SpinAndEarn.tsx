@@ -333,6 +333,10 @@ export function SpinAndEarn() {
           margin: 24px 0 32px 0;
           width: 100%;
           height: 100%;
+          display: flex;
+          flex-direction: column;
+          margin-top: 110px;
+          justify-content: space-evenly;
           max-width: 370px;
           text-align: center;
           color: #fff;
@@ -441,20 +445,21 @@ export function SpinAndEarn() {
           100% { transform: rotate(360deg); }
         }
         .pointer {
+
           position: absolute;
-          bottom: 0;
+          bottom: -1;
           left: 50%;
           transform: translateX(-50%);
           width: 0;
           height: 0;
           border-left: 15px solid transparent;
           border-right: 15px solid transparent;
-          border-bottom: 30px solid #6C5CE7;
+          border-top: 30px solid #F94449;
           filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
           z-index: 2;
         }
         .result {
-          margin-top: 20px;
+          // margin-top: 20px;
           padding: 12px 24px;
           background: rgba(255,255,255,0.1);
           border-radius: 12px;
@@ -576,16 +581,17 @@ export function SpinAndEarn() {
             </svg>
             <div className="pointer"></div>
           </div>
-          {result && (
-            <div className="result">
-              {result}
-            </div>
-          )}
+       
            
           <div className="spin-ui-card">
           
             <div className="spin-ui-header">MONADO TWIST</div>
             <EnvelopeReward />
+            {result && (
+            <div className="result">
+              {result}
+            </div>
+          )}
             <div className="spin-ui-row">
               <div className="spin-ui-box">
                 <div className="spin-ui-label">Spins Remaining</div>
