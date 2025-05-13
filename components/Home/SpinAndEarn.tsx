@@ -639,7 +639,15 @@ export function SpinAndEarn() {
           >
             Follow to get 1 extra spin! 🎁
           </button>}
-            
+            {spinsLeft === 0 && (
+              <button
+                className="buy-spin-btn"
+                onClick={handleBuySpin}
+                disabled={isBuying || isConfirming || !address}
+              >
+                {isBuying || isConfirming ? "Processing..." : "Buy 1 Spin (1 MON)"}
+              </button>
+            )}
           </div>
       
          
