@@ -159,14 +159,16 @@ export function SpinAndEarn() {
     return fullRotations + (360 - (startAngle + randomDegreeWithinSegment));
   };
 
-  const handleShare = async () => {
+  const handleShare = async (mon: string) => {
     try {
       // Compose cast as before
 
        await actions?.composeCast({
-          text: `Just crushed it on Monado Twist and racked up MON like a boss! 💸💪
-- Think you've got what it takes to beat me? 🎰 Step up, spin the wheel, and join the #BreakTheMonad challenge!
-- Only the bold survive — let's see who the real MON master is! ⚔️`,
+          text: `Just won ${mon} $MON for free — and you can too!
+  
+It’s seriously fun , addictive, and totally worth it.
+
+Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           embeds: [`${window.location.href}`],
         });
       
@@ -653,7 +655,26 @@ export function SpinAndEarn() {
          
           <button
             className="share-button"
-            onClick={handleShare}
+            onClick={async () => {
+              try {
+              const provider = new ethers.JsonRpcProvider("https://testnet-rpc.monad.xyz");
+              const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS;
+              const ABI = [
+                "function balances(address) view returns (uint256)"
+              ];
+              const contract = new ethers.Contract(CONTRACT_ADDRESS as string, ABI, provider);
+              const balance = await contract.balances(address);
+              const balanceinMon = ethers.formatEther(balance);
+              if(balanceinMon > "0") {
+                handleShare(balanceinMon.toString())
+              } else {
+                handleShare("10")
+              }
+            } catch (error) {
+              console.log(error)
+              handleShare("10")
+            }
+            }}
             disabled={!!timeUntilShare}
           >
             {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}

@@ -5,7 +5,8 @@ import {
   useAccount,
   useSendTransaction,
   useReadContract,
-  useSwitchChain
+  useSwitchChain,
+  useChainId
 } from "wagmi";
 import { FaCheckCircle } from "react-icons/fa";
 import { monadTestnet } from "viem/chains";
@@ -21,6 +22,7 @@ const ABI = [
 ];
 
 export function InnerWallet() {
+  const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const { data: hash, sendTransaction, isPending,isSuccess } = useSendTransaction();
   const { address, isConnected } = useAccount();
@@ -63,7 +65,6 @@ export function InnerWallet() {
     setLoading(true);
     
     try {
-     switchChain({ chainId: monadTestnet.id })
       sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
         data: "0x3ccfd60b",
@@ -71,34 +72,40 @@ export function InnerWallet() {
     } catch (e) {
       alert("Withdraw failed");
     }
-
   };
 
   if (!isConnected) return null;
+
+  const isOnMonadChain = chainId === monadTestnet.id;
 
   return (
     <div className="wallet-glass-card fade-in">
       <div className="flex flex-col items-center">
         <div className="title">Wallet  <span className="emoji">💰</span></div>
         <div className="balance">{displayBalance} MON</div>
-        <button onClick={withdraw} disabled={loading || balance === "0"} className="wallet-withdraw-btn">
-          {isPending ?  "Withdrawing..." : "Withdraw"}
-        </button>
+        {!isOnMonadChain ? (
+          <button onClick={() => switchChain({ chainId: monadTestnet.id })} className="wallet-withdraw-btn">
+            Switch to Monad Testnet
+          </button>
+        ) : (
+          <button onClick={withdraw} disabled={loading || balance === "0"} className="wallet-withdraw-btn">
+            {isPending ?  "Withdrawing..." : "Withdraw"}
+          </button>
+        )}
         {error && <div className="error">{error.message}</div>}
         {hash && (
-                  <button 
-                    className=" success text-black rounded-md p-2 text-sm"
-                    onClick={() =>
-                      window.open(
-                        `https://testnet.monadexplorer.com/tx/${hash}`,
-                        "_blank"
-                      )
-                    }
-                  >
-                    <FaCheckCircle />
-                  </button>
-                )}
-        
+          <button 
+            className="success text-black rounded-md p-2 text-sm"
+            onClick={() =>
+              window.open(
+                `https://testnet.monadexplorer.com/tx/${hash}`,
+                "_blank"
+              )
+            }
+          >
+            <FaCheckCircle />
+          </button>
+        )}
       </div>
       <style>{`
         .fade-in {
