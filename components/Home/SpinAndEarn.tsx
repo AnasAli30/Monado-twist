@@ -68,12 +68,12 @@ export function SpinAndEarn() {
 
   // All segments are equal
   const segments: Segment[] = [
-    { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 80, degrees: 104 },   // 40%
-    { text: "0.5", value: 0.5, color: "#7B68EE", probability: 20, degrees: 138 },   // 30%
-    { text: "1", value: 1, color: "#8A2BE2", probability: 1, degrees: 54 },        // 15%
-    { text: "2", value: 2, color: "#9370DB", probability: -1, degrees: 39 },    // 10%
-    { text: "5", value: 5, color: "#800080", probability: -10, degrees: 25.4 },       // 4%
-    { text: "50", value: 50, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
+    { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 60, degrees: 104 },   // 40%
+    { text: "0.5", value: 0.3, color: "#7B68EE", probability: 20, degrees: 138 },   // 30%
+    { text: "1", value: 0.5, color: "#8A2BE2", probability: 1, degrees: 54 },        // 15%
+    { text: "2", value: 1, color: "#9370DB", probability: -1, degrees: 39 },    // 10%
+    { text: "5", value: 2, color: "#800080", probability: -10, degrees: 25.4 },       // 4%
+    { text: "50", value: 10, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
   ];
 
   // Fetch spins and timer data from backend
