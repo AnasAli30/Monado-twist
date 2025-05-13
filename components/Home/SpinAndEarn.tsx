@@ -316,13 +316,14 @@ export function SpinAndEarn() {
   });
 
   return (
-    <div className="spin-glass-card h-full relative flex flex-col items-center w-full max-w-xl mx-auto ">
+    <div className="spin-glass-card  relative flex flex-col items-center w-full max-w-xl mx-auto ">
       <style>{`
         .spin-glass-card {
           background: linear-gradient(135deg, #a084ee 0%, #6C5CE7 100%);
           box-shadow: 0 8px 40px 0 #6C5CE7, 0 1.5px 8px 0 #0002;
           backdrop-filter: blur(12px);
           margin-bottom: 80px;
+          height: 100%;
         }
         .spin-ui-card {
           background: linear-gradient(135deg, #b9aaff 0%, #6C5CE7 100%);
@@ -331,6 +332,7 @@ export function SpinAndEarn() {
           padding: 24px 18px 32px 18px;
           margin: 24px 0 32px 0;
           width: 100%;
+          height: 100%;
           max-width: 370px;
           text-align: center;
           color: #fff;

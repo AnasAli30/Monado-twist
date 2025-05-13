@@ -123,7 +123,7 @@ export function InnerWallet() {
           border: 1.5px solid rgba(108, 92, 231, 0.6);
           padding: 40px 20px;
           margin: 150px auto;
-          height: 350px;
+          height: 100%;
           width: 100%;
           max-width: 400px;
           text-align: center;
