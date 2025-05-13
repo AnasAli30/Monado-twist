@@ -23,6 +23,8 @@ const ABI = [
 
 export function InnerWallet() {
   const chainId = useChainId();
+  console.log(chainId)
+  console.log(monadTestnet.id)
   const { switchChain } = useSwitchChain();
   const { data: hash, sendTransaction, isPending,isSuccess } = useSendTransaction();
   const { address, isConnected } = useAccount();

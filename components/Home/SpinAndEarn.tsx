@@ -164,7 +164,7 @@ export function SpinAndEarn() {
       // Compose cast as before
 
        await actions?.composeCast({
-          text: `Just won ${mon} $MON for free — and you can too!
+          text: `Just won ${mon} $MON for free — and you can earn upto 10 mon free!
   
 It’s seriously fun , addictive, and totally worth it.
 
