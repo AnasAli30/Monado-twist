@@ -65,6 +65,7 @@ export function InnerWallet() {
     setLoading(true);
     
     try {
+      switchChain({ chainId: monadTestnet.id })
       sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
         data: "0x3ccfd60b",
