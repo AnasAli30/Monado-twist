@@ -97,13 +97,14 @@ export function SpinAndEarn() {
 
   // All segments are equal
   const segments: Segment[] = [
-    { text: "0.1", value: 0.1, color: "#6C5CE7", probability: 60, degrees: 104 },   // 40%
-    { text: "0.3", value: 0.3, color: "#7B68EE", probability: 20, degrees: 138 },   // 30%
-    { text: "0.5", value: 0.5, color: "#8A2BE2", probability: 10, degrees: 54 },        // 15%
-    { text: "1", value: 1, color: "#9370DB", probability: 1, degrees: 39 },    // 10%
-    { text: "2", value: 2, color: "#800080", probability: 0, degrees: 25.4 },       // 4%
-    { text: "50", value: 0, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
+    { text: "0.1", value: 0.1, color: "#4B0082", probability: 50, degrees: 60 },  // Dark Indigo
+    { text: "0.3", value: 0.3, color: "#3A0CA3", probability: 30, degrees: 60 },  // Dark Blue-Violet
+    { text: "0.5", value: 0.5, color: "#5F0F40", probability: 10, degrees: 60 },  // Deep Rose
+    { text: "1", value: 1, color: "#2C2C54", probability: 10, degrees: 60 },      // Dark Purple
+    { text: "2", value: 2, color: "#120458", probability: -1, degrees: 60 },      // Deep Midnight Blue
+    { text: "50", value: 0, color: "#1A1A2E", probability: -1, degrees: 60 }     // Very Dark Blue
   ];
+  
 
   // Fetch spins and timer data from backend
   useEffect(() => {
@@ -156,14 +157,18 @@ export function SpinAndEarn() {
     const random = Math.random() * 100;
     let cumulativeProbability = 0;
     
-    for (const segment of segments) {
+    // Sort segments by probability in descending order to ensure proper distribution
+    const sortedSegments = [...segments].sort((a, b) => b.probability - a.probability);
+    
+    for (const segment of sortedSegments) {
       cumulativeProbability += segment.probability;
       if (random <= cumulativeProbability) {
         return segment;
       }
     }
     
-    return segments[0]; // Fallback to first segment (shouldn't happen)
+    // If no segment is selected (shouldn't happen), return the lowest probability segment
+    return sortedSegments[sortedSegments.length - 1];
   };
 
   const getRandomSpin = () => {
@@ -348,9 +353,22 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     const labelAngle = startAngle + segment.degrees / 2;
     const labelRadius = radius - 14; // Near the edge
     const labelPos = polarToCartesian(center, center, labelRadius, labelAngle);
+    
+    // Calculate icon position (slightly above the text)
+    const iconRadius = radius - 35; // Position icon above the text
+    const iconPos = polarToCartesian(center, center, iconRadius, labelAngle);
+    
     const el = (
       <g key={i}>
         <path d={path} fill={segment.color} stroke="#1a1a2e" strokeWidth="2" />
+        <image
+          x={iconPos.x + 5}
+          y={iconPos.y - 15}
+          width="35"
+          height="35"
+          href="/images/mon.png"
+          transform={`rotate(${labelAngle + 90}, ${iconPos.x}, ${iconPos.y})`}
+        />
         <text
           x={labelPos.x}
           y={labelPos.y + 0}
@@ -369,7 +387,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   });
 
   return (
-    <div className="spin-glass-card  relative flex flex-col items-center w-full max-w-xl mx-auto ">
+    <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
       <style>{`
         .spin-glass-card {
           background: linear-gradient(135deg, #a084ee 0%, #6C5CE7 100%);
@@ -378,12 +396,64 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           margin-bottom: 80px;
           height: 100%;
         }
+        .wheel-container {
+          position: relative;
+          width: 95%;
+          height: 25vh;
+          z-index: 100;
+          overflow: visible;
+          display: flex;
+          justify-content: center;
+        }
+        .wheel-border {
+          position: absolute;
+          top: -${size / 2.1}px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: ${size+5}px;
+          height: ${size+5}px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+          box-shadow: 
+            0 0 20px rgba(147, 112, 219, 0.6),
+            0 0 40px rgba(138, 43, 226, 0.4),
+            0 0 60px rgba(75, 0, 130, 0.3),
+            inset 0 0 20px rgba(147, 112, 219, 0.4);
+          animation: glowPulse 3s ease-in-out infinite;
+          border: 2px solid rgba(147, 112, 219, 0.3);
+        }
+        @keyframes glowPulse {
+          0% {
+            box-shadow: 
+              0 0 20px rgba(147, 112, 219, 0.6),
+              0 0 40px rgba(138, 43, 226, 0.4),
+              0 0 60px rgba(75, 0, 130, 0.3),
+              inset 0 0 20px rgba(147, 112, 219, 0.4);
+            border-color: rgba(147, 112, 219, 0.3);
+          }
+          50% {
+            box-shadow: 
+              0 0 30px rgba(147, 112, 219, 0.8),
+              0 0 60px rgba(138, 43, 226, 0.6),
+              0 0 90px rgba(75, 0, 130, 0.4),
+              inset 0 0 30px rgba(147, 112, 219, 0.6);
+            border-color: rgba(147, 112, 219, 0.5);
+          }
+          100% {
+            box-shadow: 
+              0 0 20px rgba(147, 112, 219, 0.6),
+              0 0 40px rgba(138, 43, 226, 0.4),
+              0 0 60px rgba(75, 0, 130, 0.3),
+              inset 0 0 20px rgba(147, 112, 219, 0.4);
+            border-color: rgba(147, 112, 219, 0.3);
+          }
+        }
         .spin-ui-card {
           background: linear-gradient(135deg, #b9aaff 0%, #6C5CE7 70%);
           border-radius: 24px;
           box-shadow: 0 4px 24px #6C5CE7aa;
           padding: 24px 18px 32px 18px;
-          margin: 24px 0 32px 0;
+          margin: 24px 0 1px 0;
           width: 100%;
           height: 100%;
           display: flex;
@@ -478,15 +548,6 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           opacity: 0.7;
           cursor: not-allowed;
         }
-        .half-wheel-container {
-          position: relative;
-          width: 95%;
-          height: 25vh;
-          z-index: 100;
-          overflow: visible;
-          display: flex;
-          justify-content: center;
-        }
         .wheel-spin-anim {
           animation: wheelIdle 12s linear infinite;
           transition: none;
@@ -524,9 +585,10 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           text-align: center;
           backdrop-filter: blur(8px);
           box-shadow: 0 4px 12px rgba(108,92,231,0.2);
+          border: 5px solid rgba(255,255,255,1);
         }
         .share-button {
-          margin-top: 16px;
+          margin-top: 10px;
           padding: 12px 24px;
           background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
           color: #fff;
@@ -549,9 +611,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           display: flex;
           justify-content: space-around;
           padding: 12px;
-          background: rgba(108,92,231,0.95);
+          background: rgba(108,92,231,1);
           backdrop-filter: blur(12px);
-          border-top: 1px solid rgba(255,255,255,0.1);
+          border-top: 5px solid rgba(255,255,255,1);
         }
         .switch-bar button {
           display: flex;
@@ -637,14 +699,15 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       />
       {view === 'spin' ? (
         <>
-            <div className="half-wheel-container">
+          <div className="wheel-container">
+            <div className="wheel-border"></div>
             <svg
               width={size}
               height={size}
               style={{
                 display: "block",
                 position: "absolute",
-                top: `-${size / 2.1}px` // This shifts the SVG up by half its height
+                top: `-${size / 2.1}px`
               }}
             >
               <g
@@ -653,12 +716,10 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               >
                 {svgSegments}
               </g>
-              
             </svg>
             <div className="pointer"></div>
           </div>
-       
-           
+         
           <div className="spin-ui-card">
           
             <div className="spin-ui-header">MONADO TWIST</div>
@@ -742,11 +803,11 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               if(Number(balanceinMon) > 0) {
                 handleShare(balanceinMon.toString())
               } else {
-                handleShare("10")
+                handleShare(" ")
               }
             } catch (error) {
               console.log(error)
-              handleShare("10")
+              handleShare(" ")
             }
             }}
             disabled={!!timeUntilShare}
