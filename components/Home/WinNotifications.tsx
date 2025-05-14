@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import Pusher from 'pusher-js';
 
-interface WinNotification {
+interface Notification {
+  type: 'win' | 'withdraw';
   amount: number;
   address: string;
   name: string;
@@ -9,8 +10,8 @@ interface WinNotification {
 }
 
 export function WinNotifications() {
-  const [notifications, setNotifications] = useState<WinNotification[]>([]);
-  const [currentWin, setCurrentWin] = useState<WinNotification | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
 
   useEffect(() => {
     // Initialize Pusher
@@ -23,15 +24,31 @@ export function WinNotifications() {
     
     // Listen for win events
     channel.bind('win', (data: { address: string; amount: number; name: string }) => {
-      const newWin = {
+      const newNotification: Notification = {
+        type: 'win',
         amount: data.amount,
         name: data.name,
         address: data.address,
         timestamp: Date.now()
       };
       
-      setCurrentWin(newWin);
-      setNotifications(prev => [newWin, ...prev].slice(0, 3)); // Keep last 3 notifications
+      setCurrentNotification(newNotification);
+      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
+    });
+
+    // Listen for withdrawal events
+    channel.bind('withdraw', (data: { address: string; amount: number; name: string }) => {
+      console.log(data);
+      const newNotification: Notification = {
+        type: 'withdraw',
+        amount: data.amount,
+        name: data.name,
+        address: data.address,
+        timestamp: Date.now()
+      };
+      
+      setCurrentNotification(newNotification);
+      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
     });
 
     return () => {
@@ -39,6 +56,15 @@ export function WinNotifications() {
       channel.unsubscribe();
     };
   }, []);
+
+  const getNotificationText = (notification: Notification) => {
+    const user = notification.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`;
+    if (notification.type === 'win') {
+      return ` ${user} won ${notification.amount} MON! 🎉`;
+    } else {
+      return ` ${user} withdrew ${notification.amount} MON! 💸`;
+    }
+  };
 
   return (
     <div className="win-notification-bar">
@@ -75,7 +101,6 @@ export function WinNotifications() {
         }
         .notification-item {
           animation: slideUp 0.5s ease-out;
-        //   margin-bottom: 8px;
         }
         @keyframes slideUp {
           0% {
@@ -108,7 +133,7 @@ export function WinNotifications() {
               opacity: index === 0 ? 1 : 0.5
             }}
           >
-            {`🎉 ${notification.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`} won ${notification.amount} MON!`}
+            {getNotificationText(notification)}
           </div>
         ))}
         {notifications.length === 0 && (

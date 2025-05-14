@@ -26,6 +26,7 @@ const ABI = [
 export function InnerWallet() {
   const { context } = useMiniAppContext();
   const fid = context?.user?.fid;
+  const name = context?.user?.username;
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const publicClient = usePublicClient();
@@ -61,7 +62,10 @@ export function InnerWallet() {
         },
         body: JSON.stringify({
           fid,
-          txHash: hash
+          txHash: hash,
+          amount: balance,
+          address: address,
+          name: name
         }),
       }).catch(error => {
         console.error('Error updating withdrawal status:', error);
