@@ -20,7 +20,7 @@ export async function GET() {
       primaryCategory: "games",
       buttonTitle: "Spin to Win",
       splashImageUrl: `${APP_URL}/images/splash.png`,
-      splashBackgroundColor: "#ffffff",
+      splashBackgroundColor: "#000000",
       webhookUrl: `${APP_URL}/api/webhook`,
     },
   };

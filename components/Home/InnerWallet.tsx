@@ -10,6 +10,7 @@ import {
 } from "wagmi";
 import { FaCheckCircle } from "react-icons/fa";
 import { monadTestnet } from "viem/chains";
+import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS!;
 
@@ -22,11 +23,11 @@ const ABI = [
 ];
 
 export function InnerWallet() {
+  const { context } = useMiniAppContext();
+  const fid = context?.user?.fid;
   const chainId = useChainId();
-  console.log(chainId)
-  console.log(monadTestnet.id)
   const { switchChain } = useSwitchChain();
-  const { data: hash, sendTransaction, isPending,isSuccess } = useSendTransaction();
+  const { data: hash, sendTransaction, isPending, isSuccess } = useSendTransaction();
   const { address, isConnected } = useAccount();
   const [balance, setBalance] = useState("0");
   const [displayBalance, setDisplayBalance] = useState("0");
@@ -37,17 +38,33 @@ export function InnerWallet() {
     functionName: 'balances',
     args: [address as `0x${string}`],
   });
-  useEffect(() => {
 
+  useEffect(() => {
     if (data) { 
         console.log(data);
         const formatted = ethers.formatEther(data as BigNumberish);
         setBalance(formatted);
         animateCountUp(0, parseFloat(formatted));
     }
-
   }, [data]);
 
+  useEffect(() => {
+    if (isSuccess && hash && fid) {
+      // Send withdrawal request to server
+      fetch('/api/withdraw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fid,
+          txHash: hash
+        }),
+      }).catch(error => {
+        console.error('Error updating withdrawal status:', error);
+      });
+    }
+  }, [isSuccess, hash, fid]);
 
   const animateCountUp = (from: number, to: number) => {
     let start = from;
@@ -67,13 +84,15 @@ export function InnerWallet() {
     setLoading(true);
     
     try {
-      switchChain({ chainId: monadTestnet.id })
-      sendTransaction({
+      await switchChain({ chainId: monadTestnet.id });
+      await sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
         data: "0x3ccfd60b",
       });
     } catch (e) {
       alert("Withdraw failed");
+    } finally {
+      setLoading(false);
     }
   };
 

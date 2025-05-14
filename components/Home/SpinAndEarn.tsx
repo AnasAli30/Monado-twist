@@ -275,7 +275,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     if (!address || !fid || isBuying) return;
   
     setIsBuying(true);
-    // switchChain({ chainId: monadTestnet.id })
+   const ch = switchChain({ chainId: monadTestnet.id })
+   console.log(ch);
     sendTransaction({
       to: CONTRACT_ADDRESS as `0x${string}`,
       data: "0x2df08a70",
