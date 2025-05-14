@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import { connectToDatabase } from '@/lib/mongodb';
+import Pusher from 'pusher';
 
 // Array of private keys for multiple wallets
 const PRIVATE_KEYS = [
@@ -23,6 +24,14 @@ const ABI = [
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS!;
 
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID!,
+  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
+  secret: process.env.PUSHER_SECRET!,
+  cluster: process.env.PUSHER_CLUSTER!,
+  useTLS: true
+});
+
 // Function to get a random wallet
 function getRandomWallet() {
   const randomIndex = Math.floor(Math.random() * PRIVATE_KEYS.length);
@@ -31,46 +40,54 @@ function getRandomWallet() {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
+  if (req.method === 'POST') {
     const { to, amount, fid } = req.body;
 
-    if (!to || !amount || !fid) {
-      return res.status(400).json({ error: 'Missing required parameters' });
+    try {
+      if (!to || !amount || !fid) {
+        return res.status(400).json({ error: 'Missing required parameters' });
+      }
+      if(amount>2) return res.status(400).json({ error: 'Amount too high' });
+      const { db } = await connectToDatabase();
+      const user = await db.collection('monad-users').findOne({ fid });
+      console.log(user)
+      if(user?.spinsLeft<0) return res.status(400).json({ error: 'No spins left' });
+      
+      // Get a random wallet
+      const wallet = getRandomWallet();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
+
+      // Convert amount to wei
+      const amountInWei = ethers.parseEther(amount.toString());
+
+      // Send transaction
+      const tx = await contract.depositFor(to, amountInWei,{value:amountInWei});
+      await tx.wait();
+
+      // Save winning record to MongoDB
+     const won =  await db.collection('winnings').insertOne({
+        address: to,
+        amount: parseFloat(amount),
+        fid: fid,
+        timestamp: new Date(),
+        name: user?.name,
+        txHash: tx.hash,
+        walletAddress: wallet.address
+      });
+
+      // Trigger the win event
+      await pusher.trigger('monado-spin', 'win', {
+        name: user?.name,
+        address: to,
+        amount: amount
+      });
+
+      res.status(200).json({ success: true, txHash: tx.hash });
+    } catch (error) {
+      console.error('Error processing win:', error);
+      res.status(500).json({ error: 'Failed to process win' });
     }
-    if(amount>2) return res.status(400).json({ error: 'Amount too high' });
-    const { db } = await connectToDatabase();
-    const user = await db.collection('monad-users').findOne({ fid });
-    if(user?.spinsLeft<0) return res.status(400).json({ error: 'No spins left' });
-    
-    // Get a random wallet
-    const wallet = getRandomWallet();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
-
-    // Convert amount to wei
-    const amountInWei = ethers.parseEther(amount.toString());
-
-    // Send transaction
-    const tx = await contract.depositFor(to, amountInWei,{value:amountInWei});
-    await tx.wait();
-
-    // Save winning record to MongoDB
-    await db.collection('winnings').insertOne({
-      address: to,
-      amount: parseFloat(amount),
-      fid: fid,
-      timestamp: new Date(),
-      name: user?.name,
-      txHash: tx.hash,
-      walletAddress: wallet.address
-    });
-
-    res.status(200).json({ success: true, txHash: tx.hash });
-  } catch (error) {
-    console.error('Error processing win:', error);
-    res.status(500).json({ error: 'Failed to process win' });
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
   }
 }

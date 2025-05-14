@@ -80,6 +80,7 @@ export function SpinAndEarn() {
     return false;
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
   // Update localStorage when totalSpins changes
   useEffect(() => {
@@ -153,6 +154,16 @@ export function SpinAndEarn() {
       return () => clearInterval(timer);
     }
   }, [fid]);
+
+  // useEffect(() => {
+  //   // Initialize WebSocket connection
+  //   const websocket = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080');
+  //   setWs(websocket);
+
+  //   return () => {
+  //     websocket.close();
+  //   };
+  // }, []);
 
   const getRandomSegment = () => {
     const random = Math.random() * 100;
@@ -272,7 +283,6 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       if (audioRef.current && !isMuted) {
         audioRef.current.currentTime = 0;
         audioRef.current.play();
-        // Stop after 5 seconds
         setTimeout(() => {
           if (audioRef.current) {
             audioRef.current.pause();
@@ -280,6 +290,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           }
         }, 5000);
       }
+
       setTimeout(async () => {
         setResult(`🎉 You won ${wonSegment.value} MON!`);
         setIsSpinning(false);
@@ -293,6 +304,15 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             }),
             headers: { 'Content-Type': 'application/json' }
           });
+
+          // Emit win event through WebSocket
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'win',
+              amount: wonSegment.value,
+              address: address
+            }));
+          }
         }
       }, 6000);
     } else {
@@ -392,6 +412,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
+      {/* <WinNotifications /> */}
       <style>{`
         .spin-glass-card {
           background: linear-gradient(135deg, #a084ee 0%, #6C5CE7 100%);
