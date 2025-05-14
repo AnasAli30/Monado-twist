@@ -157,8 +157,10 @@ export function SpinAndEarn() {
     const random = Math.random() * 100;
     let cumulativeProbability = 0;
     
+    // Filter out segments with probability -1 (50 and 2 segments) for actual spins
     const validSegments = segments.filter(segment => segment.probability > 0);
-
+    
+    // Sort segments by probability in descending order to ensure proper distribution
     const sortedSegments = [...validSegments].sort((a, b) => b.probability - a.probability);
     
     for (const segment of sortedSegments) {
@@ -240,9 +242,6 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     setIsSpinning(true);
     setTotalSpins(prev => prev + 1);
 
-    // Play spinning sound if not muted
-  
-
     // Call backend to decrement spin and get new spinsLeft
     const res = await fetch('/api/spin', {
       method: 'POST',
@@ -258,39 +257,42 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       const pointerAngle = (540 - ((rotation + newRotation) % 360)) % 360;
       let currentAngle = 0;
       let wonSegment = segments[0];
-      for (const segment of segments) {
+      
+      // Only consider segments with positive probability
+      const validSegments = segments.filter(segment => segment.probability > 0);
+      for (const segment of validSegments) {
         if (pointerAngle >= currentAngle && pointerAngle < currentAngle + segment.degrees) {
           wonSegment = segment;
           break;
         }
         currentAngle += segment.degrees;
       }
-        if (audioRef.current && !isMuted) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-      // Stop after 5 seconds
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-        }
-      }, 5000);
-    }
+
+      if (audioRef.current && !isMuted) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+        // Stop after 5 seconds
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+        }, 5000);
+      }
       setTimeout(async () => {
         setResult(`🎉 You won ${wonSegment.value} MON!`);
         setIsSpinning(false);
         if (wonSegment.value > 0 && address) {
-            await fetch('/api/win', {
-              method: 'POST',
-              body: JSON.stringify({
-                to: address,
-                amount: wonSegment.value,
-                fid
-              }),
-              headers: { 'Content-Type': 'application/json' }
-            });
-          }
-       
+          await fetch('/api/win', {
+            method: 'POST',
+            body: JSON.stringify({
+              to: address,
+              amount: wonSegment.value,
+              fid
+            }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
       }, 6000);
     } else {
       setIsSpinning(false);
