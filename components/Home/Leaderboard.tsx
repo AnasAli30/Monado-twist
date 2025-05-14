@@ -75,7 +75,7 @@ export function Leaderboard() {
 
       <style>{`
         .leaderboard-glass-card {
-          background: linear-gradient(135deg, #a084ee 0%, #6C5CE7 100%);
+          background: linear-gradient(135deg, #6C5CE7 0%, #6C5CE7 100%);
           // border-radius: 24px;
           box-shadow: 0 8px 40px rgba(108, 92, 231, 0.3);
           backdrop-filter: blur(14px);
