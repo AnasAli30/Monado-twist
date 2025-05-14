@@ -24,6 +24,7 @@ export function WinNotifications() {
     
     // Listen for win events
     channel.bind('win', (data: { address: string; amount: number; name: string }) => {
+      console.log(data);
       const newNotification: Notification = {
         type: 'win',
         amount: data.amount,
@@ -60,9 +61,9 @@ export function WinNotifications() {
   const getNotificationText = (notification: Notification) => {
     const user = notification.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`;
     if (notification.type === 'win') {
-      return ` ${user} won ${notification.amount} MON! 🎉`;
+      return `🎉 ${user} won ${notification.amount} MON! 🎉`;
     } else {
-      return ` ${user} withdrawal ${notification.amount} MON! 💸`;
+      return `💸 ${user} withdrawal ${notification.amount} MON! 💸`;
     }
   };
 
@@ -138,7 +139,7 @@ export function WinNotifications() {
         ))}
         {notifications.length === 0 && (
           <div className="notification-item">
-            🎲 Spin the wheel to win MON tokens!
+            🎲 Spin the wheel to win MON tokens! 🎲
           </div>
         )}
       </div>

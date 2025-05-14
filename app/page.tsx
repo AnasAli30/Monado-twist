@@ -12,7 +12,7 @@ const frame = {
       name: "Monado Twist",
       url: APP_URL,
       splashImageUrl: `${APP_URL}/images/splash.png`,
-      splashBackgroundColor: "#f7f7f7",
+      splashBackgroundColor: "#14051a",
     },
   },
 };

@@ -113,6 +113,8 @@ export function InnerWallet() {
     setLoading(true);
     
     try {
+      console.log("Switching to Monad Testnet");
+      console.log(monadTestnet.id, chainId);
       await switchChain({ chainId: monadTestnet.id });
       await sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
@@ -159,7 +161,9 @@ export function InnerWallet() {
                 <li>Wait 10-15 seconds</li>
                 <li>Try withdrawing again</li>
               </ol>
+            
             </div>
+            <button onClick={() => actions?.viewProfile({ fid: 249702 })} className="contact-dev-btn"> still not working? click here to contact the developer</button>
           </>
         )}
         {error && <div className="error">{error.message}</div>}
@@ -210,6 +214,19 @@ export function InnerWallet() {
           justify-content: space-evenly;
           align-items: center;
           transition: all 0.3s ease-in-out;
+        }
+
+        .contact-dev-btn {
+          position: absolute;
+          background: linear-gradient(135deg, #9b59b6, #6C5CE7);
+          color: #fff;
+          border: none;
+          font-size: 12px;
+          border-radius: 20px;
+          padding:5px 10px;
+          // padding: 14px 36px;
+          bottom: 40px;
+          opacity: 0.5;
         }
 
         .balance-container {
