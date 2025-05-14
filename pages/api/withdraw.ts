@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { fid, txHash,amount,address,name } = req.body;
+    const { fid, txHash, amount, address, name } = req.body;
 
     if (!fid || !txHash) {
       return res.status(400).json({ error: 'Missing required parameters' });
@@ -23,13 +23,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { db } = await connectToDatabase();
     
+    // Convert amount to number
+    const numericAmount = parseFloat(amount);
+    
     // Update user's withdrawal status
     await db.collection('monad-users').updateOne(
       { fid },
       { 
         $set: { withdraw: txHash },
-        $inc: { amount: amount },
-        $setOnInsert: { amount: amount }
+        $inc: { amount: numericAmount },
+        $setOnInsert: { amount: numericAmount }
       },
       { upsert: true }
     );
