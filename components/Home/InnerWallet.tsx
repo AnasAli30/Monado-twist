@@ -6,9 +6,10 @@ import {
   useSendTransaction,
   useReadContract,
   useSwitchChain,
-  useChainId
+  useChainId,
+  usePublicClient
 } from "wagmi";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaSync } from "react-icons/fa";
 import { monadTestnet } from "viem/chains";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 
@@ -27,12 +28,14 @@ export function InnerWallet() {
   const fid = context?.user?.fid;
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
+  const publicClient = usePublicClient();
   const { data: hash, sendTransaction, isPending, isSuccess } = useSendTransaction();
   const { address, isConnected } = useAccount();
   const [balance, setBalance] = useState("0");
   const [displayBalance, setDisplayBalance] = useState("0");
   const [loading, setLoading] = useState(false);
-  const { data, isLoading, error } = useReadContract({
+  const [refreshing, setRefreshing] = useState(false);
+  const { data, isLoading, error, refetch } = useReadContract({
     address: CONTRACT_ADDRESS as `0x${string}`,
     abi,
     functionName: 'balances',
@@ -80,6 +83,17 @@ export function InnerWallet() {
     }, 30);
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } catch (error) {
+      console.error('Error refreshing balance:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const withdraw = async () => {
     setLoading(true);
     
@@ -104,7 +118,16 @@ export function InnerWallet() {
     <div className="wallet-glass-card fade-in">
       <div className="flex flex-col items-center">
         <div className="title">Wallet  <span className="emoji">💰</span></div>
-        <div className="balance">{displayBalance} MON</div>
+        <div className="balance-container">
+          <div className="balance">{displayBalance} MON</div>
+          <button 
+            onClick={handleRefresh} 
+            disabled={refreshing}
+            className="refresh-button"
+          >
+            <FaSync className={refreshing ? 'spinning' : ''} />
+          </button>
+        </div>
         {!isOnMonadChain ? (
           <button onClick={() => switchChain({ chainId: monadTestnet.id })} className="wallet-withdraw-btn">
             Switch to Monad Testnet
@@ -162,6 +185,50 @@ export function InnerWallet() {
           align-items: center;
           transition: all 0.3s ease-in-out;
         }
+
+        .balance-container {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+
+        .refresh-button {
+          background: none;
+          border: none;
+          color: #b9aaff;
+          cursor: pointer;
+          padding: 8px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+        }
+
+        .refresh-button:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        .refresh-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
         .success {
           color: #00ff00;
           font-size: 20px;
@@ -188,7 +255,6 @@ export function InnerWallet() {
           font-size: 32px;
           font-weight: 600;
           color: #b9aaff;
-          margin-bottom: 16px;
         }
 
         .wallet-withdraw-btn {

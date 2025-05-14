@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
-import { useAccount, useSendTransaction, usePublicClient,useSwitchChain } from "wagmi";
+import { useAccount, useSendTransaction, usePublicClient, useSwitchChain } from "wagmi";
 import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
-import { FaHome, FaWallet, FaTicketAlt, FaTrophy } from "react-icons/fa";
+import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { ethers } from "ethers";
@@ -54,7 +54,14 @@ export function SpinAndEarn() {
   const fid = context?.user?.fid;
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
   const { switchChain } = useSwitchChain(); 
-  const [totalSpins, setTotalSpins] = useState<number>(0);
+  const [totalSpins, setTotalSpins] = useState<number>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('totalSpins');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
   const { sendTransaction, isPending: isConfirming ,data} = useSendTransaction();
   const publicClient = usePublicClient();
   const [buyTxHash, setBuyTxHash] = useState<string | null>(null);
@@ -65,6 +72,28 @@ export function SpinAndEarn() {
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
   const [timeUntilShare, setTimeUntilShare] = useState<string>('');
   const [isBuying, setIsBuying] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('isMuted');
+      return saved === 'true';
+    }
+    return false;
+  });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Update localStorage when totalSpins changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('totalSpins', totalSpins.toString());
+    }
+  }, [totalSpins]);
+
+  // Save mute state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isMuted', isMuted.toString());
+    }
+  }, [isMuted]);
 
   // All segments are equal
   const segments: Segment[] = [
@@ -73,7 +102,7 @@ export function SpinAndEarn() {
     { text: "0.5", value: 0.5, color: "#8A2BE2", probability: 10, degrees: 54 },        // 15%
     { text: "1", value: 1, color: "#9370DB", probability: 1, degrees: 39 },    // 10%
     { text: "2", value: 2, color: "#800080", probability: 0, degrees: 25.4 },       // 4%
-    { text: "10", value: 10, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
+    { text: "50", value: 0, color: "#4B0082", probability: -1, degrees: 8.6 }         // 1%
   ];
 
   // Fetch spins and timer data from backend
@@ -166,7 +195,7 @@ export function SpinAndEarn() {
        await actions?.composeCast({
           text: `Just won ${mon} $MON for free — and you can earn upto 10 mon free !
   
-It’s seriously fun , addictive, and totally worth it.
+It's seriously fun , addictive, and totally worth it.
 
 Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           embeds: [`${window.location.href}`],
@@ -193,10 +222,20 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     }
   };
 
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+    }
+  };
+
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
     setIsSpinning(true);
     setTotalSpins(prev => prev + 1);
+
+    // Play spinning sound if not muted
+  
 
     // Call backend to decrement spin and get new spinsLeft
     const res = await fetch('/api/spin', {
@@ -220,6 +259,17 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         }
         currentAngle += segment.degrees;
       }
+        if (audioRef.current && !isMuted) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+      // Stop after 5 seconds
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+      }, 5000);
+    }
       setTimeout(async () => {
         setResult(`🎉 You won ${wonSegment.value} MON!`);
         setIsSpinning(false);
@@ -235,7 +285,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             });
           }
        
-      }, 8000);
+      }, 6000);
     } else {
       setIsSpinning(false);
       alert(data.error || "No spins left");
@@ -563,7 +613,28 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         .follow-button:hover {
           transform: translateY(-2px);
         }
+        .mute-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          // padding: 2px;
+          background: transparent;
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          opacity: 0.7;
+          transition: opacity 0.5s;
+        }
+        .mute-button:hover {
+          opacity: 1;
+        }
       `}</style>
+      <audio 
+        ref={audioRef}
+        src="/spinning-sound.mp3"
+        preload="auto"
+        muted={isMuted}
+      />
       {view === 'spin' ? (
         <>
             <div className="half-wheel-container">
@@ -650,7 +721,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 onClick={handleBuySpin}
                 disabled={isBuying || isConfirming || !address}
               >
-                {isBuying || isConfirming ? "Processing..." : "Buy 1 Spin (1 MON)"}
+                {isBuying || isConfirming ? "Processing..." : "Buy 2 Spin (1 MON)"}
               </button>
             )}
           </div>
@@ -707,6 +778,13 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           onClick={() => setView('leaderboard')}
         >
           <FaTrophy /> Leaders
+        </button>
+        <button
+          className="mute-button"
+          onClick={toggleMute}
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
       </div>
     </div>

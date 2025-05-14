@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "buy") {
-    spinsLeft += 1;
+    spinsLeft += 2;
     await users.updateOne(
       { fid },
       { $set: { spinsLeft, lastSpinReset } },
