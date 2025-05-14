@@ -157,8 +157,11 @@ export function SpinAndEarn() {
     const random = Math.random() * 100;
     let cumulativeProbability = 0;
     
+    // Filter out segments with probability -1 (50 and 2 segments) for actual spins
+    const validSegments = segments.filter(segment => segment.probability > 0);
+    
     // Sort segments by probability in descending order to ensure proper distribution
-    const sortedSegments = [...segments].sort((a, b) => b.probability - a.probability);
+    const sortedSegments = [...validSegments].sort((a, b) => b.probability - a.probability);
     
     for (const segment of sortedSegments) {
       cumulativeProbability += segment.probability;
