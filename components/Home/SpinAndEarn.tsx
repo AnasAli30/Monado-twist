@@ -415,7 +415,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       {/* <WinNotifications /> */}
       <style>{`
         .spin-glass-card {
-          background: linear-gradient(135deg, #a084ee 0%, #6C5CE7 100%);
+          background: linear-gradient(135deg, #3A0CA3 0%, #3A0CA3 100%);
           box-shadow: 0 8px 40px 0 #6C5CE7, 0 1.5px 8px 0 #0002;
           backdrop-filter: blur(12px);
           margin-bottom: 80px;
@@ -478,8 +478,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           border-radius: 24px;
           box-shadow: 0 4px 24px #6C5CE7aa;
           padding: 24px 18px 32px 18px;
-          margin: 24px 0 1px 0;
-          width: 100%;
+          margin: 30px 15px 1px 15px;
+          // width: 100%;
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -517,6 +517,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           font-size: 1rem;
           font-weight: 600;
           color: #e0d7ff;
+          // border-bottom: 10px solid #000000;
           margin-bottom: 6px;
         }
         .spin-ui-value {
@@ -553,7 +554,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         .spin-ui-spin-btn {
           margin-top: 22px;
           width: 100%;
-          background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
+          background: linear-gradient(90deg, #3A0CA3 0%, #3A0CA3 100%);
           color: #fff;
           border: none;
           border-radius: 16px;
@@ -613,7 +614,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           border: 5px solid rgba(255,255,255,1);
         }
         .share-button {
-          margin-top: 10px;
+          margin: 10px;
           padding: 12px 24px;
           background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
           color: #fff;
@@ -623,6 +624,10 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           font-weight: 600;
           cursor: pointer;
           transition: transform 0.2s;
+        }
+        .share-button:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
         .share-button:hover {
           transform: translateY(-2px);

@@ -137,9 +137,19 @@ export function InnerWallet() {
             Switch to Monad Testnet
           </button>
         ) : (
-          <button onClick={withdraw} disabled={loading || balance === "0"} className="wallet-withdraw-btn">
-            {isPending ?  "Withdrawing..." : "Withdraw"}
-          </button>
+          <>
+            <button onClick={withdraw} disabled={loading || balance === "0"} className="wallet-withdraw-btn">
+              {isPending ?  "Withdrawing..." : "Withdraw"}
+            </button>
+            <div className="withdrawal-note">
+              Note: Due to heavy load, if withdrawal fails or encounters an error, please:
+              <ol>
+                <li>Reload the page</li>
+                <li>Wait 10-15 seconds</li>
+                <li>Try withdrawing again</li>
+              </ol>
+            </div>
+          </>
         )}
         {error && <div className="error">{error.message}</div>}
         {hash && (
@@ -172,13 +182,13 @@ export function InnerWallet() {
         }
 
         .wallet-glass-card {
-          border-radius: 24px;
+          // border-radius: 24px;
           box-shadow: 0 8px 40px rgba(108, 92, 231, 0.3), 0 2px 8px rgba(0,0,0,0.1);
           backdrop-filter: blur(14px);
           background: rgba(255, 255, 255, 0.1);
-          border: 1.5px solid rgba(108, 92, 231, 0.6);
+          // border: 1.5px solid rgba(108, 92, 231, 0.6);
           padding: 40px 20px;
-          margin: 150px auto;
+          // margin: 150px auto;
           height: 100%;
           width: 100%;
           max-width: 400px;
@@ -268,7 +278,7 @@ export function InnerWallet() {
           border-radius: 14px;
           padding: 14px 36px;
           font-size: 1.1rem;
-          width: 120%;
+          width: 100%;
           height: 80px;
           font-weight: bold;
           cursor: pointer;
@@ -284,6 +294,26 @@ export function InnerWallet() {
         .wallet-withdraw-btn:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+        }
+
+        .withdrawal-note {
+          margin-top: 16px;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          font-size: 0.9rem;
+          color: #b9aaff;
+          text-align: left;
+          max-width: 300px;
+        }
+
+        .withdrawal-note ol {
+          margin-top: 8px;
+          padding-left: 20px;
+        }
+
+        .withdrawal-note li {
+          margin: 4px 0;
         }
       `}</style>
     </div>
