@@ -62,7 +62,7 @@ export function WinNotifications() {
     if (notification.type === 'win') {
       return ` ${user} won ${notification.amount} MON! 🎉`;
     } else {
-      return ` ${user} withdrew ${notification.amount} MON! 💸`;
+      return ` ${user} withdrawal ${notification.amount} MON! 💸`;
     }
   };
 

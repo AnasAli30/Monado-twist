@@ -73,7 +73,7 @@ export function InnerWallet() {
 
       // Automatically cast the success message
       if (actions?.composeCast) {
-        const castMessage = `🎉 I successfully withdrew ${displayBalance.slice(0, 3)} MON from Monado Twist!\n\nThis is real, you can try it too! 🚀`;
+        const castMessage = `🎉 I successfully withdrawal ${displayBalance.slice(0, 3)} MON from Monado Twist!\n\nThis is real, you can try it too! 🚀`;
         actions.composeCast({
           text: castMessage,
           embeds: [`${window.location.origin}`, `https://testnet.monadexplorer.com/tx/${hash}`],
