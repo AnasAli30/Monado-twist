@@ -30,9 +30,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await db.collection('monad-users').updateOne(
       { fid },
       { 
-        $set: { withdraw: txHash },
-        $inc: { amount: numericAmount },
-        $setOnInsert: { amount: numericAmount }
+        $set: { 
+          withdraw: txHash,
+          amount: { $add: ["$amount", numericAmount] }
+        }
       },
       { upsert: true }
     );
