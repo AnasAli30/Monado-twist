@@ -97,12 +97,13 @@ export function SpinAndEarn() {
 
   // All segments are equal
   const segments: Segment[] = [
-    { text: "0.1", value: 0.1, color: "#4B0082", probability: 50, degrees: 60 },  // Dark Indigo
-    { text: "0.3", value: 0.3, color: "#3A0CA3", probability: 30, degrees: 60 },  // Dark Blue-Violet
-    { text: "0.5", value: 0.5, color: "#5F0F40", probability: 10, degrees: 60 },  // Deep Rose
-    { text: "1", value: 1, color: "#2C2C54", probability: 10, degrees: 60 },      // Dark Purple
-    { text: "2", value: 2, color: "#120458", probability: -1, degrees: 60 },      // Deep Midnight Blue
-    { text: "50", value: 0, color: "#1A1A2E", probability: -1, degrees: 60 }     // Very Dark Blue
+    { text: " ", value: 0.1, color: "#4B0082", probability: 50, degrees: 51.4 },  // Dark Indigo
+    { text: " ", value: 0.3, color: "#3A0CA3", probability: 30, degrees: 51.4 },  // Dark Blue-Violet
+    { text: " ", value: 0.5, color: "#5F0F40", probability: 10, degrees: 51.4 },  // Deep Rose
+    { text: " ", value: 1, color: "#2C2C54", probability: 10, degrees: 51.4 },      // Dark Purple
+    { text: " ", value: 1.5, color: "#5E2C54", probability: 0, degrees: 51.4 },      // Dark Purple
+    { text: " ", value: 2, color: "#120458", probability: -1, degrees: 51.4 },      // Deep Midnight Blue
+    { text: " ", value: 0, color: "#1A1A2E", probability: -1, degrees: 51.4 }     // Very Dark Blue
   ];
   
 
@@ -201,7 +202,7 @@ export function SpinAndEarn() {
       // Compose cast as before
 
        await actions?.composeCast({
-          text: `Just won ${mon} $MON for free — and you can earn upto 10 mon free !
+          text: `Just won ${mon} $MON for free — and you can earn upto 50 mon free !
   
 It's seriously fun , addictive, and totally worth it.
 
