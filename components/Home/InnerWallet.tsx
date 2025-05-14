@@ -9,7 +9,7 @@ import {
   useChainId,
   usePublicClient
 } from "wagmi";
-import { FaCheckCircle, FaSync } from "react-icons/fa";
+import { FaCheckCircle, FaSync, FaShare, FaTimes } from "react-icons/fa";
 import { monadTestnet } from "viem/chains";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 
@@ -24,7 +24,7 @@ const ABI = [
 ];
 
 export function InnerWallet() {
-  const { context } = useMiniAppContext();
+  const { context, actions } = useMiniAppContext();
   const fid = context?.user?.fid;
   const name = context?.user?.username;
   const chainId = useChainId();
@@ -70,8 +70,19 @@ export function InnerWallet() {
       }).catch(error => {
         console.error('Error updating withdrawal status:', error);
       });
+
+      // Automatically cast the success message
+      if (actions?.composeCast) {
+        const castMessage = `🎉 I successfully withdrew ${displayBalance.slice(0, 3)} MON from Monado Twist!\n\nThis is real, you can try it too! 🚀`;
+        actions.composeCast({
+          text: castMessage,
+          embeds: [`${window.location.origin}`, `https://testnet.monadexplorer.com/tx/${hash}`],
+        }).catch(error => {
+          console.error('Error casting:', error);
+        });
+      }
     }
-  }, [isSuccess, hash, fid]);
+  }, [isSuccess, hash, fid, displayBalance, actions]);
 
   const animateCountUp = (from: number, to: number) => {
     let start = from;
@@ -166,6 +177,7 @@ export function InnerWallet() {
           </button>
         )}
       </div>
+
       <style>{`
         .fade-in {
           animation: fadeInUp 0.6s ease-out;
