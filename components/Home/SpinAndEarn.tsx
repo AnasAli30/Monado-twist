@@ -823,13 +823,13 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                     const data = await res.json();
                     if (res.ok) {
                       setSpinsLeft(data.spinsLeft);
-                      setResult("You got 2 extra spins 🎁");
+                      setResult("You got 1 extra spins 🎁");
                       setHasLikedAndRecast(true);
                     }
                   }
                 }}
               >
-                Like & Recast to get 2 extra spins!
+                Like & Recast to get 1 extra spins!
               </button>
             )}
             {spinsLeft === 0 && (

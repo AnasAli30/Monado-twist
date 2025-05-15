@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "likeAndRecast") {
-    spinsLeft += 2;
+    spinsLeft += 1;
     await users.updateOne(
       { fid },
       { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
