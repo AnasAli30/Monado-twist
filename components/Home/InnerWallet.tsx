@@ -75,7 +75,6 @@ export function InnerWallet() {
       
       if (actions?.composeCast) {
         const castMessage = `🎉 I successfully withdrawal ${displayBalance.slice(0, 3)} MON from Monado Twist!\n\nThis is real, you can try it too! 🚀`;
-        actions.openUrl("https://warpcast.com/hackerx/0x2c3df003");
         actions.composeCast({
           text: castMessage,
           embeds: [`${window.location.origin}`, `https://testnet.monadexplorer.com/tx/${hash}`],
