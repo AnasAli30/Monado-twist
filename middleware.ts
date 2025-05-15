@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     const { randomKey, fusedKey } = body;
 
     // Skip middleware for routes that don't need verification
-    const publicRoutes = [ '/api/check-envelope'];
+    const publicRoutes = [ '/api/check-envelope' , `/api/withdraw`];
     if (publicRoutes.includes(request.nextUrl.pathname)) {
       return NextResponse.next();
     }
