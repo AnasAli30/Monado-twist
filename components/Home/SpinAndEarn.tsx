@@ -9,13 +9,7 @@ import { Leaderboard } from "@/components/Home/Leaderboard";
 import { ethers } from "ethers";
 import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      [elemName: string]: any;
-    }
-  }
-}
+import { fetchWithVerification } from '@/utils/keyVerification';
 
 interface Segment {
   text: string;
@@ -347,7 +341,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         if (wonValue > 0 && address) {
           if (wonSegment.text === "MON") {
             // Keep existing MON token handling
-            await fetch('/api/win', {
+            await fetchWithVerification('/api/win', {
               method: 'POST',
               body: JSON.stringify({
                 to: address,
@@ -361,14 +355,14 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             try {
               setResult(`Processing your ${wonSegment.text} reward...`);
               // Get signature from server
-              const signatureRes = await fetch('/api/generate-signature', {
+              const signatureRes = await fetchWithVerification('/api/generate-signature', {
                 method: 'POST',
                 body: JSON.stringify({
                   userAddress: address,
                   tokenAddress: getTokenAddress(wonSegment.text),
                   amount: parseUnits(wonValue.toString(), getTokenDecimals(wonSegment.text)).toString(),
                   tokenName: wonSegment.text,
-                  name:name
+                  name: name
                 }),
                 headers: { 'Content-Type': 'application/json' }
               });

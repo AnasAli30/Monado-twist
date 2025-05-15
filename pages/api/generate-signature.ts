@@ -4,6 +4,8 @@ import Pusher from 'pusher';
 
 const SERVER_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY_1;
 
+const CLIENT_SECRET_KEY = process.env.NEXT_PUBLIC_CLIENT_SECRET_KEY; // Must match NEXT_PUBLIC_CLIENT_SECRET_KEY
+
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
   key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
@@ -18,15 +20,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { userAddress, tokenAddress, amount, tokenName ,name} = req.body;
+    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey } = req.body;
     console.log('Request params:', { userAddress, tokenAddress, amount, tokenName });
 
-    if (!userAddress || !tokenAddress || !amount || !tokenName) {
+    if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
-    if (!SERVER_PRIVATE_KEY) {
+    if (!SERVER_PRIVATE_KEY  || !CLIENT_SECRET_KEY) {
       return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    // Verify the fused key
+    const expectedFusedKey = ethers.keccak256(ethers.toUtf8Bytes(randomKey + CLIENT_SECRET_KEY));
+    if (fusedKey !== expectedFusedKey) {
+      return res.status(401).json({ error: 'Invalid key verification' });
     }
 
     // Create the message hash exactly as in the contract using abi.encodePacked
@@ -42,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Emit win event to Pusher
     await pusher.trigger('monado-spin', 'win', {
-        name:name,
+      name: name,
       address: userAddress,
       amount: amount,
       token: tokenName
