@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import Pusher from 'pusher';
+import { connectToDatabase } from '@/lib/mongodb';
 
 const SERVER_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY_1;
 
@@ -36,6 +37,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (fusedKey !== expectedFusedKey) {
       return res.status(401).json({ error: 'Invalid key verification' });
     }
+
+    // Connect to database
+    const { db } = await connectToDatabase();
+
+    // Check if this key has been used before
+    const usedKey = await db.collection('used-keys').findOne({ 
+      fusedKey: fusedKey 
+    });
+
+    if (usedKey) {
+      return res.status(401).json({ error: 'Key already used' });
+    }
+
+    // Store the used key
+    await db.collection('used-keys').insertOne({
+      randomKey,
+      fusedKey,
+      userAddress,
+      timestamp: new Date(),
+      tokenName,
+      amount
+    });
 
     // Create the message hash exactly as in the contract using abi.encodePacked
     const packedData = ethers.solidityPacked(
