@@ -100,12 +100,12 @@ export function SpinAndEarn() {
 
   // All segments are equal
   const segments: Segment[] = [
-    { text: " ", value: 0.1, color: "#4B0082", probability: 50, degrees: 51.4 },  // Dark Indigo
-    { text: " ", value: 0.2, color: "#3A0CA3", probability: 30, degrees: 51.4 },  // Dark Blue-Violet
-    { text: " ", value: 0.3, color: "#5F0F40", probability: 10, degrees: 51.4 },  // Deep Rose
-    { text: " ", value: 0.5, color: "#2C2C54", probability: 10, degrees: 51.4 },      // Dark Purple
-    { text: " ", value: 1, color: "#5E2C54", probability: 0, degrees: 51.4 },      // Dark Purple
-    { text: " ", value: 2, color: "#120458", probability: -1, degrees: 51.4 },      // Deep Midnight Blue
+    { text: " ", value: 0.01, color: "#4B0082", probability: 50, degrees: 51.4 },  // Dark Indigo
+    { text: " ", value: 0.1, color: "#3A0CA3", probability: 30, degrees: 51.4 },  // Dark Blue-Violet
+    { text: " ", value: 0.2, color: "#5F0F40", probability: 10, degrees: 51.4 },  // Deep Rose
+    { text: " ", value: 0.3, color: "#2C2C54", probability: 10, degrees: 51.4 },      // Dark Purple
+    { text: " ", value: 0.5, color: "#5E2C54", probability: 1, degrees: 51.4 },      // Dark Purple
+    { text: " ", value: 1, color: "#120458", probability: 0, degrees: 51.4 },      // Deep Midnight Blue
     { text: " ", value: 0, color: "#1A1A2E", probability: -1, degrees: 51.4 }     // Very Dark Blue
   ];
   
@@ -341,7 +341,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   
         const response = await spinRes.json();
         setSpinsLeft(response.spinsLeft);
-        setResult("Successfully bought 1 spin! 🎉");
+        setResult("Successfully bought 4 spin!");
       } catch (err) {
         console.error("Confirmation error:", err);
         setResult("Failed to buy spin");
@@ -838,7 +838,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 onClick={handleBuySpin}
                 disabled={isBuying || isConfirming || !address}
               >
-                {isBuying || isConfirming ? "Processing..." : "Buy 3 Spin (1 MON)"}
+                {isBuying || isConfirming ? "Processing..." : "Buy 4 Spin (1 MON)"}
               </button>
             )}
             </div>}
