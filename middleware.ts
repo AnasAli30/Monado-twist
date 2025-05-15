@@ -4,6 +4,9 @@ import { ethers } from 'ethers';
 
 const CLIENT_SECRET_KEY = process.env.NEXT_PUBLIC_CLIENT_SECRET_KEY;
 
+// In-memory storage for used keys
+const usedKeys = new Set<string>();
+
 export async function middleware(request: NextRequest) {
   // Only apply to POST requests
   if (request.method !== 'POST') {
@@ -16,7 +19,7 @@ export async function middleware(request: NextRequest) {
     const { randomKey, fusedKey } = body;
 
     // Skip middleware for routes that don't need verification
-    const publicRoutes = ['/api/spin', '/api/check-envelope'];
+    const publicRoutes = [ '/api/check-envelope'];
     if (publicRoutes.includes(request.nextUrl.pathname)) {
       return NextResponse.next();
     }
@@ -36,6 +39,17 @@ export async function middleware(request: NextRequest) {
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    // Check if key has been used
+    if (usedKeys.has(fusedKey)) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Key already used' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Add key to used keys set
+    usedKeys.add(fusedKey);
 
     // If verification passes, continue
     return NextResponse.next();

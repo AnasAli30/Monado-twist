@@ -2,7 +2,7 @@ import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useAccount } from "wagmi";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { fetchWithVerification } from "@/utils/keyVerification";
 interface EnvelopeRewardProps {
   setClaimed: Dispatch<SetStateAction<boolean>>;
 }
@@ -34,7 +34,7 @@ export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
     setIsOpening(true);
     const amount = +(Math.random() * (0.03 - 0.01) + 0.01).toFixed(4);
     setReward(amount);
-    const res = await fetch("/api/send-envelope", {
+    const res = await fetchWithVerification("/api/send-envelope", {
       method: "POST",
       body: JSON.stringify({ to: address, amount, fid, name }),
       headers: { "Content-Type": "application/json" },

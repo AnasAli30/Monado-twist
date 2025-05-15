@@ -111,7 +111,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.3, 0.4, 0.1];
+        const monValues = [0.3, 0.5, 0.1];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (150 - 10) + 1).toFixed(1);
@@ -140,7 +140,7 @@ export function SpinAndEarn() {
     if (fid) {
       const fetchData = async () => {
         try {
-          const res = await fetch('/api/spin', {
+          const res = await fetchWithVerification('/api/spin', {
             method: 'POST',
             body: JSON.stringify({ fid, checkOnly: true }),
             headers: { 'Content-Type': 'application/json' }
@@ -239,20 +239,18 @@ export function SpinAndEarn() {
 
   const handleShare = async (mon: string) => {
     try {
-      // Compose cast as before
-
-       await actions?.composeCast({
-          text: `Just won ${mon} $MON for free — and you can earn upto 50 mon free !
+      await actions?.composeCast({
+        text: `Just won ${mon} $MON for free — and you can earn upto 50 mon free !
   
 It's seriously fun , addictive, and totally worth it.
 
 Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
-          embeds: [`${window.location.href}`],
-        });
+        embeds: [`${window.location.href}`],
+      });
       
       // Call backend to add spins
       if (fid) {
-        const res = await fetch('/api/spin', {
+        const res = await fetchWithVerification('/api/spin', {
           method: 'POST',
           body: JSON.stringify({ fid, mode: "add" }),
           headers: { 'Content-Type': 'application/json' }
@@ -296,7 +294,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     setTotalSpins(prev => prev + 1);
 
     // Call backend to decrement spin and get new spinsLeft
-    const res = await fetch('/api/spin', {
+    const res = await fetchWithVerification('/api/spin', {
       method: 'POST',
       body: JSON.stringify({ fid }),
       headers: { 'Content-Type': 'application/json' }
@@ -429,7 +427,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         const receipt = await publicClient.waitForTransactionReceipt({ hash: data });
         console.log("Confirmed:", receipt);
   
-        const spinRes = await fetch('/api/spin', {
+        const spinRes = await fetchWithVerification('/api/spin', {
           method: 'POST',
           body: JSON.stringify({ fid, mode: 'buy' }),
           headers: { 'Content-Type': 'application/json' }
@@ -937,7 +935,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             onClick={async () => {
               await actions?.viewProfile({ fid: 249702 });
               if (fid) {
-                const res = await fetch('/api/spin', {
+                const res = await fetchWithVerification('/api/spin', {
                   method: 'POST',
                   body: JSON.stringify({ fid, mode: "follow" }),
                   headers: { 'Content-Type': 'application/json' }
@@ -959,7 +957,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 onClick={async () => {
                   await actions?.openUrl("https://warpcast.com/hackerx/0x2c3df003");
                   if (fid) {
-                    const res = await fetch('/api/spin', {
+                    const res = await fetchWithVerification('/api/spin', {
                       method: 'POST',
                       body: JSON.stringify({ fid, mode: "likeAndRecast" }),
                       headers: { 'Content-Type': 'application/json' }
