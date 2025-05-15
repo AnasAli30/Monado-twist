@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import Pusher from 'pusher-js';
-
+import { ethers } from 'ethers';
 interface Notification {
   type: 'win' | 'withdraw';
+  name: string;
   amount: number;
   address: string;
-  name: string;
+  token: string;
   timestamp: number;
+
 }
 
 export function WinNotifications() {
@@ -23,27 +25,15 @@ export function WinNotifications() {
     const channel = pusher.subscribe('monado-spin');
     
     // Listen for win events
-    channel.bind('win', (data: { address: string; amount: number; name: string }) => {
-      console.log(data);
+    channel.bind('win', (data: { address: string; amount: number; token: string; name: string }) => {
+      console.log('Win event received:', data);
       const newNotification: Notification = {
         type: 'win',
-        amount: data.amount,
         name: data.name,
-        address: data.address,
-        timestamp: Date.now()
-      };
-      
-      setCurrentNotification(newNotification);
-      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
-    });
-
-    // Listen for withdrawal events
-    channel.bind('withdraw', (data: { address: string; amount: number; name: string }) => {
-      console.log(data);
-      const newNotification: Notification = {
-        type: 'withdraw',
-        amount: data.amount,
-        name: data.name,
+       amount: data.token == undefined ? data.amount : Number(
+          ethers.formatUnits(data.amount, data.token === "USDC" ? 6 : 18)
+        ),
+        token: data.token,
         address: data.address,
         timestamp: Date.now()
       };
@@ -59,11 +49,16 @@ export function WinNotifications() {
   }, []);
 
   const getNotificationText = (notification: Notification) => {
-    const user = notification.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`;
+    // console.log(notification);
+    const user = notification?.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`;
     if (notification.type === 'win') {
-      return `🎉 ${user} won ${notification.amount} MON! 🎉`;
+      if (notification.token == undefined) {
+        return `🎉 ${user} won ${notification.amount} MON! 🎉`;
+      } else {
+        return `🎉 ${user} won ${notification.amount} ${notification.token}! 🎉`;
+      }
     } else {
-      return `💸 ${user} withdrawal ${notification.amount} MON! 💸`;
+      return `💸 ${user} withdrew ${notification.amount} MON! 💸`;
     }
   };
 

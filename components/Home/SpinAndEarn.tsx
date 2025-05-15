@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
-import { useAccount, useSendTransaction, usePublicClient, useSwitchChain } from "wagmi";
+import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
 import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute } from "react-icons/fa";
@@ -8,6 +8,7 @@ import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { ethers } from "ethers";
 import { setFips } from "crypto";
+import { parseEther, parseUnits } from 'viem';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -52,6 +53,7 @@ export function SpinAndEarn() {
   const { address, chainId } = useAccount();
   const { context ,actions} = useMiniAppContext();
   const fid = context?.user?.fid;
+  const name = context?.user?.username;
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
   const { switchChain } = useSwitchChain(); 
   const [totalSpins, setTotalSpins] = useState<number>(() => {
@@ -84,6 +86,20 @@ export function SpinAndEarn() {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
 
+  // Add this near the top of the component, after other state declarations
+  const { writeContract, data: claimData } = useContractWrite();
+
+  const { isLoading: isClaiming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
+    hash: claimData,
+  });
+
+  // Add effect to handle transaction success
+  useEffect(() => {
+    if (isClaimSuccess) {
+      setResult(`Successfully claimed your reward! 🎉`);
+    }
+  }, [isClaimSuccess]);
+
   // Update localStorage when totalSpins changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -98,15 +114,30 @@ export function SpinAndEarn() {
     }
   }, [isMuted]);
 
-  // All segments are equal
+  const getRandomValue = (token: string): number => {
+    switch (token) {
+      case "MON":
+        const monValues = [0.3, 0.4, 0.1];
+        return monValues[Math.floor(Math.random() * monValues.length)];
+      case "YAKI":
+        return +(Math.random() * (150 - 10) + 1).toFixed(1);
+      case "OWL":
+        return +(Math.random() * (3000 - 500) + 1).toFixed(1);
+      case "USDC":
+        return +(Math.random() * (0.5 - 0.1) + 0.1).toFixed(1);
+      default:
+        return 0;
+    }
+  };
+
   const segments: Segment[] = [
-    { text: " ", value: 0.01, color: "#4B0082", probability: 50, degrees: 51.4 },  // Dark Indigo
-    { text: " ", value: 0.1, color: "#3A0CA3", probability: 30, degrees: 51.4 },  // Dark Blue-Violet
-    { text: " ", value: 0.2, color: "#5F0F40", probability: 10, degrees: 51.4 },  // Deep Rose
-    { text: " ", value: 0.3, color: "#2C2C54", probability: 10, degrees: 51.4 },      // Dark Purple
-    { text: " ", value: 0.5, color: "#5E2C54", probability: 1, degrees: 51.4 },      // Dark Purple
-    { text: " ", value: 1, color: "#120458", probability: 0, degrees: 51.4 },      // Deep Midnight Blue
-    { text: " ", value: 0, color: "#1A1A2E", probability: -1, degrees: 51.4 }     // Very Dark Blue
+    { text: "MON", value: 0, color: "#4B0082", probability: 10, degrees: 60 },  // Dark Indigo
+    { text: "YAKI", value: 0, color: "#F7931A", probability: 30, degrees: 60 },  // Bitcoin Orange
+    { text: "MON", value: 0, color: "#3A0CA3", probability: 10, degrees: 60 },  // Dark Blue-Violet
+    { text: "OWL", value: 0, color: "#2775CA", probability: 30, degrees: 60 },  // USDC Blue
+    { text: "MON", value: 0, color: "#5F0F40", probability: 10, degrees: 60 },  // Deep Rose
+    { text: "USDC", value: 0, color: "#627EEA", probability: 20, degrees: 60 },  // Ethereum Blue
+ // Meme Coin Pink
   ];
   
 
@@ -255,6 +286,18 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
+    
+    // Check if on correct chain
+    if (chainId !== monadTestnet.id) {
+      try {
+        await switchChain({ chainId: monadTestnet.id });
+      } catch (error) {
+        console.error('Failed to switch chain:', error);
+        setResult('Please switch to Monad Testnet to continue');
+        return;
+      }
+    }
+
     setIsSpinning(true);
     setTotalSpins(prev => prev + 1);
 
@@ -284,6 +327,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         currentAngle += segment.degrees;
       }
 
+      // Get random value for the won token
+      const wonValue = getRandomValue(wonSegment.text);
+
       if (audioRef.current && !isMuted) {
         audioRef.current.currentTime = 0;
         audioRef.current.play();
@@ -296,24 +342,80 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       }
 
       setTimeout(async () => {
-        setResult(`🎉 You won ${wonSegment.value} MON!`);
+        setResult(`🎉 You won ${wonValue} ${wonSegment.text}!`);
         setIsSpinning(false);
-        if (wonSegment.value > 0 && address) {
-          await fetch('/api/win', {
-            method: 'POST',
-            body: JSON.stringify({
-              to: address,
-              amount: wonSegment.value,
-              fid
-            }),
-            headers: { 'Content-Type': 'application/json' }
-          });
+        if (wonValue > 0 && address) {
+          if (wonSegment.text === "MON") {
+            // Keep existing MON token handling
+            await fetch('/api/win', {
+              method: 'POST',
+              body: JSON.stringify({
+                to: address,
+                amount: wonValue,
+                fid
+              }),
+              headers: { 'Content-Type': 'application/json' }
+            });
+          } else {
+            // New instant claim method for USDC, OWL, YAKI
+            try {
+              setResult(`Processing your ${wonSegment.text} reward...`);
+              // Get signature from server
+              const signatureRes = await fetch('/api/generate-signature', {
+                method: 'POST',
+                body: JSON.stringify({
+                  userAddress: address,
+                  tokenAddress: getTokenAddress(wonSegment.text),
+                  amount: parseUnits(wonValue.toString(), getTokenDecimals(wonSegment.text)).toString(),
+                  tokenName: wonSegment.text,
+                  name:name
+                }),
+                headers: { 'Content-Type': 'application/json' }
+              });
+              
+              if (!signatureRes.ok) {
+                throw new Error('Failed to get signature');
+              }
+              
+              const { signature } = await signatureRes.json();
+              
+              // Call smart contract to claim reward using wagmi
+              writeContract({
+                abi: [
+                  {
+                    name: 'claimTokenReward',
+                    type: 'function',
+                    stateMutability: 'nonpayable',
+                    inputs: [
+                      { name: 'token', type: 'address' },
+                      { name: 'amount', type: 'uint256' },
+                      { name: 'signature', type: 'bytes' }
+                    ],
+                    outputs: []
+                  }
+                ],
+                address: process.env.NEXT_PUBLIC_TOKEN_REWARD_ADDRESS as `0x${string}`,
+                functionName: 'claimTokenReward',
+                args: [
+                  getTokenAddress(wonSegment.text) as `0x${string}`,
+                  parseUnits(wonValue.toString(), getTokenDecimals(wonSegment.text)),
+                  signature as `0x${string}`
+                ]
+              });
+
+              // Success message will be shown by the useEffect when transaction is confirmed
+            } catch (error) {
+              console.error('Error claiming token reward:', error);
+              setResult(`Failed to claim ${wonSegment.text} reward. Please try again.`);
+            }
+          }
 
           // Emit win event through WebSocket
           if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
               type: 'win',
-              amount: wonSegment.value,
+              amount: wonValue,
+              token: wonSegment.text,
               address: address
             }));
           }
@@ -370,6 +472,21 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   const center = size / 2;
   const radius = center - 5;
 
+  const getTokenImage = (token: string): string => {
+    switch (token) {
+      case "MON":
+        return "/images/mon.png";
+      case "YAKI":
+        return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
+      case "OWL":
+        return "/images/owl.png";
+      case "USDC":
+        return "/images/usdc.png";
+      default:
+        return "/images/mon.png";
+    }
+  };
+
   // Calculate SVG paths for each segment
   let startAngle = 0;
   const svgSegments = segments.map((segment, i) => {
@@ -388,12 +505,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       <g key={i}>
         <path d={path} fill={segment.color} stroke="#1a1a2e" strokeWidth="2" />
         <image
-          x={iconPos.x + 5}
-          y={iconPos.y - 15}
+          x={iconPos.x-18}
+          y={iconPos.y -35}
           width="35"
           height="35"
-          href="/images/mon.png"
-          transform={`rotate(${labelAngle + 90}, ${iconPos.x}, ${iconPos.y})`}
+          href={getTokenImage(segment.text)}
+          transform={`rotate(${labelAngle + 180}, ${iconPos.x}, ${iconPos.y })`}
         />
         <text
           x={labelPos.x}
@@ -411,6 +528,30 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     startAngle = endAngle;
     return el;
   });
+
+  // Add this helper function near the top of the file, after the segments definition
+  const getTokenAddress = (token: string): string => {
+    switch (token) {
+      case "USDC":
+        return process.env.NEXT_PUBLIC_USDC_TOKEN_ADDRESS as string;
+      case "OWL":
+        return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
+      case "YAKI":
+        return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
+      default:
+        return "";
+    }
+  };
+
+  // Add this helper function after getTokenImage
+  const getTokenDecimals = (token: string): number => {
+    switch (token) {
+      case "USDC":
+        return 6;
+      default:
+        return 18;
+    }
+  };
 
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
@@ -778,16 +919,25 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               <div className="spin-ui-address">{address ? `${address.slice(0, 7)}...${address.slice(-5)}` : "-"}</div>
               <div className="spin-ui-network">Monad Testnet</div>
             </div>
-            <button
-              className="spin-ui-spin-btn"
-              onClick={handleSpin}
-              disabled={isSpinning || spinsLeft === null || spinsLeft <= 0}
-            >
-              {isSpinning ? "Spinning..." : spinsLeft === null ? "Loading..." : spinsLeft <= 0 ? "No Spins Left" : "SPIN NOW"}
-              {spinsLeft === 0 && timeUntilReset && (
+            {chainId !== monadTestnet.id ? (
+              <button
+                className="spin-ui-spin-btn"
+                onClick={() => switchChain({ chainId: monadTestnet.id })}
+              >
+                Switch to Monad Testnet
+              </button>
+            ) : (
+              <button
+                className="spin-ui-spin-btn"
+                onClick={handleSpin}
+                disabled={isSpinning || spinsLeft === null || spinsLeft <= 0}
+              >
+                {isSpinning ? "Spinning..." : spinsLeft === null ? "Loading..." : spinsLeft <= 0 ? "No Spins Left" : "SPIN NOW"}
+                {spinsLeft === 0 && timeUntilReset && (
                   <div className="timer-text">Resets in: {timeUntilReset}</div>
                 )}
-            </button>
+              </button>
+            )}
         { !follow && <button
             className="follow-button"
             onClick={async () => {
