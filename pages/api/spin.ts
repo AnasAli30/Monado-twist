@@ -67,8 +67,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft });
   }
 
+  if (mode === "likeAndRecast") {
+    spinsLeft += 2;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft });
+  }
+
   if (checkOnly) {
-    return res.status(200).json({ spinsLeft ,lastSpinReset:user?.lastSpinReset,lastShareSpin:user?.lastShareSpin,follow:user?.follow});
+    return res.status(200).json({ 
+      spinsLeft,
+      lastSpinReset: user?.lastSpinReset,
+      lastShareSpin: user?.lastShareSpin,
+      follow: user?.follow,
+      likeAndRecast: user?.likeAndRecast,
+      envelopeClaimed: user?.envelopeClaimed
+    });
   }
 
   if (spinsLeft <= 0) {

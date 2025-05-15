@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useAccount } from "wagmi";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function EnvelopeReward() {
+interface EnvelopeRewardProps {
+  setClaimed: Dispatch<SetStateAction<boolean>>;
+}
+
+export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
   const { isConnected, address } = useAccount();
   const { context } = useMiniAppContext();
   const fid = context?.user?.fid;
@@ -36,109 +40,173 @@ export function EnvelopeReward() {
       headers: { "Content-Type": "application/json" },
     });
     setIsOpening(false);
+    setClaimed(true);
     if (res.ok) {
-    //   alert(`You received ${amount} MON!`);
+      setTimeout(() => {
+        setShowEnvelope(false);
+      }, 2000);
     }
-    setTimeout(() => {
-      setShowEnvelope(false);
-    }, 2000);
+   
   };
 
   return (
     <AnimatePresence>
       {showEnvelope && (
         <motion.div
-          className="envelope-modal"
+          className="envelope-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="envelope-content"
+            className="envelope-container"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
           >
-            <h2 className="title">🎉 Welcome!</h2>
-            <p className="subtitle">Open your reward envelope</p>
-            <button onClick={openEnvelope} disabled={isOpening}>
-              {isOpening ? "Opening..." : "Open Envelope"}
-            </button>
-            {reward && (
-              <motion.p
-                className="reward-text"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+            <div className="envelope-content">
+              <p className="subtitle">Open your reward envelope to get started</p>
+              {reward && (
+                <motion.div
+                  className="reward-container"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <p className="reward-text">
+                    🎁 You received <strong>{reward} MON</strong>!
+                  </p>
+                </motion.div>
+              )}
+             { !reward && <div className="envelope-image">
+                <span className="envelope-emoji">✉️</span>
+              </div>}
+              <button 
+                className="open-button"
+                onClick={openEnvelope} 
+                disabled={isOpening}
               >
-                🎁 You received <strong>{reward} MON</strong>!
-              </motion.p>
-            )}
+                {isOpening ? "Sending mon..." : "Open Envelope"}
+              </button>
+           
+            </div>
           </motion.div>
 
           <style jsx>{`
-          .envelope-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
+            .envelope-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100vw;
+              height: 90vh;
+              background: rgba(0, 0, 0, 0.85);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 9999;
+              backdrop-filter: blur(8px);
+            }
 
-.envelope-content {
-  background: white;
-  border-radius: 24px;
-  padding: 40px 32px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
-  transform: translateY(0); /* no accidental shifts */
-  margin-bottom: 20px;
-}
+            .envelope-container {
+              background: linear-gradient(135deg, #3A0CA3 0%, #6C5CE7 100%);
+              border-radius: 24px;
+              padding: 40px;
+              width: 90%;
+              height:70%;
+              max-width: 400px;
+              text-align: center;
+              box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+              border: 2px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .envelope-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+            }
 
             .title {
-              font-size: 1.8rem;
-              margin-bottom: 8px;
-              color: #2d3436;
+              font-size: 2rem;
+              font-weight: 800;
+              color: #fff;
+              margin: 0;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             }
 
             .subtitle {
-              font-size: 1rem;
-              margin-bottom: 24px;
-              color: #636e72;
+              font-size: 1.2rem;
+              color: #e0d7ff;
+              margin: 0;
             }
 
-            button {
-              background: #6c5ce7;
+            .envelope-image {
+              width: 200px;
+              height: 200px;
+              margin: 1px 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+
+            .envelope-emoji {
+              font-size: 120px;
+              animation: float 3s ease-in-out infinite;
+            }
+
+            @keyframes float {
+              0% {
+                transform: translateY(0px);
+              }
+              50% {
+                transform: translateY(-20px);
+              }
+              100% {
+                transform: translateY(0px);
+              }
+            }
+
+            .open-button {
+              background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
               color: white;
               border: none;
-              padding: 14px 28px;
-              font-size: 1.1rem;
-              border-radius: 12px;
+              padding: 16px 32px;
+              font-size: 1.2rem;
+              font-weight: 600;
+              border-radius: 16px;
               cursor: pointer;
-              transition: background 0.3s ease;
-              margin-bottom: 20px;
+              transition: all 0.3s ease;
+              width: 100%;
+              max-width: 300px;
+              box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
             }
 
-            button:hover:not(:disabled) {
-              background: #5a4bd1;
+            .open-button:hover:not(:disabled) {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 16px rgba(108, 92, 231, 0.6);
             }
 
-            button:disabled {
-              opacity: 0.6;
+            .open-button:disabled {
+              opacity: 0.7;
               cursor: not-allowed;
             }
 
+            .reward-container {
+              background: rgba(255, 255, 255, 0.1);
+              padding: 16px 24px;
+              border-radius: 12px;
+              margin-top: 16px;
+            }
+
             .reward-text {
-              margin-top: 20px;
-              font-size: 1.2rem;
-              color: #00b894;
+              font-size: 1.4rem;
+              color: #fff;
+              margin: 0;
+              font-weight: 600;
+            }
+
+            .reward-text strong {
+              color: #ffe066;
             }
           `}</style>
         </motion.div>

@@ -66,6 +66,7 @@ export function SpinAndEarn() {
   const publicClient = usePublicClient();
   const [buyTxHash, setBuyTxHash] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [claimed, setClaimed] = useState<boolean>(true);
   const [result, setResult] = useState<string | null>(null);
   const [rotation, setRotation] = useState<number>(0);
   const [view, setView] = useState<'spin' | 'wallet' | 'leaderboard'>('spin');
@@ -81,6 +82,7 @@ export function SpinAndEarn() {
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
 
   // Update localStorage when totalSpins changes
   useEffect(() => {
@@ -120,7 +122,9 @@ export function SpinAndEarn() {
           });
           const data = await res.json();
           setSpinsLeft(data.spinsLeft);
-          SetFollow(data.follow)
+          setClaimed(data.envelopeClaimed);
+          SetFollow(data.follow);
+          setHasLikedAndRecast(data.likeAndRecast || false);
           // Update timers
           if (data.lastSpinReset) {
             const resetTime = new Date(data.lastSpinReset).getTime() + 24 * 60 * 60 * 1000;
@@ -747,11 +751,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             </svg>
             <div className="pointer"></div>
           </div>
-         
-          <div className="spin-ui-card">
           
+          <div className="spin-ui-card">
+          <EnvelopeReward setClaimed={setClaimed}  />
+          { claimed && <div>
             <div className="spin-ui-header">MONADO TWIST</div>
-            <EnvelopeReward />
+           
             {result && (
             <div className="result">
               {result}
@@ -804,6 +809,29 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           >
             Follow to get 1 extra spin! 🎁
           </button>}
+            {!hasLikedAndRecast && (
+              <button
+                className="follow-button"
+                onClick={async () => {
+                  await actions?.openUrl("https://warpcast.com/hackerx/0x2c3df003");
+                  if (fid) {
+                    const res = await fetch('/api/spin', {
+                      method: 'POST',
+                      body: JSON.stringify({ fid, mode: "likeAndRecast" }),
+                      headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      setSpinsLeft(data.spinsLeft);
+                      setResult("You got 2 extra spins 🎁");
+                      setHasLikedAndRecast(true);
+                    }
+                  }
+                }}
+              >
+                Like & Recast to get 2 extra spins!
+              </button>
+            )}
             {spinsLeft === 0 && (
               <button
                 className="buy-spin-btn"
@@ -813,6 +841,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 {isBuying || isConfirming ? "Processing..." : "Buy 3 Spin (1 MON)"}
               </button>
             )}
+            </div>}
           </div>
       
          
