@@ -44,7 +44,7 @@ function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
 
 export function SpinAndEarn() {
   const [follow, SetFollow] = useState(false);
-  const { address, chainId } = useAccount();
+  const { address, chainId ,isConnected} = useAccount();
   const { context ,actions} = useMiniAppContext();
   const fid = context?.user?.fid;
   const name = context?.user?.username;
@@ -912,12 +912,21 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               <div className="spin-ui-network">Monad Testnet</div>
             </div>
             {chainId !== monadTestnet.id ? (
-              <button
-                className="spin-ui-spin-btn"
-                onClick={() => switchChain({ chainId: monadTestnet.id })}
-              >
-                Switch to Monad Testnet
-              </button>
+              !isConnected ? (
+                <a
+                  href='https://warpcast.com/~/mini-apps/launch?domain=monado-twist.vercel.app'
+                  className='spin-ui-spin-btn'
+                >
+                  Open in Warpcast
+                </a>
+              ) : (
+                <button
+                  className="spin-ui-spin-btn"
+                  onClick={() => switchChain({ chainId: monadTestnet.id })}
+                >
+                  Switch to Monad Testnet
+                </button>
+              )
             ) : (
               <button
                 className="spin-ui-spin-btn"
