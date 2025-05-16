@@ -435,7 +435,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   
         const response = await spinRes.json();
         setSpinsLeft(response.spinsLeft);
-        setResult("Successfully bought 4 spin!");
+        setResult("Successfully bought 5 spin!");
       } catch (err) {
         console.error("Confirmation error:", err);
         setResult("Failed to buy spin");
