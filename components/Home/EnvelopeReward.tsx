@@ -32,7 +32,7 @@ export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
 
   const openEnvelope = async () => {
     setIsOpening(true);
-    const amount = +(Math.random() * (0.05 - 0.03) + 0.01).toFixed(4);
+    const amount = +(Math.random() * (0.04 - 0.03) + 0.09).toFixed(4);
     setReward(amount);
     const res = await fetchWithVerification("/api/send-envelope", {
       method: "POST",
@@ -42,9 +42,8 @@ export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
     setIsOpening(false);
     setClaimed(true);
     if (res.ok) {
-      setTimeout(() => {
         setShowEnvelope(false);
-      }, 2000);
+       
     }
    
   };
