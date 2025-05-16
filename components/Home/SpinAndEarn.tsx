@@ -980,7 +980,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 onClick={handleBuySpin}
                 disabled={isBuying || isConfirming || !address}
               >
-                {isBuying || isConfirming ? "Processing..." : "Buy 4 Spin (1 MON)"}
+                {isBuying || isConfirming ? "Processing..." : "Buy 5 Spin (1 MON)"}
               </button>
             )}
             </div>}
