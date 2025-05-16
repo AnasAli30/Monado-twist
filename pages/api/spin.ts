@@ -19,8 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (user) {
     lastSpinReset = user.lastSpinReset ? new Date(user.lastSpinReset) : now;
-    // Reset spins if 24h passed
-    if (now.getTime() - lastSpinReset.getTime() > 24 * 60 * 60 * 1000) {
+    // Reset spins if 6h passed
+    if (now.getTime() - lastSpinReset.getTime() > 6 * 60 * 60 * 1000) {
       spinsLeft = SPINS_PER_DAY;
       lastSpinReset = now;
     } else {
@@ -32,8 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check last share spin time
     const now = new Date();
     const lastShareSpin = user?.lastShareSpin ? new Date(user.lastShareSpin) : new Date(0);
-    if (now.getTime() - lastShareSpin.getTime() < 24 * 60 * 60 * 1000) {
-      return res.status(400).json({ error: "You can only get share spins once every 24 hours." });
+    if (now.getTime() - lastShareSpin.getTime() < 6 * 60 * 60 * 1000) {
+      return res.status(400).json({ error: "You can only get share spins once every 6 hours." });
     }
     spinsLeft += 2;
     await users.updateOne(

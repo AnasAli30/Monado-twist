@@ -116,7 +116,7 @@ export function SpinAndEarn() {
       case "YAKI":
         return +(Math.random() * (100 - 10) + 1).toFixed(1);
       case "OWL":
-        return +(Math.random() * (2000 - 100) + 1).toFixed(1);
+        return +(Math.random() * (1000 - 100) + 1).toFixed(1);
       case "USDC":
         return +(Math.random() * (0.3 - 0.1) + 0.1).toFixed(1);
       default:
@@ -125,12 +125,12 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 10, degrees: 60 },  // Dark Indigo
-    { text: "YAKI", value: 0, color: "#F7931A", probability: 30, degrees: 60 },  // Bitcoin Orange
-    { text: "MON", value: 0, color: "#3A0CA3", probability: 10, degrees: 60 },  // Dark Blue-Violet
-    { text: "OWL", value: 0, color: "#2775CA", probability: 30, degrees: 60 },  // USDC Blue
-    { text: "MON", value: 0, color: "#5F0F40", probability: 10, degrees: 60 },  // Deep Rose
-    { text: "USDC", value: 0, color: "#627EEA", probability: 20, degrees: 60 },  // Ethereum Blue
+    { text: "MON", value: 0, color: "#4B0082", probability: 5, degrees: 60 },  // Dark Indigo
+    { text: "YAKI", value: 0, color: "#F7931A", probability: 35, degrees: 60 },  // Bitcoin Orange
+    { text: "MON", value: 0, color: "#3A0CA3", probability: 5, degrees: 60 },  // Dark Blue-Violet
+    { text: "OWL", value: 0, color: "#2775CA", probability: 35, degrees: 60 },  // USDC Blue
+    { text: "MON", value: 0, color: "#5F0F40", probability: 5, degrees: 60 },  // Deep Rose
+    { text: "USDC", value: 0, color: "#627EEA", probability: 25, degrees: 60 },  // Ethereum Blue
  // Meme Coin Pink
   ];
   
@@ -152,7 +152,7 @@ export function SpinAndEarn() {
           setHasLikedAndRecast(data.likeAndRecast || false);
           // Update timers
           if (data.lastSpinReset) {
-            const resetTime = new Date(data.lastSpinReset).getTime() + 24 * 60 * 60 * 1000;
+            const resetTime = new Date(data.lastSpinReset).getTime() + 6 * 60 * 60 * 1000;
             const now = new Date().getTime();
             if (resetTime > now) {
               const timeLeft = resetTime - now;
@@ -163,7 +163,7 @@ export function SpinAndEarn() {
           }
 
           if (data.lastShareSpin) {
-            const shareTime = new Date(data.lastShareSpin).getTime() + 24 * 60 * 60 * 1000;
+            const shareTime = new Date(data.lastShareSpin).getTime() + 6 * 60 * 60 * 1000;
             const now = new Date().getTime();
             if (shareTime > now) {
               const timeLeft = shareTime - now;
