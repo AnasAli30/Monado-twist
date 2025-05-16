@@ -51,6 +51,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { db } = await connectToDatabase();
       const user = await db.collection('monad-users').findOne({ fid });
       console.log(user)
+      if(user?.spinsLeft<0) return res.status(400).json({ error: 'No spins left' });
+      
       
       // Get a random wallet
       const wallet = getRandomWallet();
