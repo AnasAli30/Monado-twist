@@ -85,8 +85,8 @@ export async function POST(request: Request) {
         await setUserNotificationDetails(fid, event.notificationDetails);
         await sendFrameNotification({
           fid,
-          title: `welcome to the app`,
-          body: `Thank you for adding Farcaster Mini App `,
+          title: "Welcome to Monado Twist",
+body: `You've just unlocked a new realm on Farcaster.`,
           notificationDetails: event.notificationDetails,
         });
       } else {
@@ -104,8 +104,9 @@ export async function POST(request: Request) {
       await setUserNotificationDetails(fid, event.notificationDetails);
       await sendFrameNotification({
         fid,
-        title: `Welcome to Farcaster Mini App`,
-        body: `Thank you for enabling notifications for Farcaster Mini App`,
+        title: "Monado Twist Activated!",
+        body: `You're all set! Notifications enabled – let the chaos begin`,        
+        notificationDetails: event.notificationDetails,
       });
 
       break;
