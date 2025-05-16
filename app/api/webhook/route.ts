@@ -87,6 +87,7 @@ export async function POST(request: Request) {
           fid,
           title: `welcome to the app`,
           body: `Thank you for adding Farcaster Mini App `,
+          notificationDetails: event.notificationDetails,
         });
       } else {
         await deleteUserNotificationDetails(fid);
