@@ -17,7 +17,7 @@ export async function GET() {
       imageUrl: `${APP_URL}/images/feed.png`,
       screenshotUrls: [],
       tags: ["monad", "farcaster", "miniapp", "game","playtoearn"],
-      primaryCategory: "social",
+      primaryCategory: "game",
       buttonTitle: "Spin to Win",
       splashImageUrl: `${APP_URL}/images/splash.png`,
       splashBackgroundColor: "#14051a",
