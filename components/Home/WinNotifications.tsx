@@ -23,6 +23,20 @@ export function WinNotifications() {
 
     // Subscribe to the channel
     const channel = pusher.subscribe('monado-spin');
+
+    channel.bind('withdraw', (data: { address: string; amount: number; token: string; name: string }) => {
+      console.log('Withdraw event received:', data);
+      const newNotification: Notification = {
+        type: 'withdraw',
+        name: data?.name,
+        amount: data?.amount,
+        address: data?.address,
+        token: data?.token,
+        timestamp: Date.now()
+      };
+      setCurrentNotification(newNotification);
+      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
+    });
     
     // Listen for win events
     channel.bind('win', (data: { address: string; amount: number; token: string; name: string }) => {
@@ -58,7 +72,7 @@ export function WinNotifications() {
         return `🎉 ${user} won ${notification.amount} ${notification.token}! 🎉`;
       }
     } else {
-      return `💸 ${user} withdrew ${notification.amount} MON! 💸`;
+      return `💸 ${user} withdraw ${notification.amount} MON! 💸`;
     }
   };
 
@@ -71,13 +85,17 @@ export function WinNotifications() {
           left: 0;
           right: 0;
           z-index: 100000;
-          background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
-          color: white;
+          background: ${notifications[0]?.type === 'withdraw' 
+            ? 'linear-gradient(90deg, #FFD700 0%, #FFF8DC 100%)'
+            : 'linear-gradient(90deg, #4CAF50 0%, #8BC34A 90%)'};
+          color: ${notifications[0]?.type === 'withdraw' ? '#000' : 'white'};
           padding: 12px;
           text-align: center;
           font-size: 1rem;
           font-weight: 600;
-          box-shadow: 0 2px 8px rgba(76,175,80,0.4);
+          box-shadow: 0 2px 8px ${notifications[0]?.type === 'withdraw' 
+            ? 'rgba(255,215,0,0.4)' 
+            : 'rgba(76,175,80,0.4)'};
           border-bottom: 2px solid rgba(255,255,255,0.2);
           overflow: hidden;
           height: 25px;
