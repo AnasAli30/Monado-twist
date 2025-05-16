@@ -245,7 +245,7 @@ export function SpinAndEarn() {
 It's seriously fun , addictive, and totally worth it.
 
 Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
-        embeds: [`${window.location.href}`],
+        embeds: [`${window.location.origin}`],
       });
       
       // Call backend to add spins
