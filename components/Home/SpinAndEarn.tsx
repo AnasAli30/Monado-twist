@@ -125,12 +125,11 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 5, degrees: 60 },  // Dark Indigo
-    { text: "YAKI", value: 0, color: "#F7931A", probability: 35, degrees: 60 },  // Bitcoin Orange
-    { text: "MON", value: 0, color: "#3A0CA3", probability: 5, degrees: 60 },  // Dark Blue-Violet
-    { text: "OWL", value: 0, color: "#2775CA", probability: 35, degrees: 60 },  // USDC Blue
-    { text: "MON", value: 0, color: "#5F0F40", probability: 5, degrees: 60 },  // Deep Rose
-    { text: "USDC", value: 0, color: "#627EEA", probability: 25, degrees: 60 },  // Ethereum Blue
+    { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
+    { text: "YAKI", value: 0, color: "#F7931A", probability: 39, degrees: 72 },  // Bitcoin Orange
+    { text: "MON", value: 0, color: "#3A0CA3", probability: 1, degrees: 72 },  // Dark Blue-Violet
+    { text: "OWL", value: 0, color: "#2775CA", probability: 39, degrees: 72 },  // USDC Blue
+    { text: "USDC", value: 0, color: "#627EEA", probability: 30, degrees: 72 },  // Ethereum Blue
  // Meme Coin Pink
   ];
   
@@ -960,7 +959,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           >
             Follow to get 1 extra spin! 🎁
           </button>}
-            {!hasLikedAndRecast && (
+            {/* {!hasLikedAndRecast && (
               <button
                 className="follow-button"
                 onClick={async () => {
@@ -982,7 +981,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               >
                 Like & Recast to get 1 extra spins!
               </button>
-            )}
+            )} */}
             {spinsLeft === 0 && (
               <button
                 className="buy-spin-btn"
@@ -996,7 +995,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           </div>
       
          
-          <button
+          {/* <button
             className="share-button"
             onClick={async () => {
               try {
@@ -1021,7 +1020,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             disabled={!!timeUntilShare}
           >
             {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}
-          </button>
+          </button> */}
          
         </>
       ) : view === 'wallet' ? (
