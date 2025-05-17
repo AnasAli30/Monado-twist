@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongo';
 
-const SPINS_PER_DAY = 2;
+const SPINS_PER_DAY = 4;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
