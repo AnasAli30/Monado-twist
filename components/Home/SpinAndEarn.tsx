@@ -114,9 +114,9 @@ export function SpinAndEarn() {
         const monValues = [0.2, 0.15, 0.1];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (80 - 10) + 1).toFixed(1);
-      case "OWL":
-        return +(Math.random() * (800 - 100) + 1).toFixed(1);
+        return +(Math.random() * (50 - 10) + 1).toFixed(1);
+      case "CHOG":
+        return +(Math.random() * (4 - 1) + 1).toFixed(1);
       case "USDC":
         return +(Math.random() * (0.2 - 0.1) + 0.1).toFixed(1);
       default:
@@ -125,10 +125,10 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
-    { text: "YAKI", value: 0, color: "#F7931A", probability: 39, degrees: 72 },  // Bitcoin Orange
+    { text: "MON", value: 0, color: "#4B0082", probability: 0, degrees: 72 },  // Dark Indigo
+    { text: "YAKI", value: 0, color: "#F7931A", probability: 38, degrees: 72 },  // Bitcoin Orange
     { text: "MON", value: 0, color: "#3A0CA3", probability: 1, degrees: 72 },  // Dark Blue-Violet
-    { text: "OWL", value: 0, color: "#2775CA", probability: 39, degrees: 72 },  // USDC Blue
+    { text: "CHOG", value: 0, color: "#2775CA", probability: 38, degrees: 72 },  // USDC Blue
     { text: "USDC", value: 0, color: "#627EEA", probability: 30, degrees: 72 },  // Ethereum Blue
  // Meme Coin Pink
   ];
@@ -469,8 +469,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         return "/images/mon.png";
       case "YAKI":
         return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
-      case "OWL":
-        return "/images/owl.png";
+      case "CHOG":
+        return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
       case "USDC":
         return "/images/usdc.png";
       default:
@@ -525,7 +525,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     switch (token) {
       case "USDC":
         return process.env.NEXT_PUBLIC_USDC_TOKEN_ADDRESS as string;
-      case "OWL":
+      case "CHOG":
         return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
       case "YAKI":
         return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
