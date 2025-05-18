@@ -39,11 +39,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
 
     console.log('emitting event');
+    try{
     await pusher.trigger('monado-spin', 'withdraw', {
         address: address,
         amount: amount,
         name: name || ''
       });
+    }catch(error){
+      console.error('Error triggering withdraw event:', error);
+    }
       // console.log(s);
 
     res.status(200).json({ success: true });

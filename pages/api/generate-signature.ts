@@ -72,14 +72,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const signature = await wallet.signMessage(ethers.getBytes(messageHash));
 
     // Emit win event to Pusher
+    try{
     await pusher.trigger('monado-spin', 'win', {
       name: name,
       address: userAddress,
       amount: amount,
       token: tokenName
     });
-
-    console.log('Generated signature:', signature);
+    }catch(error){
+      console.error('Error triggering win event:', error);
+    }
     res.status(200).json({ signature });
   } catch (error) {
     console.error('Error generating signature:', error);

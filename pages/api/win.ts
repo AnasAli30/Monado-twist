@@ -77,11 +77,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Trigger the win event
+      try{
       await pusher.trigger('monado-spin', 'win', {
         name: user?.name,
         address: to,
         amount: amount
       });
+      }catch(error){
+        console.error('Error triggering win event:', error);
+      }
 
       res.status(200).json({ success: true, txHash: tx.hash });
     } catch (error) {
