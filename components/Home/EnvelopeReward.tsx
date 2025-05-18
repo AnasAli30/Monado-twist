@@ -41,11 +41,7 @@ export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
     });
     setIsOpening(false);
     setClaimed(true);
-    if (res.ok) {
-        setShowEnvelope(false);
-       
-    }
-   
+    setShowEnvelope(false);
   };
 
   return (
