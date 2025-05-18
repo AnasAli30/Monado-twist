@@ -29,6 +29,7 @@ export async function GET() {
       ogDescription: "Win MON tokens by spinning the wheel",
       ogImageUrl: `${APP_URL}/images/feed.png`,
       heroImageUrl: `${APP_URL}/images/feed.png`,
+      requiredChains: "monad",
     },
   };
 
