@@ -611,83 +611,91 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             border-color: rgba(147, 112, 219, 0.3);
           }
         }
-        .spin-ui-card {
-          background: linear-gradient(135deg, #b9aaff 0%, #6C5CE7 70%);
-          border-radius: 24px;
-          box-shadow: 0 4px 24px #6C5CE7aa;
-          padding: 24px 18px 32px 18px;
-          margin: 30px 15px 1px 15px;
-          // width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          margin-top: 110px;
-          justify-content: space-evenly;
-          max-width: 370px;
-          text-align: center;
-          color: #fff;
-        }
-        .spin-ui-header {
-          font-size: 1.3rem;
-          font-weight: 800;
-          letter-spacing: 1px;
-          margin-bottom: 18px;
-          color: #fff;
-          text-shadow: 0 2px 8px #6C5CE7cc;
-        }
+       .spin-ui-card {
+  background: linear-gradient(135deg, rgba(185, 170, 255, 0.9), rgba(108, 92, 231, 0.95));
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+  padding: 28px 24px 36px 24px;
+  margin: 110px auto 16px auto;
+  height: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  text-align: center;
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+       .spin-ui-header {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  margin-bottom: 20px;
+  color: #fff;
+  text-shadow: 0 3px 10px rgba(108, 92, 231, 0.8);
+}
         .spin-ui-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 18px;
-        }
-        .spin-ui-box {
-          flex: 1;
-          background: rgba(255,255,255,0.08);
-          border-radius: 16px;
-          padding: 18px 0 10px 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          box-shadow: 0 2px 8px #6C5CE733;
-        }
-        .spin-ui-label {
-          font-size: 1rem;
-          font-weight: 600;
-          color: #e0d7ff;
-          // border-bottom: 10px solid #000000;
-          margin-bottom: 6px;
-        }
-        .spin-ui-value {
-          font-size: 2.2rem;
-          font-weight: 900;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+      .spin-ui-box {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 20px 0 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.3);
+  transition: transform 0.2s;
+}
+
+.spin-ui-box:hover {
+  transform: translateY(-3px);
+}
+      .spin-ui-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e0d7ff;
+  margin-bottom: 6px;
+}
+
+.spin-ui-value {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
         .spin-ui-address-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin: 12px 0 0 0;
-          gap: 10px;
-        }
-        .spin-ui-address {
-          background: rgba(255,255,255,0.08);
-          border-radius: 10px;
-          padding: 6px 14px;
-          font-size: 1rem;
-          color: #fff;
-          font-family: monospace;
-        }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+  .spin-ui-address,
+.spin-ui-network {
+  padding: 8px 16px;
+  font-size: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+      .spin-ui-address {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-family: monospace;
+}
         .spin-ui-network {
-          background: #6C5CE7;
+          background: #6C2FE7;
           color: #fff;
-          border-radius: 10px;
-          padding: 6px 14px;
-          font-size: 1rem;
-          font-weight: 600;
         }
         .spin-ui-spin-btn {
           margin-top: 22px;
@@ -695,23 +703,23 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           background: linear-gradient(90deg, #3A0CA3 0%, #3A0CA3 100%);
           color: #fff;
           border: none;
-          border-radius: 16px;
+  border-radius: 20px;
           font-size: 1.3rem;
           font-weight: 800;
           padding: 18px 0;
-          box-shadow: 0 4px 24px #6C5CE7aa;
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
           letter-spacing: 1px;
-          transition: background 0.15s, transform 0.15s;
+  transition: all 0.2s ease;
         }
         .spin-ui-spin-btn:active {
-          background: linear-gradient(90deg, #6C5CE7 0%, #a084ee 100%);
-          transform: scale(0.98);
-        }
+  background: linear-gradient(90deg, #6C5CE7, #a084ee);
+  transform: scale(0.97);
+}
         .spin-ui-spin-btn:disabled {
-          background: linear-gradient(90deg, #6C5CE7 0%, #4B0082 100%);
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
+  background: linear-gradient(90deg, #6C5CE7, #4B0082);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
         .wheel-spin-anim {
           animation: wheelIdle 12s linear infinite;
           transition: none;
@@ -738,19 +746,19 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
           z-index: 2;
         }
-        .result {
-          margin-bottom: 20px;
-          padding: 12px 24px;
-          background: rgba(255,255,255,0.1);
-          border-radius: 12px;
-          color: #fff;
-          font-size: 1.2rem;
-          font-weight: 600;
-          text-align: center;
-          backdrop-filter: blur(8px);
-          box-shadow: 0 4px 12px rgba(108,92,231,0.2);
-          border: 5px solid rgba(255,255,255,1);
-        }
+       .result {
+  margin-bottom: 24px;
+  padding: 16px 10px;
+background: rgba(50, 205, 50, 0.7); 
+  border-radius: 23px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 14px rgba(108, 92, 231, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+}
         .share-button {
           margin: 10px;
           padding: 12px 24px;
@@ -893,11 +901,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           { claimed && <div>
             <div className="spin-ui-header">MONADO TWIST</div>
            
-            {result && (
-            <div className="result">
-              {result}
-            </div>
-          )}
+           
             <div className="spin-ui-row">
               <div className="spin-ui-box">
                 <div className="spin-ui-label">Spins Remaining</div>
@@ -910,18 +914,25 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 <div className="spin-ui-value">{totalSpins}</div>
               </div>
             </div>
+            {result && (
+            <div className="result">
+              {result}
+            </div>
+          )}
             <div className="spin-ui-address-row">
               <div className="spin-ui-address">{address ? `${address.slice(0, 7)}...${address.slice(-5)}` : "-"}</div>
               <div className="spin-ui-network">Monad Testnet</div>
             </div>
             {chainId !== monadTestnet.id ? (
               !isConnected ? (
-                <a
-                  href='https://warpcast.com/~/mini-apps/launch?domain=monado-twist.vercel.app'
+                <div
+                  onClick={() => {
+                    window.open('https://warpcast.com/~/mini-apps/launch?domain=monado-twist.vercel.app');
+                  }}
                   className='spin-ui-spin-btn'
                 >
                   Open in Warpcast
-                </a>
+                </div>
               ) : (
                 <button
                   className="spin-ui-spin-btn"
