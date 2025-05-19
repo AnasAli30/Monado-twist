@@ -127,7 +127,7 @@ export function SpinAndEarn() {
   const segments: Segment[] = [
     { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
     { text: "YAKI", value: 0, color: "#F7931A", probability: 20, degrees: 72 },  // Bitcoin Orange
-    { text: "null", value: 0, color: "#3A0CA3", probability: 40, degrees: 72 },  // Dark Blue-Violet
+    { text: "", value: 0, color: "#3A0CA3", probability: 40, degrees: 72 },  // Dark Blue-Violet
     { text: "CHOG", value: 0, color: "#2775CA", probability: 20, degrees: 72 },  // USDC Blue
     { text: "USDC", value: 0, color: "#627EEA", probability: 19, degrees: 72 },  
   ];
@@ -330,7 +330,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       }
 
       setTimeout(async () => {
-        if (wonSegment.text === "null") {
+        if (wonSegment.text === "") {
           setResult("😢 No win this time. Try again!");
           setIsSpinning(false);
           return;
@@ -475,8 +475,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
       case "USDC":
         return "/images/usdc.png";
-      case "null":
-        return "https://w7.pngwing.com/pngs/18/440/png-transparent-red-cancel-delete-no-forbidden-prohibited-not-allowed-free-vector-graphics.png";
+      case "":
+        return "/images/cancel.png";
       default:
         return "/images/mon.png";
     }
