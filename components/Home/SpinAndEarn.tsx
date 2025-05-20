@@ -111,7 +111,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [ 0.1, 0.05];
+        const monValues = [ 0.08, 0.05,0.09];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (30 - 10) + 1).toFixed(1);
@@ -125,9 +125,9 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 0, degrees: 72 },  // Dark Indigo
+    { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
     { text: "YAKI", value: 0, color: "#F7931A", probability: 20, degrees: 72 },  // Bitcoin Orange
-    { text: "", value: 0, color: "#3A0CA3", probability: 41, degrees: 72 },  // Dark Blue-Violet
+    { text: "", value: 0, color: "#3A0CA3", probability: 40, degrees: 72 },  // Dark Blue-Violet
     { text: "CHOG", value: 0, color: "#2775CA", probability: 20, degrees: 72 },  // USDC Blue
     { text: "USDC", value: 0, color: "#627EEA", probability: 19, degrees: 72 },  
   ];
