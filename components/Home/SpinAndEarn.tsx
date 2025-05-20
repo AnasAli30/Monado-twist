@@ -111,23 +111,23 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.15, 0.1, 0.05];
+        const monValues = [ 0.1, 0.05];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (50 - 10) + 1).toFixed(1);
+        return +(Math.random() * (30 - 10) + 1).toFixed(1);
       case "CHOG":
-        return +(Math.random() * (3 - 1) + 1).toFixed(1);
+        return +(Math.random() * (2 - 1) + 1).toFixed(1);
       case "USDC":
-        return +(Math.random() * (0.1 - 0.01) + 0.1).toFixed(1);
+        return +(Math.random() * (0.1 - 0.01) + 0.08).toFixed(1);
       default:
         return 0;
     }
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
+    { text: "MON", value: 0, color: "#4B0082", probability: 0, degrees: 72 },  // Dark Indigo
     { text: "YAKI", value: 0, color: "#F7931A", probability: 20, degrees: 72 },  // Bitcoin Orange
-    { text: "", value: 0, color: "#3A0CA3", probability: 40, degrees: 72 },  // Dark Blue-Violet
+    { text: "", value: 0, color: "#3A0CA3", probability: 41, degrees: 72 },  // Dark Blue-Violet
     { text: "CHOG", value: 0, color: "#2775CA", probability: 20, degrees: 72 },  // USDC Blue
     { text: "USDC", value: 0, color: "#627EEA", probability: 19, degrees: 72 },  
   ];
@@ -698,6 +698,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           color: #fff;
         }
         .spin-ui-spin-btn {
+        cursor: pointer;
           margin-top: 22px;
           width: 100%;
           background: linear-gradient(90deg, #3A0CA3 0%, #3A0CA3 100%);
@@ -855,7 +856,6 @@ background: rgba(50, 205, 50, 0.7);
           display: flex;
           align-items: center;
           justify-content: center;
-          // padding: 2px;
           background: transparent;
           border: none;
           color: #fff;
