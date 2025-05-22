@@ -79,13 +79,36 @@ export function SpinAndEarn() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
+  const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
 
+  const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
   const { writeContract, data: claimData } = useContractWrite();
 
   const { isLoading: isClaiming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
     hash: claimData,
   });
+
+  async function isUserFollower(userFid: number): Promise<boolean> {
+    const options = {
+      method: 'GET',
+      headers: {
+        'x-api-key': neynarApiKey,
+        'x-neynar-experimental': 'false'
+      }
+    };
+  
+    try {
+      const res = await fetch('https://api.neynar.com/v2/farcaster/followers?limit=100&fid=249702', options);
+      const data = await res.json();
+      if (!data.users) return false;
+      // Check if any follower's fid matches the userFid
+      return data.users.some((f: any) => f.user.fid === userFid);
+    } catch (err) {
+      console.error('Error checking follower:', err);
+      return false;
+    }
+  }
 
   // Add effect to handle transaction success
   useEffect(() => {
@@ -953,11 +976,31 @@ background: rgba(50, 205, 50, 0.7);
                 )}
               </button>
             )}
-        { !follow && <button
+        {!follow && !awaitingFollowVerification && (
+          <button
             className="follow-button"
             onClick={async () => {
               await actions?.viewProfile({ fid: 249702 });
+              setAwaitingFollowVerification(true);
+              setResult("After following, click 'Verify Follow' to get your spin!");
+            }}
+          >
+            Follow to get 1 extra spin! 🎁
+          </button>
+        )}
+
+        {!follow && awaitingFollowVerification && (
+          <button
+            className="follow-button"
+            onClick={async () => {
               if (fid) {
+                setResult("Verifying your follow...");
+                const isFollower = await isUserFollower(fid);
+                if (!isFollower) {
+                  setResult("You haven't followed yet. Please follow first, then click 'Verify Follow'.");
+                  return;
+                }
+                // If follower, grant spin
                 const res = await fetchWithVerification('/api/spin', {
                   method: 'POST',
                   body: JSON.stringify({ fid, mode: "follow" }),
@@ -967,13 +1010,15 @@ background: rgba(50, 205, 50, 0.7);
                 if (res.ok) {
                   setSpinsLeft(data.spinsLeft);
                   setResult("You got 1 extra spin for following! 🎁");
-                  SetFollow(true)
+                  SetFollow(true);
+                  setAwaitingFollowVerification(false);
                 }
               }
             }}
           >
-            Follow to get 1 extra spin! 🎁
-          </button>}
+            Verify Follow
+          </button>
+        )}
             {/* {!hasLikedAndRecast && (
               <button
                 className="follow-button"
