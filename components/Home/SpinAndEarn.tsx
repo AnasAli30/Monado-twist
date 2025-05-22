@@ -997,7 +997,7 @@ background: rgba(50, 205, 50, 0.7);
                 setResult("Verifying your follow...");
                 const isFollower = await isUserFollower(fid);
                 if (!isFollower) {
-                  setResult("You haven't followed yet. Please follow first, then click 'Verify Follow'.");
+                  setResult("Please follow first then wait 10 seconds to verify your follow.");
                   return;
                 }
                 // If follower, grant spin
