@@ -93,7 +93,7 @@ export function SpinAndEarn() {
     const options = {
       method: 'GET',
       headers: {
-        'x-api-key': neynarApiKey,
+        'x-api-key': neynarApiKey || '',
         'x-neynar-experimental': 'false'
       }
     };
@@ -982,7 +982,7 @@ background: rgba(50, 205, 50, 0.7);
             onClick={async () => {
               await actions?.viewProfile({ fid: 249702 });
               setAwaitingFollowVerification(true);
-              setResult("After following, click 'Verify Follow' to get your spin!");
+              // setResult("After following, click 'Verify Follow' to get your spin!");
             }}
           >
             Follow to get 1 extra spin! 🎁
