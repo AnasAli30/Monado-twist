@@ -118,11 +118,11 @@ export function SpinAndEarn() {
       setResult(`Successfully claimed your reward! 🎉`);
       
       // Cast for non-MON tokens after successful claim
-      if (wonSegment.text !== "MON") {
+      // if (wonSegment.text !== "MON") {
         const message = `Just claimed ${wonValue} ${wonSegment.text} from Monado Twist 🎰\n\nCome spin & earn`;
         actions?.composeCast?.({ text: message,embeds: [`${window.location.origin}`], });
         
-      }
+      // }
     }
   }, [isClaimSuccess, wonSegment, wonValue, actions]);
 
