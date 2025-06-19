@@ -69,6 +69,8 @@ export function SpinAndEarn() {
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
   const [timeUntilShare, setTimeUntilShare] = useState<string>('');
   const [isBuying, setIsBuying] = useState(false);
+  const [wonSegment, setWonSegment] = useState<Segment | null>(null);
+  const [wonValue, setWonValue] = useState<number>(0);
   const [isMuted, setIsMuted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('isMuted');
@@ -112,10 +114,17 @@ export function SpinAndEarn() {
 
   // Add effect to handle transaction success
   useEffect(() => {
-    if (isClaimSuccess) {
+    if (isClaimSuccess && wonSegment && wonValue) {
       setResult(`Successfully claimed your reward! 🎉`);
+      
+      // Cast for non-MON tokens after successful claim
+      if (wonSegment.text !== "MON") {
+        const message = `Just claimed ${wonValue} ${wonSegment.text} from Monado Twist 🎰\n\nCome spin & earn`;
+        actions?.composeCast?.({ text: message,embeds: [`${window.location.origin}`], });
+        
+      }
     }
-  }, [isClaimSuccess]);
+  }, [isClaimSuccess, wonSegment, wonValue, actions]);
 
   // Update localStorage when totalSpins changes
   useEffect(() => {
@@ -340,6 +349,10 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       }
 
       let wonValue = getRandomValue(wonSegment.text);
+      
+      // Store the won segment and value
+      setWonSegment(wonSegment);
+      setWonValue(wonValue);
 
       if (audioRef.current && !isMuted) {
         audioRef.current.currentTime = 0;
