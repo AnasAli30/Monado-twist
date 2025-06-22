@@ -70,7 +70,15 @@ export function Leaderboard() {
                   {index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
                 </div>
 
-                <img src={entry.pfpUrl || '/images/icon.png'} alt={entry.name} className="leaderboard-pfp" />
+                <img 
+                  src={entry.pfpUrl || '/images/icon.png'} 
+                  alt={entry.name} 
+                  className="leaderboard-pfp"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null; // prevents looping
+                    e.currentTarget.src = '/images/icon.png';
+                  }}
+                />
                 
                 <div className="user-info">
                   <div className="leaderboard-name">{entry.name || 'Anonymous'}</div>
