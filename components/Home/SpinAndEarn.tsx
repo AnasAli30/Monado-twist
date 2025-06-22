@@ -201,14 +201,14 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [ 0.05, 0.08,0.09];
+        const monValues = [ 0.04, 0.07,0.09,0.03,0.05,0.06,0.08];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (10 - 1) + 1).toFixed(1);
+        return +(Math.random() * (5 - 1) + 1).toFixed(1);
       case "CHOG":
-        return +(Math.random() * (0.9 - 0.1) + 0.9).toFixed(1);
+        return +(Math.random() * (0.45 - 0.1) + 0.45).toFixed(1);
       case "USDC":
-        return +(Math.random() * (0.05 - 0.01) + 0.05).toFixed(1);
+        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(1);
       default:
         return 0;
     }
@@ -728,7 +728,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             </div>
             <div className="popup-message">
               {isBoughtSpins ? (
-                <span className="bought-spins-message">+10 Spins</span>
+                <span className="bought-spins-message">+20 Spins</span>
               ) : (
                 result
               )}
@@ -1523,7 +1523,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 onClick={handleBuySpin}
                 disabled={isBuying || isConfirming || !address}
               >
-                {isBuying || isConfirming ? "Processing..." : "Buy 10 Spin (1 MON)"}
+                {isBuying || isConfirming ? "Processing..." : "Buy 20 Spin (1 MON)"}
               </button>
             )} 
         {!follow && !awaitingFollowVerification && (
