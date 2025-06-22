@@ -849,7 +849,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
            border-radius: 32px;
            border: 1px solid rgba(255, 255, 255, 0.2);
            padding: 28px 24px 36px;
-           margin: 80px auto 16px auto;
+           margin: 0px auto 15px auto;
            width: 97%;
            max-width: 400px;
            display: flex;
