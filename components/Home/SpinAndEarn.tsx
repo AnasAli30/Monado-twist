@@ -426,10 +426,6 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
       let wonValue = getRandomValue(wonSegment.text);
       
-      // Store the won segment and value
-      setWonSegment(wonSegment);
-      setWonValue(wonValue);
-
       if (audioRef.current && !isMuted) {
         audioRef.current.volume = 0.2;
         audioRef.current.currentTime = 0;
@@ -443,6 +439,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       }
 
       setTimeout(async () => {
+        // Setting the state after the animation
+        setWonSegment(wonSegment);
+        setWonValue(wonValue);
         if (wonSegment.text === "") {
           setResult("😢 No win this time. Try again!");
           setIsSpinning(false);

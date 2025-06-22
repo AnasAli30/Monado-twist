@@ -70,10 +70,10 @@ export function Leaderboard() {
   return (
     <div className="leaderboard-container fade-in">
       <div className="leaderboard-card">
-        <div className="leaderboard-header">
+      <div className="leaderboard-header">
           <FaTrophy />
-          <h2>Top Winners</h2>
-        </div>
+        <h2>Top Winners</h2>
+      </div>
         
         {userStats && (
           <div className="user-stats-card">
@@ -100,16 +100,16 @@ export function Leaderboard() {
               </div>
           </div>
         )}
-
-        {loading ? (
+      
+      {loading ? (
           <div className="skeleton-list">
             {Array.from({ length: 8 }).map((_, index) => (
               <SkeletonLeaderboardItem key={index} />
             ))}
           </div>
-        ) : (
-          <div className="leaderboard-list">
-            {leaders.map((entry, index) => (
+      ) : (
+        <div className="leaderboard-list">
+          {leaders.map((entry, index) => (
               <div 
                 key={entry.fid} 
                 className={`leaderboard-item ${context?.user?.fid === entry.fid ? 'current-user' : ''}`}  
@@ -120,7 +120,7 @@ export function Leaderboard() {
                   {index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
                 </div>
 
-                <img 
+              <img
                   src={entry.pfpUrl || '/images/icon.png'} 
                   alt={entry.name} 
                   className="leaderboard-pfp"
@@ -146,9 +146,9 @@ export function Leaderboard() {
                  
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+          ))}
+        </div>
+      )}
       </div>
 
       <style>{`
@@ -379,7 +379,7 @@ export function Leaderboard() {
           box-sizing: border-box;
           animation: rotation 1s linear infinite;
           margin: 40px auto;
-        }
+          }
         @keyframes rotation {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
