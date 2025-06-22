@@ -554,7 +554,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             fid, 
             mode: 'buy',
             amount: 1, // 1 MON for 8 spins
-            address 
+            address,
+            pfpUrl: context?.user?.pfpUrl
           }),
           headers: { 'Content-Type': 'application/json' }
         });

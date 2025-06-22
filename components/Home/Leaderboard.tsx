@@ -58,6 +58,23 @@ export function Leaderboard() {
     fetchUserStats();
   }, [currentUserFid]);
 
+  const handleShare = async (rank: number, totalSpins: number, totalWinnings: string) => {
+    const text = `I’m #${rank} on the Monado Twist leaderboard!
+
+- ${totalSpins} spins, ${parseFloat(totalWinnings).toFixed(2)} $MON earned.
+- Try to beat me — if you dare 😂😎
+
+Spin. Win. Repeat.`;
+    try {
+      await actions?.composeCast({
+        text,
+        embeds: [`${window.location.origin}`],
+      });
+    } catch (error) {
+      console.error('Failed to share:', error);
+    }
+  };
+
   const getMedalColor = (rank: number) => {
     switch(rank) {
       case 1: return '#FFD700'; // Gold
@@ -143,8 +160,20 @@ export function Leaderboard() {
                     <span>{parseFloat(entry.totalWinnings).toFixed(2)}</span>
                     <span className="mon-label">MON</span>
                   </div>
-                 
+                  {currentUserFid === entry.fid && index < 50 && (
+                  <button 
+                    className="share-rank-btn" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare(index + 1, entry.totalSpins, entry.totalWinnings);
+                    }}
+                  >
+                    Share
+                  </button>
+                )}
                 </div>
+               
+                
               </div>
           ))}
         </div>
@@ -395,6 +424,24 @@ export function Leaderboard() {
           border: 1px solid #f72585;
           border-radius: 20px;
           box-shadow: 0 0 15px rgba(247, 37, 133, 0.3);
+        }
+
+        .share-rank-btn {
+          margin-left: auto;
+          padding: 6px 12px;
+          background: linear-gradient(90deg, #1D8CF7, #1D63F7);
+          color: white;
+          border: none;
+          width: 100%;
+          border-radius: 10px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 8px rgba(29, 140, 247, 0.3);
+        }
+        .share-rank-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(29, 140, 247, 0.4);
         }
       `}</style>
     </div>

@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { db } = await connectToDatabase();
       const user = await db.collection('monad-users').findOne({ fid });
       console.log(user,fid,amount,to)
-      if(!user) return res.status(400).json({ error: 'User not found' });
+      if(!user) return res.status(400).json({ error: 'lol' });
       if(user?.spinsLeft<=0) return res.status(400).json({ error: 'No spins left' });
       
       

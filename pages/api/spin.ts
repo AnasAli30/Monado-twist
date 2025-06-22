@@ -15,7 +15,7 @@ const pusher = new Pusher({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
-  const { fid, checkOnly, mode, amount, address } = req.body;
+  const { fid, checkOnly, mode, amount, address, pfpUrl } = req.body;
   if (!fid) return res.status(400).json({ error: 'Missing fid' });
 
   const client = await clientPromise;
@@ -84,7 +84,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name: user?.name,
         address: address,
         amount: amount,
-        spins: SPINS_PER_PURCHASE
+        spins: SPINS_PER_PURCHASE,
+        pfpUrl: pfpUrl
       });
     } catch (error) {
       console.error('Error triggering purchase notification:', error);
