@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Pusher from 'pusher-js';
 import { ethers } from 'ethers';
+
 interface Notification {
   type: 'win' | 'withdraw' | 'purchase';
   name: string;
@@ -12,89 +13,77 @@ interface Notification {
   pfpUrl?: string;
 }
 
+const animationTypes = ['right-left', 'left-right', 'top-bottom', 'bottom-top'];
+
 export function WinNotifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
+  const [displayedNotification, setDisplayedNotification] = useState<Notification | null>(null);
+  const [exitingNotification, setExitingNotification] = useState<Notification | null>(null);
+  const [animationClass, setAnimationClass] = useState('right-left');
 
   useEffect(() => {
-    // Initialize Pusher
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
     });
 
-    // Subscribe to the channel
     const channel = pusher.subscribe('monado-spin');
 
-    channel.bind('withdraw', (data: { address: string; amount: number; token: string; name: string , pfpUrl?: string }) => {
-      console.log('Withdraw event received:', data);
+    const handleNotification = (data: any, type: 'win' | 'withdraw' | 'purchase') => {
       const newNotification: Notification = {
-        type: 'withdraw',
-        name: data?.name,
-        amount: data?.amount,
-        address: data?.address,
-        pfpUrl: data?.pfpUrl,
-        token: data?.token,
-        timestamp: Date.now()
-      };
-      setCurrentNotification(newNotification);
-      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
-    });
-    
-    // Listen for win events
-    channel.bind('win', (data: { address: string; amount: number; token: string; name: string, pfpUrl: string }) => {
-      console.log('Win event received:', data);
-      const newNotification: Notification = {
-        type: 'win',
+        type: type,
         name: data.name,
-        amount: data.token == undefined ? data.amount : Number(
-          ethers.formatUnits(data.amount, data.token === "USDC" ? 6 : 18)
-        ),
+        amount: type === 'win' && data.token !== undefined
+          ? Number(ethers.formatUnits(data.amount, data.token === "USDC" ? 6 : 18))
+          : data.amount,
         token: data.token,
         address: data.address,
-        pfpUrl: data?.pfpUrl,
-        timestamp: Date.now()
-      };
-      
-      setCurrentNotification(newNotification);
-      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
-    });
-
-    // Listen for purchase events
-    channel.bind('purchase', (data: { address: string; amount: number; name: string; spins: number }) => {
-      console.log('Purchase event received:', data);
-      const newNotification: Notification = {
-        type: 'purchase',
-        name: data.name,
-        amount: data.amount,
-        address: data.address,
-        token: 'MON',
+        pfpUrl: data.pfpUrl,
         spins: data.spins,
         timestamp: Date.now()
       };
-      console.log('Purchase event received:', newNotification);
-      setCurrentNotification(newNotification);
-      setNotifications(prev => [newNotification, ...prev].slice(0, 3));
-    });
+
+      const randomAnimation = animationTypes[Math.floor(Math.random() * animationTypes.length)];
+      setAnimationClass(randomAnimation);
+
+      setExitingNotification(displayedNotification);
+      setDisplayedNotification(newNotification);
+
+      setTimeout(() => {
+        setExitingNotification(null);
+      }, 500);
+    };
+    
+    channel.bind('withdraw', (data: any) => handleNotification(data, 'withdraw'));
+    channel.bind('win', (data: any) => handleNotification(data, 'win'));
+    channel.bind('purchase', (data: any) => handleNotification(data, 'purchase'));
 
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
     };
-  }, []);
+  }, [displayedNotification]);
+
+  const getNotificationContent = (notification: Notification) => (
+    <>
+      {notification.pfpUrl && (
+        <img src={notification.pfpUrl} alt="pfp" style={{ width: 20, height: 20, borderRadius: '50%', marginRight: 8 }} />
+      )}
+      {getNotificationText(notification)}
+    </>
+  );
 
   const getNotificationText = (notification: Notification) => {
     const user = notification?.name || `${notification.address.slice(0, 6)}...${notification.address.slice(-4)}`;
     switch (notification.type) {
       case 'win':
         if (notification.token == undefined) {
-          return ` ${user} won ${notification.amount} MON! 🎉`;
+           return ` ${user} won ${notification.amount} MON! 🎉`;
         } else {
-          return ` ${user} won ${notification.amount} ${notification.token}! 🎉`;
+           return ` ${user} won ${notification.amount} ${notification.token}! 🎉`;
         }
       case 'withdraw':
-        return ` ${user} withdraw ${notification.amount} MON! 💸`;
+         return ` ${user} withdraw ${notification.amount} MON! 💸`;
       case 'purchase':
-        return ` ${user} bought ${notification.spins} spins 🥂👀`;
+         return ` ${user} bought ${notification.spins} spins 🥂👀`;
       default:
         return '🎲 Spin the wheel to win MON tokens! 🎲';
     }
@@ -126,6 +115,8 @@ export function WinNotifications() {
     }
   };
 
+  const notificationType = displayedNotification?.type || exitingNotification?.type || 'win';
+
   return (
     <div className="win-notification-bar">
       <style jsx>{`
@@ -135,74 +126,85 @@ export function WinNotifications() {
           left: 0;
           right: 0;
           z-index: 100000;
-          background: ${getBackgroundStyle(notifications[0]?.type)};
-          color: ${notifications[0]?.type === 'withdraw' ? '#000' : 'white'};
-          padding: 12px;
+          background: ${getBackgroundStyle(notificationType)};
+          color: ${notificationType === 'withdraw' ? '#000' : 'white'};
+          padding: 2px 12px;
           text-align: center;
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 600;
-          box-shadow: 0 2px 8px ${getBoxShadowColor(notifications[0]?.type)};
+          box-shadow: 0 2px 8px ${getBoxShadowColor(notificationType)};
           border-bottom: 2px solid rgba(255,255,255,0.2);
           overflow: hidden;
           height: 25px;
         }
-        .notification-content {
+        .notification-container {
           position: relative;
-          animation: slideUp 0.5s ease-out;
-        }
-        .notification-queue {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          width: 100%;
+          height: 100%;
         }
         .notification-item {
-          animation: slideUp 0.5s ease-out;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          will-change: transform;
         }
-        @keyframes slideUp {
-          0% {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          100% {
-            transform: translateY(0);
-            opacity: 1;
-          }
+        .entering-right-left { animation: slideInFromRight 0.5s ease-out forwards; }
+        .exiting-right-left { animation: slideOutToLeft 0.5s ease-out forwards; }
+        .entering-left-right { animation: slideInFromLeft 0.5s ease-out forwards; }
+        .exiting-left-right { animation: slideOutToRight 0.5s ease-out forwards; }
+        .entering-top-bottom { animation: slideInFromTop 0.5s ease-out forwards; }
+        .exiting-top-bottom { animation: slideOutToBottom 0.5s ease-out forwards; }
+        .entering-bottom-top { animation: slideInFromBottom 0.5s ease-out forwards; }
+        .exiting-bottom-top { animation: slideOutToTop 0.5s ease-out forwards; }
+
+        @keyframes slideInFromRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
         }
-        @keyframes slideOut {
-          0% {
-            transform: translateY(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(-100%);
-            opacity: 0;
-          }
+        @keyframes slideOutToLeft {
+          from { transform: translateX(0); }
+          to { transform: translateX(-100%); }
+        }
+        @keyframes slideInFromLeft {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes slideOutToRight {
+          from { transform: translateX(0); }
+          to { transform: translateX(100%); }
+        }
+        @keyframes slideInFromTop {
+          from { transform: translateY(-100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideOutToBottom {
+          from { transform: translateY(0); opacity: 1; }
+          to { transform: translateY(100%); opacity: 0; }
+        }
+        @keyframes slideInFromBottom {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideOutToTop {
+          from { transform: translateY(0); opacity: 1; }
+          to { transform: translateY(-100%); opacity: 0; }
         }
       `}</style>
-      <div className="notification-queue">
-        {notifications.map((notification, index) => (
-          <div 
-            key={notification.timestamp} 
-            className="notification-item"
-            style={{
-              animation: index === 0 ? 'slideUp 0.5s ease-out' : 'none',
-              opacity: index === 0 ? 1 : 0.5,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {notification.pfpUrl && (
-              <img src={notification.pfpUrl} alt="pfp" style={{ width: 20, height: 20, borderRadius: '50%', marginRight: 8 }} />
-            )}
-            {getNotificationText(notification)}
+      <div className="notification-container">
+        {exitingNotification && (
+          <div key={exitingNotification.timestamp} className={`notification-item exiting-${animationClass}`}>
+            {getNotificationContent(exitingNotification)}
           </div>
-        ))}
-        {notifications.length === 0 && (
+        )}
+        {displayedNotification && (
+          <div key={displayedNotification.timestamp} className={`notification-item entering-${animationClass}`}>
+            {getNotificationContent(displayedNotification)}
+          </div>
+        )}
+        {!displayedNotification && !exitingNotification && (
           <div className="notification-item">
             🎲 Spin the wheel to win MON tokens! 🎲
           </div>
@@ -210,4 +212,4 @@ export function WinNotifications() {
       </div>
     </div>
   );
-} 
+}

@@ -66,7 +66,8 @@ export function InnerWallet() {
           txHash: hash,
           amount: balance,
           address: address,
-          name: name
+          name: name,
+          pfpUrl: pfpUrl
         }),
       }).catch(error => {
         console.error('Error updating withdrawal status:', error);

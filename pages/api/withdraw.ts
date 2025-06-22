@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { fid, txHash, amount, address, name } = req.body;
+    const { fid, txHash, amount, address, name, pfpUrl } = req.body;
 
     if (!fid || !txHash) {
       return res.status(400).json({ error: 'Missing required parameters' });
@@ -43,7 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await pusher.trigger('monado-spin', 'withdraw', {
         address: address,
         amount: amount,
-        name: name || ''
+        name: name || '',
+        pfpUrl: pfpUrl
       });
     }catch(error){
       console.error('Error triggering withdraw event:', error);
