@@ -383,7 +383,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       setWonValue(wonValue);
 
       if (audioRef.current && !isMuted) {
-        audioRef.current.volume = 0.5;
+        audioRef.current.volume = 0.2;
         audioRef.current.currentTime = 0;
         audioRef.current.play();
         setTimeout(() => {
@@ -720,9 +720,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         }
 
         .spin-glass-card {
-          background: linear-gradient(135deg, #3A0CA3 0%, #3A0CA3 100%);
-          box-shadow: 0 8px 40px 0 #6C5CE7, 0 1.5px 8px 0 #0002;
-          backdrop-filter: blur(12px);
+          background-color: #24243e;
+          background-image: 
+              url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+              radial-gradient(circle at 1% 1%, rgba(247, 37, 133, 0.2), transparent 30%),
+              radial-gradient(circle at 99% 99%, rgba(72, 12, 168, 0.2), transparent 40%);
+          box-shadow: inset 0 0 120px rgba(0,0,0,0.6);
           margin-bottom: 80px;
           height: 100%;
         }
@@ -778,118 +781,180 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             border-color: rgba(147, 112, 219, 0.3);
           }
         }
-       .spin-ui-card {
-  background: rgba(26, 26, 46, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 32px;
-  box-shadow: 0 8px 40px rgba(108, 92, 231, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  padding: 28px 24px 36px 24px;
-  margin: 110px auto 16px auto;
-  width: 97%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  text-align: center;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-       .spin-ui-header {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 1.2px;
-  margin-bottom: 20px;
-  color: #fff;
-  text-shadow: 0 3px 10px rgba(108, 92, 231, 0.8);
-}
-        .spin-ui-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-      .spin-ui-box {
-  flex: 1;
-  background: rgba(108, 92, 231, 0.1);
-  border-radius: 20px;
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: background 0.3s;
-}
 
-.spin-ui-box:hover {
-  background: rgba(108, 92, 231, 0.2);
-  transform: none;
-}
-      .spin-ui-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #e0d7ff;
-  margin-bottom: 6px;
-}
-
-.spin-ui-value {
-  font-size: 2.4rem;
-  font-weight: 900;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-        .spin-ui-address-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-}
-  .spin-ui-address,
-.spin-ui-network {
-  padding: 8px 16px;
-  font-size: 1rem;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-      .spin-ui-address {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-family: monospace;
-}
-        .spin-ui-network {
-          background: #6C2FE7;
-          color: #fff;
+        @keyframes border-glow {
+          0% {
+            border-color: rgba(108, 92, 231, 0.4);
+            box-shadow: 0 8px 40px rgba(108, 92, 231, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                        0 0 10px rgba(147, 112, 219, 0.1);
+          }
+          50% {
+            border-color: rgba(147, 112, 219, 0.7);
+            box-shadow: 0 12px 50px rgba(108, 92, 231, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                        0 0 25px rgba(147, 112, 219, 0.3);
+          }
+          100% {
+            border-color: rgba(108, 92, 231, 0.4);
+            box-shadow: 0 8px 40px rgba(108, 92, 231, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                        0 0 10px rgba(147, 112, 219, 0.1);
+          }
         }
-        .spin-ui-spin-btn {
-        cursor: pointer;
-          margin-top: 22px;
-          width: 100%;
-          background: linear-gradient(90deg, #3A0CA3 0%, #3A0CA3 100%);
+        
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 10px 40px rgba(247, 37, 133, 0.2), 0 0 0px rgba(247, 37, 133, 0.2);
+          }
+          50% {
+            box-shadow: 0 10px 50px rgba(247, 37, 133, 0.4), 0 0 20px rgba(247, 37, 133, 0.2);
+          }
+        }
+
+       .spin-ui-card {
+           background:linear-gradient(0deg,rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 100%);
+           border-radius: 32px;
+           border: 1px solid rgba(255, 255, 255, 0.2);
+           padding: 28px 24px 36px;
+           margin: 110px auto 16px auto;
+           width: 97%;
+           max-width: 400px;
+           display: flex;
+           flex-direction: column;
+           border-radius: 32px;
+           justify-content: space-evenly;
+           text-align: center;
+           color: #fff;
+           animation: pulse-glow 4s ease-in-out infinite;
+           transition: all 0.3s ease;
+           position: relative;
+        }
+        
+        .spin-ui-card::before,
+        .spin-ui-card::after {
+          content: '';
+          position: absolute;
+          width: 22px;
+          height: 22px;
+          background: radial-gradient(circle at 30% 30%, #f0f0f0, #b0b0b0);
+          border-radius: 50%;
+          box-shadow: -2px 2px 4px rgba(0,0,0,0.4);
+          border: 2px solid #888;
+          z-index: 10;
+        }
+
+        .spin-ui-card::before {
+          top: 20px;
+          left: 20px;
+        }
+
+        .spin-ui-card::after {
+          top: 20px;
+          right: 20px;
+        }
+
+       .spin-ui-header {
+          font-size: 2rem;
+          font-weight: 900;
+          color: #fff;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(247, 37, 133, 0.5);
+          margin-bottom: 25px;
+        }
+
+        .spin-ui-row {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+
+      .spin-ui-box {
+          flex: 1;
+          background: linear-gradient(145deg, rgba(0,0,0,0.25), rgba(0,0,0,0.4));
+          padding: 16px 6px;
+          border-radius: 24px;
+          box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .spin-ui-box:hover {
+          background: linear-gradient(145deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+          border-color: rgba(255,255,255,0.2);
+          transform: none;
+        }
+
+        .spin-ui-label {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #e0d7ff;
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .spin-ui-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .spin-ui-address {
+          background: rgba(0,0,0,0.2);
+          color: #f0f0f0;
+          font-family: monospace;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+        }
+        .spin-ui-network {
+          background: #f72585;
           color: #fff;
           border: none;
-  border-radius: 20px;
-          font-size: 1.3rem;
-          font-weight: 800;
-          padding: 18px 0;
-  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.2);
-          letter-spacing: 1px;
-  transition: all 0.2s ease;
+          border-radius: 12px;
         }
-        .spin-ui-spin-btn:active {
-  background: linear-gradient(90deg, #6C5CE7, #a084ee);
-  transform: scale(0.97);
-}
+        .spin-ui-spin-btn {
+          cursor: pointer;
+          margin-top: 22px;
+          width: 100%;
+          background: linear-gradient(180deg, #f72585, #b5179e);
+          color: #fff;
+          border: none;
+          border-bottom: 6px solid #8e0a71;
+          border-radius: 20px;
+          font-size: 1.5rem;
+          font-weight: 900;
+          padding: 18px 0;
+          box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
+          letter-spacing: 1px;
+          transition: all 0.15s ease-out;
+          text-transform: uppercase;
+        }
+        .spin-ui-spin-btn:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 30px rgba(247, 37, 133, 0.6);
+          background: linear-gradient(180deg, #ff3a9a, #d12cb1);
+        }
+        .spin-ui-spin-btn:active:not(:disabled) {
+          transform: translateY(4px);
+          box-shadow: 0 3px 10px rgba(247, 37, 133, 0.5);
+          border-bottom-width: 2px;
+        }
         .spin-ui-spin-btn:disabled {
-  background: linear-gradient(90deg, #6C5CE7, #4B0082);
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+          background: #3c304e;
+          box-shadow: none;
+          opacity: 0.6;
+          cursor: not-allowed;
+          border-bottom: 6px solid #2a2138;
+        }
         .wheel-spin-anim {
           animation: wheelIdle 12s linear infinite;
           transition: none;
@@ -1023,41 +1088,52 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           margin-top: 4px;
         }
         .buy-spin-btn {
-          background: linear-gradient(90deg, #6C5CE7 0%, #a084ee 100%);
+          margin-top: 16px;
+          padding: 14px 24px;
+          background: radial-gradient(circle,rgba(63, 94, 251, 1) 0%, rgba(252, 70, 107, 1) 100%);
           color: #fff;
-          border: none;
-          border-radius: 12px;
-          padding: 12px 24px;
+          border: 1px solid #7209b7;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          border-radius: 16px;
           font-size: 1rem;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
-          transition: all 0.2s;
-          margin-top: 12px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
+          transition: all 0.2s ease;
+          text-transform: uppercase;
         }
         .buy-spin-btn:hover:not(:disabled) {
+          background: linear-gradient(90deg, #7209b7, #560bad);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          color: #fff;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(108,92,231,0.4);
         }
         .buy-spin-btn:disabled {
           opacity: 0.7;
           cursor: not-allowed;
+          transform: none;
+          background: transparent;
+          border-color: rgba(247, 37, 133, 0.4);
+          color: rgba(247, 37, 133, 0.4);
+          box-shadow: none;
         }
         .follow-button {
-          margin-top: 12px;
-          padding: 12px 24px;
-          background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
+          margin-top: 16px;
+          padding: 14px 24px;
+          background: linear-gradient(90deg, #560bad, #480ca8);
           color: #fff;
-          border: none;
-          border-radius: 12px;
+          border: 1px solid #7209b7;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          border-radius: 16px;
           font-size: 1rem;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
-          transition: transform 0.2s;
+          transition: all 0.2s ease;
+          text-transform: uppercase;
         }
         .follow-button:hover {
+          background: linear-gradient(90deg, #7209b7, #560bad);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          color: #fff;
           transform: translateY(-2px);
         }
         .popup-overlay {
@@ -1065,7 +1141,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           top: 0;
           left: 0;
           right: 0;
-          bottom: 25px;
+          bottom: 0;
+          height: 100%;
           background: rgba(18, 18, 45, 0.7);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
@@ -1080,7 +1157,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           width: 90%;
           max-width: 350px;
           padding: 25px;
-          margin-bottom: 0;
+          margin-bottom: 30px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1309,7 +1386,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 <div className="spin-ui-value">{totalSpins}</div>
               </div>
             </div>
-            {result && (
+            {/* {result && (
               <div className={`result ${
                   result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')
                   ? 'success'
@@ -1319,11 +1396,11 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               }`}>
                 {result}
               </div>
-            )}
-            <div className="spin-ui-address-row">
+            )} */}
+            {/* <div className="spin-ui-address-row">
               <div className="spin-ui-address">{address ? `${address.slice(0, 7)}...${address.slice(-5)}` : "-"}</div>
               <div className="spin-ui-network">Monad Testnet</div>
-            </div>
+            </div> */}
             {chainId !== monadTestnet.id ? (
               !isConnected ? (
                 <div
@@ -1332,7 +1409,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                   }}
                   className='spin-ui-spin-btn'
                 >
-                  Open in Warpcast
+                  Open in Farcaster
                 </div>
               ) : (
                 <button
@@ -1354,6 +1431,15 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 )}
               </button>
             )}
+             {spinsLeft === 0 && (
+              <button
+                className="buy-spin-btn"
+                onClick={handleBuySpin}
+                disabled={isBuying || isConfirming || !address}
+              >
+                {isBuying || isConfirming ? "Processing..." : "Buy 10 Spin (1 MON)"}
+              </button>
+            )} 
         {!follow && !awaitingFollowVerification && (
           <button
             className="follow-button"
@@ -1366,6 +1452,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             Follow to get 1 extra spin! 🎁
           </button>
         )}
+
+        
 
         {!follow && awaitingFollowVerification && (
           <button
@@ -1420,15 +1508,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 Like & Recast to get 1 extra spins!
               </button>
             )} */}
-            {spinsLeft === 0 && (
-              <button
-                className="buy-spin-btn"
-                onClick={handleBuySpin}
-                disabled={isBuying || isConfirming || !address}
-              >
-                {isBuying || isConfirming ? "Processing..." : "Buy 10 Spin (1 MON)"}
-              </button>
-            )} 
+           
             </div>}
           </div>
       
