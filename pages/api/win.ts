@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if(amount>0.1) return res.status(400).json({ error: 'Amount too high' });
       const { db } = await connectToDatabase();
       const user = await db.collection('monad-users').findOne({ fid });
-      console.log(user)
+      console.log(user,fid,amount,to)
       if(user?.spinsLeft<0) return res.status(400).json({ error: 'No spins left' });
       
       
