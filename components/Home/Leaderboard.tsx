@@ -59,12 +59,35 @@ export function Leaderboard() {
   }, [currentUserFid]);
 
   const handleShare = async (rank: number, totalSpins: number, totalWinnings: string) => {
-    const text = `I’m #${rank} on the Monado Twist leaderboard!
+    let bestFriendsText = '';
+    const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+
+    if (currentUserFid && neynarApiKey) {
+      try {
+        const options = {
+          method: 'GET',
+          headers: { 'x-api-key': neynarApiKey },
+        };
+        const res = await fetch(`https://api.neynar.com/v2/farcaster/user/best_friends/?limit=3&fid=${currentUserFid}`, options);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.users && data.users.length > 0) {
+            const mentions = data.users.map((user: { username: string }) => `@${user.username}`).join(' ');
+            bestFriendsText = `\n\join the fun ${mentions}`;
+          }
+        }
+      } catch (err) {
+        console.error('Could not fetch best friends', err);
+      }
+    }
+
+    const text = `I'm #${rank} on the Monado Twist leaderboard!
 
 - ${totalSpins} spins, ${parseFloat(totalWinnings).toFixed(2)} $MON earned.
 - Try to beat me — if you dare 😂😎
 
-Spin. Win. Repeat.`;
+Spin. Win. Repeat.${bestFriendsText}`;
+
     try {
       await actions?.composeCast({
         text,
@@ -173,8 +196,10 @@ Spin. Win. Repeat.`;
                 )}
                 </div>
                
-                
+                  
               </div>
+              
+              
           ))}
         </div>
       )}
@@ -432,7 +457,7 @@ Spin. Win. Repeat.`;
           background: linear-gradient(90deg, #1D8CF7, #1D63F7);
           color: white;
           border: none;
-          width: 100%;
+          width: 100px;
           border-radius: 10px;
           cursor: pointer;
           font-weight: 600;
