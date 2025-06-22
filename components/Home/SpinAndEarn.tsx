@@ -209,7 +209,7 @@ export function SpinAndEarn() {
       case "YAKI":
         return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
       case "CHOG":
-        return +(Math.random() * (0.3 - 0.1) + 0.1).toFixed(3);
+        return +(Math.random() * (0.3 - 0.01) + 0.01).toFixed(3);
       case "USDC":
         return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(4);
       default:
