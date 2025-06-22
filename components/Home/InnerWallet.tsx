@@ -27,6 +27,7 @@ export function InnerWallet() {
   const { context, actions } = useMiniAppContext();
   const fid = context?.user?.fid;
   const name = context?.user?.username;
+  const pfpUrl = context?.user?.pfpUrl;
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const publicClient = usePublicClient();
@@ -74,7 +75,10 @@ export function InnerWallet() {
       // Automatically cast the success message
       
       if (actions?.composeCast) {
-        const castMessage = `🎉 I successfully withdrawal ${displayBalance} MON from Monado Twist!\n\nThis is real, you can try it too! 🚀`;
+        const castMessage = `🎉 I successfully withdrew ${displayBalance} MON from Monado Twist — and it's 100% REAL! 🔥🚀 
+
+        No cap, it actually works. Go try it yourself and thank me later!
+        `;
         actions.composeCast({
           text: castMessage,
           embeds: [`${window.location.origin}`, `https://testnet.monadexplorer.com/tx/${hash}`],
@@ -133,217 +137,273 @@ export function InnerWallet() {
   const isOnMonadChain = chainId === monadTestnet.id;
 
   return (
-    <div className="wallet-glass-card fade-in">
-      <div className="flex flex-col items-center">
-        <div className="title">Wallet  <span className="emoji">💰</span></div>
-        <div className="balance-container">
-          <div className="balance">{displayBalance} MON</div>
-          <button 
-            onClick={handleRefresh} 
-            disabled={refreshing}
-            className="refresh-button"
-          >
-            <FaSync className={refreshing ? 'spinning' : ''} />
-          </button>
+    <div className="wallet-container fade-in">
+      <div className="wallet-card">
+        {context?.user && (
+          <div className="profile-section">
+            <img src={pfpUrl} alt={`${name}'s profile picture`} className="profile-picture" />
+            <div className="profile-info">
+              <div className="profile-name">{name}</div>
+              <div className="profile-fid">FID: {fid}</div>
+            </div>
+          </div>
+        )}
+
+       
+
+        <div className="balance-display">
+          <div className="balance-label">Your Balance</div>
+          <div className="balance-amount">{displayBalance} MON</div>
         </div>
+
+        <button 
+          onClick={handleRefresh} 
+          disabled={refreshing}
+          className="refresh-button"
+        >
+          <FaSync className={refreshing ? 'spinning' : ''} />
+          {refreshing ? 'Refreshing...' : 'Refresh Balance'}
+        </button>
+
         {!isOnMonadChain ? (
-          <button onClick={() => switchChain({ chainId: monadTestnet.id })} className="wallet-withdraw-btn">
+          <button onClick={() => switchChain({ chainId: monadTestnet.id })} className="wallet-action-btn primary">
             Switch to Monad Testnet
           </button>
         ) : (
           <>
-            <button onClick={withdraw} disabled={loading || balance === "0"} className="wallet-withdraw-btn">
-              {isPending ?  "Withdrawing..." : "Withdraw"}
+            <button onClick={withdraw} disabled={loading || isPending || balance === "0"} className="wallet-action-btn primary">
+              {isPending ?  "Withdrawing..." : "Withdraw Balance"}
             </button>
             <div className="withdrawal-note">
-              Note: Due to heavy load, if withdrawal fails or encounters an error, please:
-              <ol>
-                <li>Reload the page</li>
-                <li>Wait 10-15 seconds</li>
-                <li>Try withdrawing again</li>
-              </ol>
-            
+              <p><strong>Note:</strong> If withdrawal fails, please reload, wait 15s, and try again.</p>
+              <p>Still having issues? <p className="contact-link" onClick={() => actions?.viewProfile({ fid: 249702 })}>Contact the developer.</p></p>
             </div>
-            <button onClick={() => actions?.viewProfile({ fid: 249702 })} className="contact-dev-btn"> still not working? click here to contact the developer</button>
           </>
         )}
-        {error && <div className="error">{error.message}</div>}
+
         {hash && (
-          <button 
-            className="success text-black rounded-md p-2 text-sm"
-            onClick={() =>
-              window.open(
-                `https://testnet.monadexplorer.com/tx/${hash}`,
-                "_blank"
-              )
-            }
-          >
+          <div className="success-message">
             <FaCheckCircle />
-          </button>
+            <p>Withdrawal submitted! <a href={`https://testnet.monadexplorer.com/tx/${hash}`} target="_blank" rel="noopener noreferrer">View on Explorer</a></p>
+          </div>
         )}
+        
+        {error && <div className="error-message">{error.message}</div>}
       </div>
 
       <style>{`
+        .wallet-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          padding: 20px;
+        }
+
         .fade-in {
           animation: fadeInUp 0.6s ease-out;
         }
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        .wallet-glass-card {
-          // border-radius: 24px;
-          box-shadow: 0 8px 40px rgba(108, 92, 231, 0.3), 0 2px 8px rgba(0,0,0,0.1);
-          backdrop-filter: blur(14px);
-          background: rgba(255, 255, 255, 0.1);
-          // border: 1.5px solid rgba(108, 92, 231, 0.6);
-          padding: 40px 20px;
-          // margin: 150px auto;
-          height: 100%;
+        .wallet-card {
+          position: relative;
           width: 100%;
-          max-width: 400px;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-evenly;
-          align-items: center;
-          transition: all 0.3s ease-in-out;
-        }
-
-        .contact-dev-btn {
-          position: absolute;
-          background: linear-gradient(135deg, #9b59b6, #6C5CE7);
+          max-width: 420px;
+          background: linear-gradient(135deg, #480ca8, #7209b7);
+          border-radius: 32px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          padding: 30px;
           color: #fff;
-          border: none;
-          font-size: 12px;
-          border-radius: 20px;
-          padding:5px 10px;
-          // padding: 14px 36px;
-          bottom: 40px;
-          opacity: 0.5;
+          text-align: center;
+          box-shadow: 0 10px 40px rgba(247, 37, 133, 0.2);
+          animation: pulse-glow 4s ease-in-out infinite;
         }
 
-        .balance-container {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 16px;
+        .wallet-card::before,
+        .wallet-card::after {
+          content: '';
+          position: absolute;
+          width: 22px;
+          height: 22px;
+          background: radial-gradient(circle at 30% 30%, #f0f0f0, #b0b0b0);
+          border-radius: 50%;
+          box-shadow: -2px 2px 4px rgba(0,0,0,0.4);
+          border: 2px solid #888;
+          z-index: 10;
+        }
+        .wallet-card::before { top: 20px; left: 20px; }
+        .wallet-card::after { top: 20px; right: 20px; }
+
+        .wallet-header {
+          font-size: 2rem;
+          font-weight: 900;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(247, 37, 133, 0.5);
+          margin-bottom: 25px;
+        }
+
+        .balance-display {
+          background: rgba(0,0,0,0.25);
+          border-radius: 20px;
+          padding: 20px;
+          margin-bottom: 25px;
+          box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .balance-label {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #e0d7ff;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 8px;
+        }
+
+        .balance-amount {
+          font-size: 2.8rem;
+          font-weight: 900;
+          text-shadow: 0 0 15px rgba(255,255,255,0.4);
+          letter-spacing: 1px;
         }
 
         .refresh-button {
-          background: none;
-          border: none;
-          color: #b9aaff;
-          cursor: pointer;
-          padding: 8px;
-          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.2s ease;
-        }
-
-        .refresh-button:hover {
-          color: #ffffff;
+          gap: 10px;
+          width: 100%;
+          margin-bottom: 25px;
+          padding: 12px;
           background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #fff;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
         }
 
-        .refresh-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
+        .refresh-button:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.2);
         }
 
         .spinning {
           animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
-
-        .success {
-          color: #00ff00;
-          font-size: 20px;
-          font-weight: 600;
-        }
-        .error {
-          color: #ff0000;
-          font-size: 20px;
-          font-weight: 600;
-        }
-        .emoji {
-          font-size: 36px;
-          margin-bottom: 10px;
-        }
-
-        .title {
-          font-size: 26px;
-          font-weight: 700;
-          color: #ffffff;
-          margin-bottom: 6px;
-        }
-
-        .balance {
-          font-size: 32px;
-          font-weight: 600;
-          color: #b9aaff;
-        }
-
-        .wallet-withdraw-btn {
-          background: linear-gradient(135deg, #9b59b6, #6C5CE7);
-          color: #fff;
-          border: none;
-          border-radius: 14px;
-          padding: 14px 36px;
-          font-size: 1.1rem;
+        
+        .wallet-action-btn {
           width: 100%;
-          height: 80px;
-          font-weight: bold;
           cursor: pointer;
-          transition: all 0.2s ease-in-out;
-          box-shadow: 0 4px 16px rgba(108, 92, 231, 0.6);
+          border: none;
+          border-radius: 16px;
+          font-size: 1.2rem;
+          font-weight: 800;
+          padding: 16px 0;
+          transition: all 0.15s ease-out;
+          text-transform: uppercase;
         }
 
-        .wallet-withdraw-btn:hover:not(:disabled) {
-          transform: scale(1.05);
-          box-shadow: 0 6px 24px rgba(108, 92, 231, 0.8);
+        .wallet-action-btn.primary {
+          background: linear-gradient(180deg, #f72585, #b5179e);
+          color: #fff;
+          border-bottom: 6px solid #8e0a71;
+          box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
         }
-
-        .wallet-withdraw-btn:disabled {
-          opacity: 0.5;
+        .wallet-action-btn.primary:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 12px 30px rgba(247, 37, 133, 0.6);
+          background: linear-gradient(180deg, #ff3a9a, #d12cb1);
+        }
+        .wallet-action-btn.primary:active:not(:disabled) {
+          transform: translateY(4px);
+          box-shadow: 0 3px 10px rgba(247, 37, 133, 0.5);
+          border-bottom-width: 2px;
+        }
+        .wallet-action-btn:disabled {
+          background: #3c304e;
+          box-shadow: none;
+          opacity: 0.6;
           cursor: not-allowed;
+          border-bottom: 6px solid #2a2138;
         }
 
         .withdrawal-note {
-          margin-top: 16px;
-          padding: 12px;
-          background: rgba(255, 255, 255, 0.1);
+          margin-top: 20px;
+          font-size: 0.8rem;
+          color: #e0d7ff;
+          line-height: 1.5;
+          background: rgba(0,0,0,0.15);
+          padding: 10px 15px;
           border-radius: 12px;
-          font-size: 0.9rem;
-          color: #b9aaff;
+        }
+
+        .contact-link {
+          text-decoration: underline;
+          cursor: pointer;
+          color: #f72585;
+          font-weight: 600;
+        }
+
+        .success-message, .error-message {
+          margin-top: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 15px;
+          border-radius: 12px;
+          font-weight: 600;
+        }
+        .success-message {
+          background: rgba(30, 255, 150, 0.2);
+          color: #1eff96;
+        }
+        .error-message {
+          background: rgba(255, 80, 80, 0.2);
+          color: #ff5050;
+        }
+        .success-message a {
+          text-decoration: underline;
+        }
+
+        .profile-section {
+          display: flex;
+          align-items: center;
+          margin-top: 20px;
+          gap: 15px;
+          margin-bottom: 25px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-picture {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border: 3px solid #f72585;
+          box-shadow: 0 0 15px rgba(247, 37, 133, 0.5);
+        }
+
+        .profile-info {
           text-align: left;
-          max-width: 300px;
         }
 
-        .withdrawal-note ol {
-          margin-top: 8px;
-          padding-left: 20px;
+        .profile-name {
+          font-size: 1.4rem;
+          font-weight: 700;
         }
-
-        .withdrawal-note li {
-          margin: 4px 0;
+        
+        .profile-fid {
+          font-size: 0.9rem;
+          color: #e0d7ff;
+          opacity: 0.8;
         }
       `}</style>
     </div>

@@ -813,7 +813,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         }
 
        .spin-ui-card {
-           background:linear-gradient(0deg,rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 100%);
+           background:linear-gradient(0deg,rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 80%);
            border-radius: 32px;
            border: 1px solid rgba(255, 255, 255, 0.2);
            padding: 28px 24px 36px;
