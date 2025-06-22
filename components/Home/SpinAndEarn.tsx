@@ -201,14 +201,14 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [ 0.04, 0.07,0.09,0.03,0.05,0.06,0.08];
+        const monValues = [ 0.01,0.03,0.05,0.07,0.09];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (5 - 1) + 1).toFixed(2);
+        return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
       case "CHOG":
-        return +(Math.random() * (0.45 - 0.1) + 0.45).toFixed(2);
+        return +(Math.random() * (0.3 - 0.1) + 0.1).toFixed(3);
       case "USDC":
-        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(3);
+        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(4);
       default:
         return 0;
     }
@@ -217,9 +217,9 @@ export function SpinAndEarn() {
   const segments: Segment[] = [
     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 72 },  // Gold
     { text: "YAKI", value: 0, color: "#00E5FF", probability: 20, degrees: 72 },  // Bright Teal
-    { text: "", value: 0, color: "#004D40", probability: 40, degrees: 72 },  // Dark Teal
+    { text: "", value: 0, color: "#004D40", probability: 45, degrees: 72 },  // Dark Teal
     { text: "CHOG", value: 0, color: "#00BFA5", probability: 20, degrees: 72 },  // Medium Teal
-    { text: "USDC", value: 0, color: "#B8860B", probability: 19, degrees: 72 },  // Dark Gold
+    { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 72 },  // Dark Gold
   ];
 
   // Fetch spins and timer data from backend
