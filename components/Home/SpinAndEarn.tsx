@@ -140,6 +140,38 @@ export function SpinAndEarn() {
   }, [isMuted]);
 
   useEffect(() => {
+    // Sync user data to DB
+    if (fid) {
+      const pfpUrl = context?.user?.pfpUrl;
+      const savedSpins = localStorage.getItem('totalSpins');
+      const totalSpins = savedSpins ? parseInt(savedSpins, 10) : null;
+
+      const dataToUpdate: { fid: number; pfpUrl?: string; totalSpins?: number } = { fid };
+      let shouldUpdate = false;
+
+      if (pfpUrl) {
+        dataToUpdate.pfpUrl = pfpUrl;
+        shouldUpdate = true;
+      }
+      if (totalSpins !== null) {
+        dataToUpdate.totalSpins = totalSpins;
+        shouldUpdate = true;
+      }
+      console.log('shouldUpdate', shouldUpdate);
+      if (shouldUpdate) {
+        fetchWithVerification('/api/update-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataToUpdate),
+        })
+        .then(res => res.json())
+        .then(data => console.log('Sync result:', data.message))
+        .catch(err => console.error('Failed to sync user data:', err));
+      }
+    }
+  }, [fid, context?.user?.pfpUrl]);
+
+  useEffect(() => {
     if (result) {
       setIsResultPopupVisible(true);
     } else {
@@ -813,11 +845,11 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         }
 
        .spin-ui-card {
-           background:linear-gradient(0deg,rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 80%);
+           background:linear-gradient(0deg,rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 20%);
            border-radius: 32px;
            border: 1px solid rgba(255, 255, 255, 0.2);
            padding: 28px 24px 36px;
-           margin: 110px auto 16px auto;
+           margin: 80px auto 16px auto;
            width: 97%;
            max-width: 400px;
            display: flex;

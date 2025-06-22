@@ -9,30 +9,73 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { db } = await connectToDatabase();
     
-    // Aggregate total winnings per address with FID
+    // Aggregate total winnings per address with FID and user data
     const leaders = await db.collection('winnings')
       .aggregate([
+        // Group by FID to sum up winnings
         {
           $group: {
-            _id: '$address',
+            _id: '$fid',
             totalWinnings: { $sum: '$amount' },
-            name: { $first: '$name' },
-            fid: { $first: '$fid' }  // Get the FID for each address
+            address: { $first: '$address' },
+            name: { $first: '$name' }
           }
         },
+        // Join with the users collection to get totalSpins and pfpUrl
         {
-          $sort: { totalWinnings: -1 }
+          $lookup: {
+            from: 'users',
+            localField: '_id',
+            foreignField: 'fid',
+            as: 'userData'
+          }
+        },
+        // Deconstruct the userData array
+        {
+          $unwind: {
+            path: '$userData',
+            preserveNullAndEmptyArrays: true // Keep users even if they're not in the users table
+          }
+        },
+        // Add the engagement score
+        {
+          $addFields: {
+            totalSpins: { $ifNull: [ '$userData.totalSpins', 0 ] },
+            pfpUrl: { $ifNull: [ '$userData.pfpUrl', null ] },
+            // Engagement Score = (totalWinnings * 0.7) + (totalSpins * 0.3)
+            // We can tweak these weights later if needed.
+            engagementScore: {
+              $add: [
+                { $multiply: [ '$totalWinnings', 0.5 ] },
+                { $multiply: [ { $ifNull: [ '$userData.totalSpins', 0 ] }, 0.5 ] }
+              ]
+            }
+          }
+        },
+        // Filter out users who do not have a pfpUrl
+        {
+          $match: {
+            pfpUrl: { $ne: null }
+          }
+        },
+        // Sort by the new engagement score
+        {
+          $sort: { engagementScore: -1 }
         },
         {
           $limit: 100
         },
+        // Project the final fields
         {
           $project: {
             _id: 0,
-            address: '$_id',
-            name: '$name',
+            fid: '$_id',
+            address: 1,
+            name: 1,
             totalWinnings: { $toString: '$totalWinnings' },
-            fid: 1
+            totalSpins: 1,
+            pfpUrl: 1,
+            engagementScore: 1
           }
         }
       ]).toArray();

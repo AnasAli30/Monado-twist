@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { FaTrophy, FaMedal } from 'react-icons/fa';
 import { useMiniAppContext } from '@/hooks/use-miniapp-context';
+import { SkeletonLeaderboardItem } from './SkeletonLeaderboardItem';
 
 interface LeaderboardEntry {
   address: string;
   totalWinnings: string;
+  totalSpins: number;
   fid: number;
   rank: number;
   name: string;
+  pfpUrl?: string;
 }
 
 export function Leaderboard() {
@@ -20,7 +23,6 @@ export function Leaderboard() {
       try {
         const res = await fetch('/api/leaderboard');
         const data = await res.json();
-        console.log(data);
         setLeaders(data);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
@@ -32,77 +34,125 @@ export function Leaderboard() {
     fetchLeaderboard();
   }, []);
 
+  const getMedalColor = (rank: number) => {
+    switch(rank) {
+      case 1: return '#FFD700'; // Gold
+      case 2: return '#C0C0C0'; // Silver
+      case 3: return '#CD7F32'; // Bronze
+      default: return 'transparent';
+    }
+  };
+
   return (
-    <div className="leaderboard-glass-card  fade-in">
-      <div className="leaderboard-header">
-        <FaTrophy className="trophy-icon" />
-        <h2>Top Winners</h2>
-      </div>
-      
-      {loading ? (
-        <div className="loading">Loading...</div>
-      ) : (
-        <div className="leaderboard-list">
-          {leaders.map((entry, index) => (
-            console.log(entry),
-            <div key={entry.address} className="leaderboard-item"  onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}>
-                <div className="rank">
-               
-                  {index < 3 ? (
-                    <FaMedal className={`medal-${index + 1}`} />
-                  ) : (
-                    <span>{index + 1}</span>
-                  )}
-                </div>
-                {/* {context?.user?.pfpUrl && (
-              <img
-                src={context?.user?.pfpUrl}
-                className="w-10 h-10 rounded-full border border-white mr-2"
-                alt="User Profile Picture"
-              />
-            )} */}
-                <div className="user-info">
-                
-                 { entry.name!=null && <div className="fid"> {String(entry.name)}</div>}
-                  <div className="address">{`${entry.address.slice(0, 6)}...${entry.address.slice(-4)}`}</div>
-                </div>
-                <div className="winnings">{parseFloat(entry.totalWinnings).toFixed(2)} MON</div>
-              </div>
-     
-          ))}
+    <div className="leaderboard-container fade-in">
+      <div className="leaderboard-card">
+        <div className="leaderboard-header">
+          <FaTrophy />
+          <h2>Top Winners</h2>
         </div>
-      )}
+        
+        {loading ? (
+          <div className="skeleton-list">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonLeaderboardItem key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="leaderboard-list">
+            {leaders.map((entry, index) => (
+              <div 
+                key={entry.fid} 
+                className={`leaderboard-item ${context?.user?.fid === entry.fid ? 'current-user' : ''}`}  
+                onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}
+              >
+                <div className="rank-section">
+                  <span className="rank-number">{index + 1}</span>
+                  {index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
+                </div>
+
+                <img src={entry.pfpUrl || '/images/icon.png'} alt={entry.name} className="leaderboard-pfp" />
+                
+                <div className="user-info">
+                  <div className="leaderboard-name">{entry.name || 'Anonymous'}</div>
+                  <div className="leaderboard-address">{`${entry.address.slice(0, 6)}...${entry.address.slice(-4)}`}</div>
+                </div>
+
+                <div className="stats-section">
+                  <div className="stat-item winnings">
+                    <span className="stat-value">{parseFloat(entry.totalWinnings).toFixed(2)}</span>
+                    <span className="stat-label">MON</span>
+                  </div>
+                  <div className="stat-item spins">
+                    <span className="stat-value">{entry.totalSpins}</span>
+                    <span className="stat-label">Spins</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <style>{`
-        .leaderboard-glass-card {
-          background: linear-gradient(135deg, #6C5CE7 0%, #6C5CE7 100%);
-          // border-radius: 24px;
-          box-shadow: 0 8px 40px rgba(108, 92, 231, 0.3);
-          backdrop-filter: blur(14px);
-          border: 1.5px solid rgba(108, 92, 231, 0.6);
-          padding: 24px;
-          // margin: 32px auto;
+        .leaderboard-container {
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
           width: 100%;
-          // max-width: 400px;
+          height: 100%;
+          padding: 8px;
+          overflow-y: auto;
         }
+
+        .fade-in {
+          animation: fadeInUp 0.6s ease-out;
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .leaderboard-card {
+          position: relative;
+          width: 100%;
+          max-width: 480px;
+          background: linear-gradient(135deg, #480ca8, #7209b7);
+          border-radius: 32px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          padding: 5px;
+          color: #fff;
+          box-shadow: 0 10px 40px rgba(247, 37, 133, 0.2);
+          animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        .leaderboard-card::before,
+        .leaderboard-card::after {
+          content: '';
+          position: absolute;
+          width: 22px;
+          height: 22px;
+          background: radial-gradient(circle at 30% 30%, #f0f0f0, #b0b0b0);
+          border-radius: 50%;
+          box-shadow: -2px 2px 4px rgba(0,0,0,0.4);
+          border: 2px solid #888;
+          z-index: 10;
+        }
+        .leaderboard-card::before { top: 20px; left: 20px; }
+        .leaderboard-card::after { top: 20px; right: 20px; }
 
         .leaderboard-header {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 24px;
-          color: #fff;
+          justify-content: center;
+          gap: 15px;
+          margin-bottom: 25px;
+          font-size: 2rem;
+          font-weight: 900;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(247, 37, 133, 0.5);
         }
-
-        .trophy-icon {
-          font-size: 24px;
+        .leaderboard-header .fa-trophy {
           color: #FFD700;
-        }
-
-        .leaderboard-header h2 {
-          font-size: 24px;
-          font-weight: 700;
-          margin: 0;
+          filter: drop-shadow(0 0 10px #FFD700);
         }
 
         .leaderboard-list {
@@ -114,67 +164,177 @@ export function Leaderboard() {
         .leaderboard-item {
           display: flex;
           align-items: center;
-          padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
-          color: #fff;
+          gap: 12px;
+          padding: 10px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 16px;
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
+          cursor: pointer;
+        }
+        .leaderboard-item:hover {
+          transform: translateY(-2px);
+          background: rgba(0, 0, 0, 0.3);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+        .leaderboard-item.current-user {
+          background: rgba(247, 37, 133, 0.2);
+          border-color: #f72585;
         }
 
-        .rank {
-          width: 40px;
+        .rank-section {
           display: flex;
           align-items: center;
+          gap: 8px;
+          width: 60px;
+          font-weight: 700;
+          font-size: 1.1rem;
           justify-content: center;
-          font-weight: 600;
+        }
+        .medal-icon {
+          font-size: 1.5rem;
+          filter: drop-shadow(0 0 8px);
         }
 
-        .medal-1 { color: #FFD700; }
-        .medal-2 { color: #C0C0C0; }
-        .medal-3 { color: #CD7F32; }
+        .leaderboard-pfp {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          border: 2px solid rgba(255,255,255,0.3);
+        }
 
         .user-info {
           flex: 1;
+          text-align: left;
+        }
+
+        .leaderboard-name {
+          font-weight: 600;
+          font-size: 1rem;
+        }
+        .leaderboard-address {
+          font-family: monospace;
+          font-size: 0.8rem;
+          opacity: 0.7;
+        }
+        
+        .stats-section {
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
           gap: 4px;
         }
 
-        .fid {
-          font-size: 0.9rem;
-          color: #b9aaff;
-          font-weight: 600;
+        .stat-item {
+          display: flex;
+          align-items: baseline;
+          gap: 5px;
+        }
+        
+        .stat-value {
+          font-weight: 700;
+          font-size: 1.1rem;
+        }
+        
+        .stat-label {
+          font-size: 0.7rem;
+          font-weight: 500;
+          opacity: 0.8;
+          text-transform: uppercase;
         }
 
-        .address {
-          font-family: monospace;
-          font-size: 0.9rem;
+        .stat-item.winnings .stat-value {
+          color: #1eff96;
+          text-shadow: 0 0 8px rgba(30, 255, 150, 0.5);
+        }
+        
+        .stat-item.spins .stat-value {
+          color: #f72585;
+          text-shadow: 0 0 8px rgba(247, 37, 133, 0.5);
         }
 
-        .winnings {
-          font-weight: 600;
-          color: #C7F6C7;
+        .mon-label {
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+        
+        /* Skeleton Loader Styles */
+        .skeleton-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .skeleton-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 16px;
+          height: 67px; /* Match leaderboard-item height */
         }
 
-        .loading {
-          text-align: center;
-          color: #fff;
-          padding: 20px;
-          height: 100vh;
+        @keyframes shimmer {
+          0% { background-position: -468px 0; }
+          100% { background-position: 468px 0; }
         }
 
-        .fade-in {
-          animation: fadeInUp 0.6s ease-out;
+        .skeleton-rank, .skeleton-pfp, .skeleton-text, .skeleton-winnings {
+          background-color: rgba(255, 255, 255, 0.08);
+          background-image: linear-gradient(to right, 
+            rgba(255,255,255,0.08) 0%, 
+            rgba(255,255,255,0.12) 20%, 
+            rgba(255,255,255,0.08) 40%, 
+            rgba(255,255,255,0.08) 100%
+          );
+          background-repeat: no-repeat;
+          background-size: 800px 104px; 
+          animation: shimmer 1.5s linear infinite;
+          border-radius: 8px;
         }
 
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .skeleton-rank {
+          width: 60px;
+          height: 24px;
+        }
+        .skeleton-pfp {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+        }
+        .skeleton-user-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .skeleton-text.short {
+          height: 16px;
+          width: 60%;
+        }
+        .skeleton-text.long {
+          height: 12px;
+          width: 80%;
+        }
+        .skeleton-winnings {
+          width: 80px;
+          height: 24px;
+        }
+
+        .loading-spinner {
+          width: 48px;
+          height: 48px;
+          border: 5px solid #FFF;
+          border-bottom-color: #f72585;
+          border-radius: 50%;
+          display: inline-block;
+          box-sizing: border-box;
+          animation: rotation 1s linear infinite;
+          margin: 40px auto;
+        }
+        @keyframes rotation {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
