@@ -82,7 +82,7 @@ export function Leaderboard() {
                 
                 <div className="user-info">
                   <div className="leaderboard-name">{entry.name || 'Anonymous'}</div>
-                  <div className="leaderboard-address">{`${entry.address.slice(0, 6)}...${entry.address.slice(-4)}`}</div>
+                  <div className="leaderboard-address">{entry.address ? `${entry.address.slice(0, 6)}...${entry.address.slice(-4)}` : 'No address yet'}</div>
                 </div>
 
                 <div className="stats-section">
