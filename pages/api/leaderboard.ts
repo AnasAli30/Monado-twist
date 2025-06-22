@@ -46,16 +46,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // We can tweak these weights later if needed.
             engagementScore: {
               $add: [
-                { $multiply: [ '$totalWinnings', 0.5 ] },
-                { $multiply: [ { $ifNull: [ '$userData.totalSpins', 0 ] }, 0.5 ] }
+                { $multiply: [ '$totalWinnings', 0.1 ] },
+                { $multiply: [ { $ifNull: [ '$userData.totalSpins', 0 ] }, 0.9 ] }
               ]
             }
-          }
-        },
-        // Filter out users who do not have a pfpUrl
-        {
-          $match: {
-            pfpUrl: { $ne: null }
           }
         },
         // Sort by the new engagement score

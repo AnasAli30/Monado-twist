@@ -9,7 +9,10 @@ export function SkeletonLeaderboardItem() {
         <div className="skeleton-text short"></div>
         <div className="skeleton-text long"></div>
       </div>
-      <div className="skeleton-winnings"></div>
+      <div className="skeleton-stats">
+        <div className="skeleton-winnings"></div>
+        <div className="skeleton-spins"></div>
+      </div>
     </div>
   );
 } 

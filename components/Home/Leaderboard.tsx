@@ -78,14 +78,13 @@ export function Leaderboard() {
                 </div>
 
                 <div className="stats-section">
-                  <div className="stat-item winnings">
-                    <span className="stat-value">{parseFloat(entry.totalWinnings).toFixed(2)}</span>
-                    <span className="stat-label">MON</span>
+                  <div className="winnings-section">
+                    <span>{parseFloat(entry.totalWinnings).toFixed(2)}</span>
+                    <span className="mon-label">MON</span>
                   </div>
-                  <div className="stat-item spins">
-                    <span className="stat-value">{entry.totalSpins}</span>
-                    <span className="stat-label">Spins</span>
-                  </div>
+                  { entry.totalSpins > 0 && <div className="spins-section">
+                    {entry.totalSpins} Spins
+                  </div>}
                 </div>
               </div>
             ))}
@@ -219,43 +218,29 @@ export function Leaderboard() {
         }
         
         .stats-section {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 4px;
+          text-align: right;
         }
 
-        .stat-item {
+        .winnings-section {
           display: flex;
           align-items: baseline;
           gap: 5px;
-        }
-        
-        .stat-value {
           font-weight: 700;
           font-size: 1.1rem;
-        }
-        
-        .stat-label {
-          font-size: 0.7rem;
-          font-weight: 500;
-          opacity: 0.8;
-          text-transform: uppercase;
-        }
-
-        .stat-item.winnings .stat-value {
           color: #1eff96;
           text-shadow: 0 0 8px rgba(30, 255, 150, 0.5);
         }
-        
-        .stat-item.spins .stat-value {
-          color: #f72585;
-          text-shadow: 0 0 8px rgba(247, 37, 133, 0.5);
-        }
-
         .mon-label {
           font-size: 0.8rem;
           font-weight: 500;
+          opacity: 0.8;
+        }
+        
+        .spins-section {
+          font-size: 0.8rem;
+          font-weight: 500;
+          opacity: 0.7;
+          margin-top: 4px;
         }
         
         /* Skeleton Loader Styles */
@@ -318,7 +303,11 @@ export function Leaderboard() {
         }
         .skeleton-winnings {
           width: 80px;
-          height: 24px;
+          height: 22px;
+        }
+        .skeleton-spins {
+          width: 60px;
+          height: 12px;
         }
 
         .loading-spinner {
