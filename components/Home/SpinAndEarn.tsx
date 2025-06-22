@@ -758,8 +758,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               radial-gradient(circle at 1% 1%, rgba(247, 37, 133, 0.2), transparent 30%),
               radial-gradient(circle at 99% 99%, rgba(72, 12, 168, 0.2), transparent 40%);
           box-shadow: inset 0 0 120px rgba(0,0,0,0.6);
-          margin-bottom: 80px;
-          height: 100%;
+          padding-bottom: 60px;
+          min-height: 100vh;
         }
         .wheel-container {
           position: relative;
@@ -849,7 +849,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
            border-radius: 32px;
            border: 1px solid rgba(255, 255, 255, 0.2);
            padding: 28px 24px 36px;
-           margin: 0px auto 15px auto;
+           margin: 1px auto 16px auto;
            width: 97%;
            max-width: 400px;
            display: flex;
@@ -1048,6 +1048,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           color: #fff;
           border: none;
           border-radius: 12px;
+          margin-top: 40px;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
@@ -1061,19 +1062,20 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           transform: translateY(-2px);
         }
         .switch-bar {
-          position: sticky;
+          position: fixed;
           bottom: 0;
           left: 0;
           right: 0;
           width: 100%;
           display: flex;
           justify-content: space-around;
-          padding: 5px 5px;
-          background: rgba(18, 18, 45, 0.5);
+          padding: 8px 5px;
+          background: rgba(18, 18, 45, 0.7);
           backdrop-filter: blur(15px);
           -webkit-backdrop-filter: blur(15px);
           border-top: 1px solid rgba(255, 255, 255, 0.1);
-          // gap: 5px;
+          gap: 5px;
+          z-index: 100;
         }
         .switch-bar button {
           display: flex;
