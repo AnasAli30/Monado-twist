@@ -6,6 +6,8 @@ import { InnerWallet } from "@/components/Home/InnerWallet";
 import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
+import { Confetti } from './Confetti';
+import { CryingEmoji } from './CryingEmoji';
 import { ethers } from "ethers";
 import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
@@ -80,6 +82,8 @@ export function SpinAndEarn() {
     return false;
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const winAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
+  const loseAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
   const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
@@ -379,6 +383,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       setWonValue(wonValue);
 
       if (audioRef.current && !isMuted) {
+        audioRef.current.volume = 0.5;
         audioRef.current.currentTime = 0;
         audioRef.current.play();
         setTimeout(() => {
@@ -615,11 +620,35 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
   const isSuccessPopup = result ? (result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')) : false;
   const isWinSuccess = result ? (result.includes('won') || result.includes('reward') || result.includes('claimed')) : false;
+  const isNoWin = result ? result.includes('😢') || result.includes('No win') : false;
+  
+  useEffect(() => {
+    if (isWinSuccess && !isMuted) {
+      const soundToPlay = winAudioRefs.current[Math.floor(Math.random() * winAudioRefs.current.length)];
+      if (soundToPlay) {
+        soundToPlay.volume = 0.5;
+        soundToPlay.currentTime = 0;
+        soundToPlay.play();
+      }
+    } else if (isNoWin && !isMuted) {
+      const soundToPlay = loseAudioRefs.current[Math.floor(Math.random() * loseAudioRefs.current.length)];
+      if (soundToPlay) {
+        soundToPlay.volume = 0.5;
+        soundToPlay.currentTime = 0;
+        soundToPlay.play();
+      }
+    }
+  }, [isWinSuccess, isNoWin, isMuted]);
+
+  const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3'];
+  const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3'];
 
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
       {isResultPopupVisible && result && (
         <div className="popup-overlay" onClick={handleClosePopup}>
+          {isWinSuccess && <Confetti />}
+          {isNoWin && <CryingEmoji />}
           <div
             className={`popup-content result ${
               isSuccessPopup
@@ -1144,13 +1173,101 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           opacity: 0.6;
           cursor: not-allowed;
         }
+        @keyframes sparkle-animation {
+          0%, 100% {
+            transform: scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .sparkle {
+          position: absolute;
+          background: #fff;
+          border-radius: 50%;
+          filter: blur(1px);
+          animation: sparkle-animation 2s ease-out infinite;
+          pointer-events: none;
+        }
+        .confetti-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 1;
+        }
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-20vh) rotate(0deg) rotateY(0);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(120vh) rotate(720deg) rotateY(360deg);
+            opacity: 0;
+          }
+        }
+        .confetti-particle {
+          position: absolute;
+          top: -20%;
+          animation: confetti-fall 7s linear infinite;
+        }
+        .popup-content {
+          z-index: 2;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .crying-emoji-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .crying-emoji-particle {
+          position: absolute;
+          top: -20%;
+          animation: confetti-fall 7s linear infinite;
+          opacity: 0.8;
+        }
       `}</style>
-      <audio 
+      <audio
         ref={audioRef}
         src="/spinning-sound.mp3"
         preload="auto"
         muted={isMuted}
       />
+      {winSounds.map((src, i) => (
+        <audio
+          key={src}
+          ref={(el) => {
+            winAudioRefs.current[i] = el;
+          }}
+          src={src}
+          preload="auto"
+          muted={isMuted}
+        />
+      ))}
+      {loseSounds.map((src, i) => (
+        <audio
+          key={src}
+          ref={(el) => {
+            loseAudioRefs.current[i] = el;
+          }}
+          src={src}
+          preload="auto"
+          muted={isMuted}
+        />
+      ))}
       {view === 'spin' ? (
         <>
           <div className="wheel-container">
