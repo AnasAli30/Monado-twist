@@ -41,7 +41,7 @@ function getRandomWallet() {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { to, amount, fid } = req.body;
+    const { to, amount, fid, pfpUrl } = req.body;
 
     try {
       if (!to || !amount || !fid) {
@@ -82,7 +82,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await pusher.trigger('monado-spin', 'win', {
         name: user?.name,
         address: to,
-        amount: amount
+        amount: amount,
+        pfpUrl: pfpUrl
       });
       }catch(error){
         console.error('Error triggering win event:', error);

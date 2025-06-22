@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
+import { WinNotifications } from "./WinNotifications";
 
 interface Segment {
   text: string;
@@ -462,7 +463,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               body: JSON.stringify({
                 to: address,
                 amount: wonValue,
-                fid
+                fid,
+                pfpUrl: context?.user?.pfpUrl
               }),
               headers: { 'Content-Type': 'application/json' }
             });
@@ -478,7 +480,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                   tokenAddress: getTokenAddress(wonSegment.text),
                   amount: parseUnits(wonValue.toString(), getTokenDecimals(wonSegment.text)).toString(),
                   tokenName: wonSegment.text,
-                  name: name
+                  name: name,
+                  pfpUrl: context?.user?.pfpUrl
                 }),
                 headers: { 'Content-Type': 'application/json' }
               });

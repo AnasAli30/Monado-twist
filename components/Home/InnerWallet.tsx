@@ -185,6 +185,14 @@ export function InnerWallet() {
             <button onClick={withdraw} disabled={loading || isPending || balance === "0"} className="wallet-action-btn primary">
               {isPending ?  "Withdrawing..." : "Withdraw Balance"}
             </button>
+            
+        {hash && (
+          <div className="success-message">
+            <FaCheckCircle />
+            <p>Withdrawal submitted! </p>
+            <a href={`https://testnet.monadexplorer.com/tx/${hash}`} target="_blank" rel="noopener noreferrer">View on Explorer</a>
+          </div>
+        )}
             <div className="withdrawal-note">
               <p><strong>Note:</strong> Having trouble with the withdrawal? Close and reopen the mini app, wait 15 seconds, and give it another try.</p>
               <p>Still having issues?</p>
@@ -193,12 +201,6 @@ export function InnerWallet() {
           </>
         )}
 
-        {hash && (
-          <div className="success-message">
-            <FaCheckCircle />
-            <p>Withdrawal submitted! <a href={`https://testnet.monadexplorer.com/tx/${hash}`} target="_blank" rel="noopener noreferrer">View on Explorer</a></p>
-          </div>
-        )}
         
         {error && <div className="error-message">{error.message}</div>}
       </div>

@@ -9,6 +9,7 @@ interface Notification {
   token: string;
   timestamp: number;
   spins?: number;
+  pfpUrl?: string;
 }
 
 export function WinNotifications() {
@@ -24,13 +25,14 @@ export function WinNotifications() {
     // Subscribe to the channel
     const channel = pusher.subscribe('monado-spin');
 
-    channel.bind('withdraw', (data: { address: string; amount: number; token: string; name: string }) => {
+    channel.bind('withdraw', (data: { address: string; amount: number; token: string; name: string , pfpUrl?: string }) => {
       console.log('Withdraw event received:', data);
       const newNotification: Notification = {
         type: 'withdraw',
         name: data?.name,
         amount: data?.amount,
         address: data?.address,
+        pfpUrl: data?.pfpUrl,
         token: data?.token,
         timestamp: Date.now()
       };
@@ -39,16 +41,17 @@ export function WinNotifications() {
     });
     
     // Listen for win events
-    channel.bind('win', (data: { address: string; amount: number; token: string; name: string }) => {
+    channel.bind('win', (data: { address: string; amount: number; token: string; name: string, pfpUrl: string }) => {
       console.log('Win event received:', data);
       const newNotification: Notification = {
         type: 'win',
         name: data.name,
-       amount: data.token == undefined ? data.amount : Number(
+        amount: data.token == undefined ? data.amount : Number(
           ethers.formatUnits(data.amount, data.token === "USDC" ? 6 : 18)
         ),
         token: data.token,
         address: data.address,
+        pfpUrl: data?.pfpUrl,
         timestamp: Date.now()
       };
       
@@ -84,14 +87,14 @@ export function WinNotifications() {
     switch (notification.type) {
       case 'win':
         if (notification.token == undefined) {
-          return `🎉 ${user} won ${notification.amount} MON! 🎉`;
+          return ` ${user} won ${notification.amount} MON! 🎉`;
         } else {
-          return `🎉 ${user} won ${notification.amount} ${notification.token}! 🎉`;
+          return ` ${user} won ${notification.amount} ${notification.token}! 🎉`;
         }
       case 'withdraw':
-        return `💸 ${user} withdraw ${notification.amount} MON! 💸`;
+        return ` ${user} withdraw ${notification.amount} MON! 💸`;
       case 'purchase':
-        return `🎲 ${user} bought ${notification.spins} spins 🎲`;
+        return ` ${user} bought ${notification.spins} spins 🥂👀`;
       default:
         return '🎲 Spin the wheel to win MON tokens! 🎲';
     }
@@ -187,9 +190,15 @@ export function WinNotifications() {
             className="notification-item"
             style={{
               animation: index === 0 ? 'slideUp 0.5s ease-out' : 'none',
-              opacity: index === 0 ? 1 : 0.5
+              opacity: index === 0 ? 1 : 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
+            {notification.pfpUrl && (
+              <img src={notification.pfpUrl} alt="pfp" style={{ width: 20, height: 20, borderRadius: '50%', marginRight: 8 }} />
+            )}
             {getNotificationText(notification)}
           </div>
         ))}

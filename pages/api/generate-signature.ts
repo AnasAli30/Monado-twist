@@ -21,8 +21,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey } = req.body;
-    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName ,fusedKey,randomKey});
+    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl } = req.body;
+    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName ,fusedKey,randomKey, pfpUrl });
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
       return res.status(400).json({ error: 'Missing required parameters' });
@@ -77,7 +77,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       name: name,
       address: userAddress,
       amount: amount,
-      token: tokenName
+      token: tokenName,
+      pfpUrl: pfpUrl
     });
     }catch(error){
       console.error('Error triggering win event:', error);
