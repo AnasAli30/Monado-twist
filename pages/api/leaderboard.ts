@@ -9,67 +9,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { db } = await connectToDatabase();
     
-    // Aggregate total winnings per address with FID and user data
-    const leaders = await db.collection('winnings')
+    const leaders = await db.collection('monad-users')
       .aggregate([
-        // Group by FID to sum up winnings
+        // 1. Match users who have spun at least once
         {
-          $group: {
-            _id: '$fid',
-            totalWinnings: { $sum: '$amount' },
-            address: { $first: '$address' },
-            name: { $first: '$name' }
+          $match: {
+            totalSpins: { $exists: true, $gt: 0 }
           }
         },
-        // Join with the users collection to get totalSpins and pfpUrl
+        // 2. Sort by total spins to get the top spinners first
+        {
+          $sort: { totalSpins: -1 }
+        },
+        // 3. Limit the initial list to 200
+        {
+          $limit: 200
+        },
+        // 4. Look up their winnings data
         {
           $lookup: {
-            from: 'users',
-            localField: '_id',
+            from: 'winnings',
+            localField: 'fid',
             foreignField: 'fid',
-            as: 'userData'
+            as: 'winningsData'
           }
         },
-        // Deconstruct the userData array
-        {
-          $unwind: {
-            path: '$userData',
-            preserveNullAndEmptyArrays: true // Keep users even if they're not in the users table
-          }
-        },
-        // Add the engagement score
-        {
-          $addFields: {
-            totalSpins: { $ifNull: [ '$userData.totalSpins', 0 ] },
-            pfpUrl: { $ifNull: [ '$userData.pfpUrl', null ] },
-            // Engagement Score = (totalWinnings * 0.7) + (totalSpins * 0.3)
-            // We can tweak these weights later if needed.
-            engagementScore: {
-              $add: [
-                { $multiply: [ '$totalWinnings', 0.1 ] },
-                { $multiply: [ { $ifNull: [ '$userData.totalSpins', 0 ] }, 0.9 ] }
-              ]
-            }
-          }
-        },
-        // Sort by the new engagement score
-        {
-          $sort: { engagementScore: -1 }
-        },
-        {
-          $limit: 100
-        },
-        // Project the final fields
+        // 5. Project the final fields and calculate total winnings
         {
           $project: {
             _id: 0,
-            fid: '$_id',
-            address: 1,
-            name: 1,
-            totalWinnings: { $toString: '$totalWinnings' },
-            totalSpins: 1,
+            fid: 1,
             pfpUrl: 1,
-            engagementScore: 1
+            totalSpins: 1,
+            // Get name & address from the first win record, as it may not be on the user doc
+            name: { $ifNull: [ '$username', { $first: '$winningsData.name' } ] },
+            address: { $first: '$winningsData.address' },
+            // Calculate total winnings by summing the amounts from the winnings array
+            totalWinnings: { $toString: { $sum: '$winningsData.amount' } }
           }
         }
       ]).toArray();

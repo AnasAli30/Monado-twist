@@ -104,8 +104,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (checkOnly) {
-    return res.status(200).json({ 
+    const winningsData = await db.collection('winnings').aggregate([
+        { $match: { fid: fid } },
+        { $group: { _id: "$fid", totalMonWon: { $sum: "$amount" } } }
+    ]).toArray();
+    const totalMonWon = winningsData.length > 0 ? winningsData[0].totalMonWon.toFixed(2) : 0;
+    return res.status(200).json({
       spinsLeft,
+      totalMonWon: parseFloat(totalMonWon),
       lastSpinReset: user?.lastSpinReset,
       lastShareSpin: user?.lastShareSpin,
       follow: user?.follow,

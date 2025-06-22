@@ -78,13 +78,14 @@ export function Leaderboard() {
                 </div>
 
                 <div className="stats-section">
+                { entry.totalSpins > 0 && <div className="spins-section">
+                    {entry.totalSpins} Spins
+                  </div>}
                   <div className="winnings-section">
                     <span>{parseFloat(entry.totalWinnings).toFixed(2)}</span>
                     <span className="mon-label">MON</span>
                   </div>
-                  { entry.totalSpins > 0 && <div className="spins-section">
-                    {entry.totalSpins} Spins
-                  </div>}
+                 
                 </div>
               </div>
             ))}

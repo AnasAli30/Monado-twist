@@ -81,6 +81,14 @@ export function SpinAndEarn() {
     }
     return false;
   });
+  const [totalMonWon, setTotalMonWon] = useState<number>(0);
+  const [totalWins, setTotalWins] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('totalWins');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const loseAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
@@ -131,6 +139,13 @@ export function SpinAndEarn() {
       localStorage.setItem('totalSpins', totalSpins.toString());
     }
   }, [totalSpins]);
+
+  // Update localStorage when totalWins changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('totalWins', totalWins.toString());
+    }
+  }, [totalWins]);
 
   // Save mute state to localStorage
   useEffect(() => {
@@ -219,6 +234,7 @@ export function SpinAndEarn() {
           });
           const data = await res.json();
           setSpinsLeft(data.spinsLeft);
+          setTotalMonWon(data.totalMonWon || 0);
           setClaimed(data.envelopeClaimed);
           SetFollow(data.follow);
           setHasLikedAndRecast(data.likeAndRecast || false);
@@ -432,10 +448,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           setIsSpinning(false);
           return;
         }
+        setTotalWins(prev => prev + 1);
         setResult(`🎉 You won ${wonValue} ${wonSegment.text}!`);
         setIsSpinning(false);
         if (wonValue > 0 && address) {
           if (wonSegment.text === "MON") {
+            setTotalMonWon(prev => prev + wonValue);
             // Keep existing MON token handling
             await fetchWithVerification('/api/win', {
               method: 'POST',
@@ -1418,6 +1436,21 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               <div className="spin-ui-box">
                 <div className="spin-ui-label">Total Spins</div>
                 <div className="spin-ui-value">{totalSpins}</div>
+              </div>
+            </div>
+            <div className="spin-ui-row">
+              <div className="spin-ui-box">
+                <div className="spin-ui-label">Total MON Won</div>
+                <div className="spin-ui-value">
+                  {totalMonWon.toFixed(2)}
+                  <img src="/images/mon.png" alt="MON" style={{ width: 28, height: 28, marginLeft: 4 }} />
+                </div>
+              </div>
+              <div className="spin-ui-box">
+                <div className="spin-ui-label">Win Rate</div>
+                <div className="spin-ui-value">
+                  {totalSpins > 0 ? ((totalWins / totalSpins) * 100).toFixed(0) : 0}%
+                </div>
               </div>
             </div>
             {/* {result && (
