@@ -1,11 +1,21 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongo';
+import Pusher from 'pusher';
 
 const SPINS_PER_DAY = 3;
+const SPINS_PER_PURCHASE = 10;
+
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID!,
+  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
+  secret: process.env.PUSHER_SECRET!,
+  cluster: process.env.PUSHER_CLUSTER!,
+  useTLS: true
+});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
-  const { fid, checkOnly, mode } = req.body;
+  const { fid, checkOnly, mode, amount, address } = req.body;
   if (!fid) return res.status(400).json({ error: 'Missing fid' });
 
   const client = await clientPromise;
@@ -58,12 +68,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "buy") {
-    spinsLeft += 8;
+    if (!amount || !address) {
+      return res.status(400).json({ error: "Missing amount or address for purchase" });
+    }
+    spinsLeft += SPINS_PER_PURCHASE;
     await users.updateOne(
       { fid },
       { $set: { spinsLeft, lastSpinReset } },
       { upsert: true }
     );
+
+    // Trigger purchase notification
+    try {
+      await pusher.trigger('monado-spin', 'purchase', {
+        name: user?.name,
+        address: address,
+        amount: amount,
+        spins: SPINS_PER_PURCHASE
+      });
+    } catch (error) {
+      console.error('Error triggering purchase notification:', error);
+    }
+
     return res.status(200).json({ spinsLeft });
   }
 

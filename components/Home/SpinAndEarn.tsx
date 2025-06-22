@@ -3,7 +3,7 @@ import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
-import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute } from "react-icons/fa";
+import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { ethers } from "ethers";
@@ -64,6 +64,7 @@ export function SpinAndEarn() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [claimed, setClaimed] = useState<boolean>(true);
   const [result, setResult] = useState<string | null>(null);
+  const [isResultPopupVisible, setIsResultPopupVisible] = useState(false);
   const [rotation, setRotation] = useState<number>(0);
   const [view, setView] = useState<'spin' | 'wallet' | 'leaderboard'>('spin');
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
@@ -115,16 +116,10 @@ export function SpinAndEarn() {
   // Add effect to handle transaction success
   useEffect(() => {
     if (isClaimSuccess && wonSegment && wonValue) {
-      setResult(`Successfully claimed your reward! 🎉`);
-      
-      // Cast for non-MON tokens after successful claim
-      // if (wonSegment.text !== "MON") {
-        const message = `Just claimed ${wonValue} ${wonSegment.text} from Monado Twist 🎰\n\nCome spin & earn`;
-        actions?.composeCast?.({ text: message,embeds: [`${window.location.origin}`], });
-        
-      // }
+      setResult(`Successfully claimed your ${wonValue} ${wonSegment.text} reward! 🎉`);
+      // The automatic cast is removed from here and will be handled by the share button.
     }
-  }, [isClaimSuccess, wonSegment, wonValue, actions]);
+  }, [isClaimSuccess, wonSegment, wonValue]);
 
   // Update localStorage when totalSpins changes
   useEffect(() => {
@@ -139,6 +134,18 @@ export function SpinAndEarn() {
       localStorage.setItem('isMuted', isMuted.toString());
     }
   }, [isMuted]);
+
+  useEffect(() => {
+    if (result) {
+      setIsResultPopupVisible(true);
+    } else {
+      setIsResultPopupVisible(false);
+    }
+  }, [result]);
+
+  const handleClosePopup = () => {
+    setResult(null);
+  };
 
   const getRandomValue = (token: string): number => {
     switch (token) {
@@ -157,11 +164,11 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#4B0082", probability: 1, degrees: 72 },  // Dark Indigo
-    { text: "YAKI", value: 0, color: "#F7931A", probability: 20, degrees: 72 },  // Bitcoin Orange
-    { text: "", value: 0, color: "#3A0CA3", probability: 40, degrees: 72 },  // Dark Blue-Violet
-    { text: "CHOG", value: 0, color: "#2775CA", probability: 20, degrees: 72 },  // USDC Blue
-    { text: "USDC", value: 0, color: "#627EEA", probability: 19, degrees: 72 },  
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 72 },  // Gold
+    { text: "YAKI", value: 0, color: "#00E5FF", probability: 20, degrees: 72 },  // Bright Teal
+    { text: "", value: 0, color: "#004D40", probability: 40, degrees: 72 },  // Dark Teal
+    { text: "CHOG", value: 0, color: "#00BFA5", probability: 20, degrees: 72 },  // Medium Teal
+    { text: "USDC", value: 0, color: "#B8860B", probability: 19, degrees: 72 },  // Dark Gold
   ];
 
   // Fetch spins and timer data from backend
@@ -295,6 +302,23 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     } catch (error) {
       console.error("Error sharing:", error);
       setResult("Share failed.");
+    }
+  };
+
+  const handleShareWin = async () => {
+    if (!wonSegment || wonValue <= 0) return;
+
+    const message = `I just won ${wonValue} ${wonSegment.text} from Monado Twist! 🎰\n\nCome spin & earn with me! #BreakTheMonad`;
+    
+    try {
+        await actions?.composeCast?.({ 
+            text: message,
+            embeds: [`${window.location.origin}`], 
+        });
+        handleClosePopup();
+    } catch (error) {
+        console.error("Error sharing win:", error);
+        setResult("Sharing failed. Please try again.");
     }
   };
 
@@ -466,13 +490,18 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   
         const spinRes = await fetchWithVerification('/api/spin', {
           method: 'POST',
-          body: JSON.stringify({ fid, mode: 'buy' }),
+          body: JSON.stringify({ 
+            fid, 
+            mode: 'buy',
+            amount: 1, // 1 MON for 8 spins
+            address 
+          }),
           headers: { 'Content-Type': 'application/json' }
         });
   
         const response = await spinRes.json();
         setSpinsLeft(response.spinsLeft);
-        setResult("Successfully bought 8 spin!");
+        setResult("Successfully bought 10 spin!");
       } catch (err) {
         console.error("Confirmation error:", err);
         setResult("Failed to buy spin");
@@ -584,10 +613,83 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     }
   };
 
+  const isSuccessPopup = result ? (result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')) : false;
+  const isWinSuccess = result ? (result.includes('won') || result.includes('reward') || result.includes('claimed')) : false;
+
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
+      {isResultPopupVisible && result && (
+        <div className="popup-overlay" onClick={handleClosePopup}>
+          <div
+            className={`popup-content result ${
+              isSuccessPopup
+                ? 'success'
+                : result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')
+                ? 'error'
+                : 'info'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="popup-close-btn" onClick={handleClosePopup}>
+              &times;
+            </button>
+            <div className="popup-icon">
+              {isSuccessPopup && <FaCheckCircle />}
+              {(result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) && <FaTimesCircle />}
+              {!(isSuccessPopup || result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) && <FaInfoCircle />}
+            </div>
+            <div className="popup-message">{result}</div>
+            {isWinSuccess && (
+              <div className="popup-actions">
+                <button
+                  className="popup-action-btn spin-again"
+                  onClick={() => {
+                    handleClosePopup();
+                    handleSpin();
+                  }}
+                  disabled={isSpinning || spinsLeft === null || spinsLeft <= 0}
+                >
+                  Spin Again
+                </button>
+                <button
+                  className="popup-action-btn share-win"
+                  onClick={handleShareWin}
+                >
+                  Share Win
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* <WinNotifications /> */}
       <style>{`
+        @keyframes fadeInSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        /* Cool scrollbar styles */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: rgba(18, 18, 45, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, #6C5CE7, #a084ee);
+          border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(135deg, #a084ee, #6C5CE7);
+        }
+
         .spin-glass-card {
           background: linear-gradient(135deg, #3A0CA3 0%, #3A0CA3 100%);
           box-shadow: 0 8px 40px 0 #6C5CE7, 0 1.5px 8px 0 #0002;
@@ -648,21 +750,21 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           }
         }
        .spin-ui-card {
-  background: linear-gradient(135deg, rgba(185, 170, 255, 0.9), rgba(108, 92, 231, 0.95));
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 32px;
+  box-shadow: 0 8px 40px rgba(108, 92, 231, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   padding: 28px 24px 36px 24px;
   margin: 110px auto 16px auto;
-  height: 100%;
-  max-width: 380px;
+  width: 97%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   text-align: center;
   color: #fff;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
        .spin-ui-header {
   font-size: 1.5rem;
@@ -680,18 +782,20 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 }
       .spin-ui-box {
   flex: 1;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(108, 92, 231, 0.1);
   border-radius: 20px;
-  padding: 20px 0 12px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.3);
-  transition: transform 0.2s;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.3s;
 }
 
 .spin-ui-box:hover {
-  transform: translateY(-3px);
+  background: rgba(108, 92, 231, 0.2);
+  transform: none;
 }
       .spin-ui-label {
   font-size: 1rem;
@@ -744,7 +848,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           font-size: 1.3rem;
           font-weight: 800;
           padding: 18px 0;
-  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.2);
           letter-spacing: 1px;
   transition: all 0.2s ease;
         }
@@ -784,18 +888,33 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           z-index: 2;
         }
        .result {
-  margin-bottom: 24px;
-  padding: 16px 10px;
-background: rgba(50, 205, 50, 0.7); 
-  border-radius: 23px;
-  color: #fff;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 6px 14px rgba(108, 92, 231, 0.3);
-  border: 3px solid rgba(255, 255, 255, 0.9);
-}
+          margin-bottom: 20px;
+          padding: 14px 20px;
+          border-radius: 18px;
+          color: #fff;
+          font-size: 1.1rem;
+          font-weight: 600;
+          text-align: center;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          animation: fadeInSlideUp 0.5s ease-out forwards;
+          text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .result.success {
+          background: rgba(30, 255, 150, 0.2);
+          box-shadow: 0 4px 15px rgba(30, 255, 150, 0.2);
+          border-color: rgba(30, 255, 150, 0.5);
+        }
+        .result.error {
+          background: rgba(255, 80, 80, 0.2);
+          box-shadow: 0 4px 15px rgba(255, 80, 80, 0.2);
+          border-color: rgba(255, 80, 80, 0.5);
+        }
+        .result.info {
+          background: rgba(80, 150, 255, 0.2);
+          box-shadow: 0 4px 15px rgba(80, 150, 255, 0.2);
+          border-color: rgba(80, 150, 255, 0.5);
+        }
         .share-button {
           margin: 10px;
           padding: 12px 24px;
@@ -823,27 +942,51 @@ background: rgba(50, 205, 50, 0.7);
           width: 100%;
           display: flex;
           justify-content: space-around;
-          padding: 12px;
-          background: rgba(108,92,231,1);
-          backdrop-filter: blur(12px);
-          border-top: 5px solid rgba(255,255,255,1);
+          padding: 5px 5px;
+          background: rgba(18, 18, 45, 0.5);
+          backdrop-filter: blur(15px);
+          -webkit-backdrop-filter: blur(15px);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          // gap: 5px;
         }
         .switch-bar button {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
+          gap: 1px;
+          padding: 10px 12px;
           background: transparent;
           border: none;
-          color: #fff;
-          font-size: 0.9rem;
+          color: #bca0ff;
+          font-size: 0.75rem;
+          font-weight: 500;
           cursor: pointer;
-          opacity: 0.7;
-          transition: opacity 0.2s;
+          opacity: 0.8;
+          transition: all 0.25s ease-in-out;
+          border-radius: 12px;
+          margin: 3px;
+          flex: 1;
+        }
+        .switch-bar .mute-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+          flex: 0 1 auto;
+        }
+        .switch-bar button svg {
+          font-size: 1.4rem;
+        }
+        .switch-bar button:hover {
+          background: rgba(255, 255, 255, 0.08);
+          color: #fff;
         }
         .switch-bar button.active {
           opacity: 1;
-          font-weight: 600;
+          font-weight: 700;
+          color: #fff;
+          background: #6C5CE7;
+          transform: translateY(-3px);
+          box-shadow: 0 5px 12px rgba(108, 92, 231, 0.4);
         }
         .timer-text {
           font-size: 0.8rem;
@@ -888,19 +1031,118 @@ background: rgba(50, 205, 50, 0.7);
         .follow-button:hover {
           transform: translateY(-2px);
         }
-        .mute-button {
+        .popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(18, 18, 45, 0.7);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
-          background: transparent;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease-out;
+        }
+        .popup-content.result {
+          position: relative;
+          width: 90%;
+          max-width: 350px;
+          padding: 25px;
+          margin-bottom: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .popup-icon {
+          font-size: 3.5rem;
+          margin-bottom: 15px;
+          line-height: 1;
+        }
+        .result.success .popup-icon {
+          color: #1eff96;
+          filter: drop-shadow(0 0 10px rgba(30, 255, 150, 0.5));
+        }
+        .result.error .popup-icon {
+          color: #ff5050;
+          filter: drop-shadow(0 0 10px rgba(255, 80, 80, 0.5));
+        }
+        .result.info .popup-icon {
+          color: #5096ff;
+          filter: drop-shadow(0 0 10px rgba(80, 150, 255, 0.5));
+        }
+        .popup-message {
+          font-size: 1.1rem;
+          font-weight: 500;
+          text-align: center;
+        }
+        .popup-close-btn {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          width: 32px;
+          height: 32px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 50%;
+          color: #fff;
+          font-size: 1.5rem;
+          font-weight: bold;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+          transition: all 0.2s;
+        }
+        .popup-close-btn:hover {
+          background: #F94449;
+          transform: scale(1.1);
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .popup-actions {
+          display: flex;
+          gap: 15px;
+          margin-top: 25px;
+          width: 100%;
+        }
+        .popup-action-btn {
+          flex: 1;
+          padding: 12px;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
           border: none;
           color: #fff;
-          cursor: pointer;
-          opacity: 0.7;
-          transition: opacity 0.5s;
         }
-        .mute-button:hover {
-          opacity: 1;
+        .popup-action-btn.spin-again {
+          background: linear-gradient(90deg, #6C5CE7, #a084ee);
+          box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+        .popup-action-btn.share-win {
+          background: linear-gradient(90deg, #1D8CF7, #1D63F7);
+          box-shadow: 0 4px 15px rgba(29, 140, 247, 0.3);
+        }
+        .popup-action-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+        }
+        .popup-action-btn.spin-again:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+        }
+        .popup-action-btn.share-win:hover {
+            box-shadow: 0 6px 20px rgba(29, 140, 247, 0.4);
+        }
+        .popup-action-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
       `}</style>
       <audio 
@@ -951,10 +1193,16 @@ background: rgba(50, 205, 50, 0.7);
               </div>
             </div>
             {result && (
-            <div className="result">
-              {result}
-            </div>
-          )}
+              <div className={`result ${
+                  result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')
+                  ? 'success'
+                  : result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')
+                  ? 'error'
+                  : 'info'
+              }`}>
+                {result}
+              </div>
+            )}
             <div className="spin-ui-address-row">
               <div className="spin-ui-address">{address ? `${address.slice(0, 7)}...${address.slice(-5)}` : "-"}</div>
               <div className="spin-ui-network">Monad Testnet</div>
@@ -963,7 +1211,7 @@ background: rgba(50, 205, 50, 0.7);
               !isConnected ? (
                 <div
                   onClick={() => {
-                    window.open('https://warpcast.com/~/mini-apps/launch?domain=monado-twist.vercel.app');
+                    window.open('https://farcaster.xyz/~/mini-apps/launch?domain=monado-twist.vercel.app');
                   }}
                   className='spin-ui-spin-btn'
                 >
@@ -1061,14 +1309,14 @@ background: rgba(50, 205, 50, 0.7);
                 onClick={handleBuySpin}
                 disabled={isBuying || isConfirming || !address}
               >
-                {isBuying || isConfirming ? "Processing..." : "Buy 8 Spin (1 MON)"}
+                {isBuying || isConfirming ? "Processing..." : "Buy 10 Spin (1 MON)"}
               </button>
-            )}
+            )} 
             </div>}
           </div>
       
          
-          {/* <button
+           <button
             className="share-button"
             onClick={async () => {
               try {
@@ -1093,7 +1341,7 @@ background: rgba(50, 205, 50, 0.7);
             disabled={!!timeUntilShare}
           >
             {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}
-          </button> */}
+          </button> 
          
         </>
       ) : view === 'wallet' ? (
@@ -1106,19 +1354,19 @@ background: rgba(50, 205, 50, 0.7);
           className={view === 'spin' ? 'active' : ''}
           onClick={() => setView('spin')}
         >
-          <FaHome /> Home
+          <FaHome />
         </button>
         <button
           className={view === 'wallet' ? 'active' : ''}
           onClick={() => setView('wallet')}
         >
-          <FaWallet /> Wallet
+          <FaWallet /> 
         </button>
         <button
           className={view === 'leaderboard' ? 'active' : ''}
           onClick={() => setView('leaderboard')}
         >
-          <FaTrophy /> Leaders
+          <FaTrophy /> 
         </button>
         <button
           className="mute-button"
