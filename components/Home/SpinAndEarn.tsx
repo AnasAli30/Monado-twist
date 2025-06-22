@@ -204,11 +204,11 @@ export function SpinAndEarn() {
         const monValues = [ 0.04, 0.07,0.09,0.03,0.05,0.06,0.08];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (5 - 1) + 1).toFixed(1);
+        return +(Math.random() * (5 - 1) + 1).toFixed(2);
       case "CHOG":
-        return +(Math.random() * (0.45 - 0.1) + 0.45).toFixed(1);
+        return +(Math.random() * (0.45 - 0.1) + 0.45).toFixed(2);
       case "USDC":
-        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(1);
+        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(3);
       default:
         return 0;
     }
