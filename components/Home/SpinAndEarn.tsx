@@ -640,8 +640,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     }
   }, [isWinSuccess, isNoWin, isMuted]);
 
-  const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3'];
-  const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3'];
+  const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3' , '/audio/win-4.mp3', '/audio/win-5.mp3', '/audio/win-6.mp3'];
+  const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3', '/audio/lose-3.mp3', '/audio/lose-4.mp3', '/audio/lose-5.mp3', '/audio/lose-6.mp3' , '/audio/lose-7.mp3'];
 
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
@@ -1065,7 +1065,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           top: 0;
           left: 0;
           right: 0;
-          bottom: 0;
+          bottom: 25px;
           background: rgba(18, 18, 45, 0.7);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);

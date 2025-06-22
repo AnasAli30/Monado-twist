@@ -36,7 +36,7 @@ export const Confetti: React.FC<ConfettiProps> = ({ count = 80 }) => {
               className="confetti-particle"
               style={{
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
+                animationDelay: `${Math.random() * 2}s`,
                 animationDuration: `${Math.random() * 4 + 5}s`,
                 width: `${Math.random() * 10 + 6}px`,
                 height: `${Math.random() * 8 + 5}px`,
