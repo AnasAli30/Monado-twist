@@ -41,8 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             fid: 1,
             pfpUrl: 1,
             totalSpins: 1,
-            // Get name & address from the first win record, as it may not be on the user doc
-            name: { $ifNull: [ '$username', { $first: '$winningsData.name' } ] },
+            name: '$name',
+            // Get address from the first win record, as it may not be on the user doc
             address: { $first: '$winningsData.address' },
             // Calculate total winnings by summing the amounts from the winnings array
             totalWinnings: { $toString: { $sum: '$winningsData.amount' } }
