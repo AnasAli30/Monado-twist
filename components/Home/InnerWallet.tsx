@@ -186,8 +186,9 @@ export function InnerWallet() {
               {isPending ?  "Withdrawing..." : "Withdraw Balance"}
             </button>
             <div className="withdrawal-note">
-              <p><strong>Note:</strong> If withdrawal fails, please reload, wait 15s, and try again.</p>
-              <p>Still having issues? <p className="contact-link" onClick={() => actions?.viewProfile({ fid: 249702 })}>Contact the developer.</p></p>
+              <p><strong>Note:</strong> Having trouble with the withdrawal? Close and reopen the mini app, wait 15 seconds, and give it another try.</p>
+              <p>Still having issues?</p>
+              <p className="contact-link" onClick={() => actions?.viewProfile({ fid: 249702 })}>Contact the developer.</p>
             </div>
           </>
         )}

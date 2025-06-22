@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         // 3. Limit the initial list to 200
         {
-          $limit: 100
+          $limit: 50
         },
         // 4. Look up their winnings data
         {

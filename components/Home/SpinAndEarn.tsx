@@ -556,7 +556,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   
         const response = await spinRes.json();
         setSpinsLeft(response.spinsLeft);
-        setResult("Successfully bought 10 spin!");
+        setResult("Successfully bought spins! 🎁");
       } catch (err) {
         console.error("Confirmation error:", err);
         setResult("Failed to buy spin");
@@ -671,6 +671,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   const isSuccessPopup = result ? (result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')) : false;
   const isWinSuccess = result ? (result.includes('won') || result.includes('reward') || result.includes('claimed')) : false;
   const isNoWin = result ? result.includes('😢') || result.includes('No win') : false;
+  const isBoughtSpins = result === "Successfully bought spins! 🎁";
   
   useEffect(() => {
     if (isWinSuccess && !isMuted) {
@@ -713,11 +714,25 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
               &times;
             </button>
             <div className="popup-icon">
-              {isSuccessPopup && <FaCheckCircle />}
-              {(result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) && <FaTimesCircle />}
-              {!(isSuccessPopup || result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) && <FaInfoCircle />}
+              {isBoughtSpins ? (
+                  <FaTicketAlt className="popup-ticket-icon" />
+                ) : isWinSuccess && wonSegment ? (
+                  <img src={getTokenImage(wonSegment.text)} alt={wonSegment.text} className="popup-token-img" />
+                ) : isSuccessPopup ? (
+                  <FaCheckCircle />
+                ) : (result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) ? (
+                  <FaTimesCircle />
+                ) : (
+                  <FaInfoCircle />
+              )}
             </div>
-            <div className="popup-message">{result}</div>
+            <div className="popup-message">
+              {isBoughtSpins ? (
+                <span className="bought-spins-message">+10 Spins</span>
+              ) : (
+                result
+              )}
+            </div>
             {isWinSuccess && (
               <div className="popup-actions">
                 <button
@@ -1368,6 +1383,24 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           animation: confetti-fall 7s linear infinite;
           opacity: 0.8;
         }
+        .popup-token-img {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          border: 3px solid rgba(255,255,255,0.6);
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+        .popup-ticket-icon {
+          font-size: 3.5rem;
+          line-height: 1;
+          color: #00E5FF;
+          filter: drop-shadow(0 0 12px #00E5FF);
+        }
+        .bought-spins-message {
+          font-size: 1.4rem;
+          font-weight: 700;
+          text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
       `}</style>
       <audio
         ref={audioRef}
@@ -1453,21 +1486,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 </div>
               </div>
             </div>
-            {/* {result && (
-              <div className={`result ${
-                  result.includes('🎉') || result.includes('Successfully') || result.includes('got') || result.includes('🎁')
-                  ? 'success'
-                  : result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')
-                  ? 'error'
-                  : 'info'
-              }`}>
-                {result}
-              </div>
-            )} */}
-            {/* <div className="spin-ui-address-row">
-              <div className="spin-ui-address">{address ? `${address.slice(0, 7)}...${address.slice(-5)}` : "-"}</div>
-              <div className="spin-ui-network">Monad Testnet</div>
-            </div> */}
+           
             {chainId !== monadTestnet.id ? (
               !isConnected ? (
                 <div
@@ -1552,34 +1571,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             Verify Follow
           </button>
         )}
-            {/* {!hasLikedAndRecast && (
-              <button
-                className="follow-button"
-                onClick={async () => {
-                  await actions?.openUrl("https://warpcast.com/hackerx/0x2c3df003");
-                  if (fid) {
-                    const res = await fetchWithVerification('/api/spin', {
-                      method: 'POST',
-                      body: JSON.stringify({ fid, mode: "likeAndRecast" }),
-                      headers: { 'Content-Type': 'application/json' }
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                      setSpinsLeft(data.spinsLeft);
-                      setResult("You got 1 extra spins 🎁");
-                      setHasLikedAndRecast(true);
-                    }
-                  }
-                }}
-              >
-                Like & Recast to get 1 extra spins!
-              </button>
-            )} */}
-           
             </div>}
           </div>
       
-         
            <button
             className="share-button"
             onClick={async () => {

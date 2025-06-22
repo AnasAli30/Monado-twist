@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey } = req.body;
-    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName });
+    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName ,fusedKey,randomKey});
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
       return res.status(400).json({ error: 'Missing required parameters' });
