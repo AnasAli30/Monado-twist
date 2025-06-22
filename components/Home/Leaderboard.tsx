@@ -13,10 +13,19 @@ interface LeaderboardEntry {
   pfpUrl?: string;
 }
 
+interface UserStats {
+  totalSpins: number;
+  totalWinnings: number;
+  name: string;
+  pfpUrl?: string;
+}
+
 export function Leaderboard() {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
   const { actions, context } = useMiniAppContext();
+  const currentUserFid = context?.user?.fid;
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -31,8 +40,23 @@ export function Leaderboard() {
       }
     };
 
+    const fetchUserStats = async () => {
+      if (currentUserFid) {
+        try {
+          const res = await fetch(`/api/user-stats?fid=${currentUserFid}`);
+          if (res.ok) {
+            const data = await res.json();
+            setUserStats(data);
+          }
+        } catch (error) {
+          console.error('Error fetching user stats:', error);
+        }
+      }
+    };
+
     fetchLeaderboard();
-  }, []);
+    fetchUserStats();
+  }, [currentUserFid]);
 
   const getMedalColor = (rank: number) => {
     switch(rank) {
@@ -51,6 +75,32 @@ export function Leaderboard() {
           <h2>Top Winners</h2>
         </div>
         
+        {userStats && (
+          <div className="user-stats-card">
+              <img 
+                src={userStats.pfpUrl || '/images/icon.png'} 
+                alt={userStats.name} 
+                className="leaderboard-pfp"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/images/icon.png';
+                }}
+              />
+              <div className="user-info">
+                <div className="leaderboard-name">{userStats.name} (You)</div>
+              </div>
+              <div className="stats-section">
+                <div className="spins-section">
+                  {userStats.totalSpins} Spins
+                </div>
+                <div className="winnings-section">
+                  <span>{userStats.totalWinnings.toFixed(2)}</span>
+                  <span className="mon-label">MON</span>
+                </div>
+              </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="skeleton-list">
             {Array.from({ length: 8 }).map((_, index) => (
@@ -333,6 +383,18 @@ export function Leaderboard() {
         @keyframes rotation {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        .user-stats-card {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          margin: 0 10px 20px 10px;
+          background: rgba(247, 37, 133, 0.25);
+          border: 1px solid #f72585;
+          border-radius: 20px;
+          box-shadow: 0 0 15px rgba(247, 37, 133, 0.3);
         }
       `}</style>
     </div>

@@ -140,15 +140,27 @@ export function InnerWallet() {
       <div className="wallet-card">
         {context?.user && (
           <div className="profile-section">
-            <img src={pfpUrl} alt={`${name}'s profile picture`} className="profile-picture" />
-            <div className="profile-info">
-              <div className="profile-name">{name}</div>
-              <div className="profile-fid">FID: {fid}</div>
+            <div className="profile-details">
+              <img 
+                src={pfpUrl} 
+                alt={`${name}'s profile picture`} 
+                className="profile-picture" 
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/images/icon.png';
+                }}
+              />
+              <div className="profile-info">
+                <div className="profile-name">{name}</div>
+                <div className="profile-fid">FID: {fid}</div>
+              </div>
+            </div>
+            <div className="profile-address-box">
+              <div className="profile-address-value">{address ? `${address.slice(0, 4)}...${address.slice(-4)}` : "-"}</div>
+              <div className="profile-network-tag">Monad Testnet</div>
             </div>
           </div>
         )}
-
-       
 
         <div className="balance-display">
           <div className="balance-label">Your Balance</div>
@@ -241,7 +253,7 @@ export function InnerWallet() {
           font-size: 2rem;
           font-weight: 900;
           text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(247, 37, 133, 0.5);
-          margin-bottom: 25px;
+          margin-bottom: 30px;
         }
 
         .balance-display {
@@ -253,63 +265,58 @@ export function InnerWallet() {
         }
 
         .balance-label {
-          font-size: 0.9rem;
+          font-size: 1.1rem;
           font-weight: 500;
           color: #e0d7ff;
+          margin-bottom: 10px;
           text-transform: uppercase;
           letter-spacing: 1px;
-          margin-bottom: 8px;
         }
 
         .balance-amount {
-          font-size: 2.8rem;
+          font-size: 3rem;
           font-weight: 900;
+          color: #fff;
           text-shadow: 0 0 15px rgba(255,255,255,0.4);
-          letter-spacing: 1px;
         }
 
         .refresh-button {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          justify-content: center;
           gap: 10px;
-          width: 100%;
-          margin-bottom: 25px;
-          padding: 12px;
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: #fff;
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: #e0d7ff;
+          padding: 10px 18px;
           border-radius: 12px;
-          font-size: 1rem;
-          font-weight: 600;
+          margin-bottom: 25px;
           cursor: pointer;
           transition: all 0.2s;
         }
-
         .refresh-button:hover:not(:disabled) {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        .spinning {
-          animation: spin 1s linear infinite;
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
         }
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
         
         .wallet-action-btn {
           width: 100%;
-          cursor: pointer;
-          border: none;
-          border-radius: 16px;
+          padding: 18px 0;
+          border-radius: 20px;
           font-size: 1.2rem;
           font-weight: 800;
-          padding: 16px 0;
+          cursor: pointer;
           transition: all 0.15s ease-out;
+          border: none;
           text-transform: uppercase;
+          letter-spacing: 1px;
         }
-
         .wallet-action-btn.primary {
           background: linear-gradient(180deg, #f72585, #b5179e);
           color: #fff;
@@ -319,7 +326,6 @@ export function InnerWallet() {
         .wallet-action-btn.primary:hover:not(:disabled) {
           transform: translateY(-3px);
           box-shadow: 0 12px 30px rgba(247, 37, 133, 0.6);
-          background: linear-gradient(180deg, #ff3a9a, #d12cb1);
         }
         .wallet-action-btn.primary:active:not(:disabled) {
           transform: translateY(4px);
@@ -333,53 +339,56 @@ export function InnerWallet() {
           cursor: not-allowed;
           border-bottom: 6px solid #2a2138;
         }
-
+        
         .withdrawal-note {
           margin-top: 20px;
-          font-size: 0.8rem;
-          color: #e0d7ff;
+          font-size: 0.85rem;
           line-height: 1.5;
-          background: rgba(0,0,0,0.15);
-          padding: 10px 15px;
-          border-radius: 12px;
+          opacity: 0.8;
         }
-
         .contact-link {
           text-decoration: underline;
           cursor: pointer;
-          color: #f72585;
+          color: #b5179e;
           font-weight: 600;
         }
 
-        .success-message, .error-message {
+        .success-message {
           margin-top: 20px;
+          padding: 12px;
+          background: rgba(30, 255, 150, 0.15);
+          border: 1px solid rgba(30, 255, 150, 0.4);
+          border-radius: 12px;
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 10px 15px;
-          border-radius: 12px;
-          font-weight: 600;
-        }
-        .success-message {
-          background: rgba(30, 255, 150, 0.2);
           color: #1eff96;
-        }
-        .error-message {
-          background: rgba(255, 80, 80, 0.2);
-          color: #ff5050;
         }
         .success-message a {
           text-decoration: underline;
+          font-weight: 600;
+        }
+
+        .error-message {
+          margin-top: 20px;
+          color: #ff5050;
         }
 
         .profile-section {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          margin-top: 20px;
+          gap: 20px;
+          margin-bottom: 35px;
+          padding-bottom: 25px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .profile-details {
+          display: flex;
+          align-items: center;
           gap: 15px;
-          margin-bottom: 25px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid rgba(255,255,255,0.1);
+          width: 100%;
         }
 
         .profile-picture {
@@ -395,14 +404,41 @@ export function InnerWallet() {
         }
 
         .profile-name {
-          font-size: 1.4rem;
+          font-size: 1.25rem;
           font-weight: 700;
         }
-        
+
         .profile-fid {
           font-size: 0.9rem;
           color: #e0d7ff;
           opacity: 0.8;
+        }
+        
+        .profile-address-box {
+          width: 100%;
+          background: linear-gradient(145deg, rgba(0,0,0,0.25), rgba(0,0,0,0.4));
+          border-radius: 16px;
+          padding: 12px 18px;
+          box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .profile-address-value {
+          font-family: monospace;
+          font-size: 0.95rem;
+          color: #fff;
+        }
+
+        .profile-network-tag {
+          background: #f72585;
+          color: #fff;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 10px;
+          text-transform: uppercase;
         }
       `}</style>
     </div>
