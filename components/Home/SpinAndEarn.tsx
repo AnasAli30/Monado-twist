@@ -98,7 +98,7 @@ export function SpinAndEarn() {
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
-  const { writeContract, data: claimData } = useContractWrite();
+  const { writeContract, data: claimData, reset: resetClaim } = useContractWrite();
 
   const { isLoading: isClaiming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
     hash: claimData,
@@ -130,8 +130,11 @@ export function SpinAndEarn() {
     if (isClaimSuccess && wonSegment && wonValue) {
       setResult(`Successfully claimed your ${wonValue} ${wonSegment.text} reward! 🎉`);
       // The automatic cast is removed from here and will be handled by the share button.
+      if (resetClaim) {
+        resetClaim();
+      }
     }
-  }, [isClaimSuccess, wonSegment, wonValue]);
+  }, [isClaimSuccess, wonSegment, wonValue, resetClaim]);
 
   // Update localStorage when totalSpins changes
   useEffect(() => {
