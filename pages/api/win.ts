@@ -86,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pfpUrl: pfpUrl
       });
       }catch(error){
-        console.error('Error triggering win event:', error);
+        console.error('Error triggering wn event:', error);
       }
 
       res.status(200).json({ success: true, txHash: tx.hash });
