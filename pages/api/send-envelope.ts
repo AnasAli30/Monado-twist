@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await users.updateOne({ fid }, { $set: { envelopeClaimed: true, name } });
     res.status(200).json({ txHash: tx.hash });
   } catch (e: any) {
+    console.log(e.message)
     res.status(500).json({ error: e.message });
   }
 }
