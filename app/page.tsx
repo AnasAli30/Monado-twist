@@ -42,18 +42,11 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: "Monado Twist",
       description: "Spin to Win",
-      images: [
-        {
-          url: `${APP_URL}/api/og-image?user=Guest`,
-          width: 1200,
-          height: 630,
-          alt: "Monado Twist Dynamic OG Image",
-        },
-      ],
+      images: [`${APP_URL}`],
     },
     other: {
       "fc:frame": JSON.stringify(frame),
-      "frameEmbedNext": JSON.stringify(frameEmbedNext),
+      // "frameEmbedNext": JSON.stringify(frameEmbedNext),
     },
   };
 }
