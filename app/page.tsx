@@ -6,7 +6,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Record<
   const { rank = '-', spins = '-', winnings = '-' } = searchParams || {};
   const imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}`;
   const frameEmbedNext = {
-    frameUrl: `${APP_URL}?rank=${rank}&spins=${spins}&winnings=${winnings}`,
+    frameUrl: `${APP_URL}`,
     frameEmbed: {
       version: "next",
       imageUrl,
