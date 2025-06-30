@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaTrophy, FaMedal } from 'react-icons/fa';
 import { useMiniAppContext } from '@/hooks/use-miniapp-context';
 import { SkeletonLeaderboardItem } from './SkeletonLeaderboardItem';
+import { APP_URL } from "@/lib/constants";
 
 interface LeaderboardEntry {
   address: string;
@@ -91,7 +92,7 @@ Spin. Win. Repeat.${bestFriendsText}`;
     try {
       await actions?.composeCast({
         text,
-        embeds: [`${window.location.origin}`],
+        embeds: [`${APP_URL}/api/og-image?rank=${rank}&spins=${totalSpins}&winnings=${parseFloat(totalWinnings).toFixed(2)}`],
       });
     } catch (error) {
       console.error('Failed to share:', error);
