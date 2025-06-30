@@ -1538,43 +1538,32 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             onClick={async () => {
               await actions?.viewProfile({ fid: 249702 });
               setAwaitingFollowVerification(true);
-              // setResult("After following, click 'Verify Follow' to get your spin!");
+              setResult("Verifying your follow...");
+              setTimeout(async () => {
+                // If follower, grant spin
+                if (fid) {
+                  const res = await fetchWithVerification('/api/spin', {
+                    method: 'POST',
+                    body: JSON.stringify({ fid, mode: "follow" }),
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    setSpinsLeft(data.spinsLeft);
+                    setResult("You got 1 extra spin for following! 🎁");
+                    SetFollow(true);
+                  } else {
+                    setResult("Error granting spin. Please try again.");
+                  }
+                } else {
+                  setResult("You got 1 extra spin for following! 🎁");
+                  SetFollow(true);
+                }
+                setAwaitingFollowVerification(false);
+              }, 5000);
             }}
           >
             Follow to get 1 extra spin! 🎁
-          </button>
-        )}
-
-        
-
-        {!follow && awaitingFollowVerification && (
-          <button
-            className="follow-button"
-            onClick={async () => {
-              if (fid) {
-                setResult("Verifying your follow...");
-                const isFollower = await isUserFollower(fid);
-                if (!isFollower) {
-                  setResult("Please follow first then wait 10 seconds to verify your follow.");
-                  return;
-                }
-                // If follower, grant spin
-                const res = await fetchWithVerification('/api/spin', {
-                  method: 'POST',
-                  body: JSON.stringify({ fid, mode: "follow" }),
-                  headers: { 'Content-Type': 'application/json' }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                  setSpinsLeft(data.spinsLeft);
-                  setResult("You got 1 extra spin for following! 🎁");
-                  SetFollow(true);
-                  setAwaitingFollowVerification(false);
-                }
-              }
-            }}
-          >
-            Verify Follow
           </button>
         )}
             </div>}
