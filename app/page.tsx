@@ -17,6 +17,25 @@ const frame = {
   },
 };
 
+const frameEmbedNext = {
+  frameUrl: `${APP_URL}`,
+  frameEmbed: {
+    version: "next",
+    imageUrl: `${APP_URL}/api/og-image?user=Guest`,
+    button: {
+      title: "Spin to Win 🎰",
+      action: {
+        type: "launch_frame",
+        name: "Monado Twist",
+        url: APP_URL,
+        splashImageUrl: `${APP_URL}/images/splash.png`,
+        splashBackgroundColor: "#14051a",
+      },
+    },
+  },
+  // Optionally add author or other fields here
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Monado Twist",
@@ -34,6 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       "fc:frame": JSON.stringify(frame),
+      "frameEmbedNext": JSON.stringify(frameEmbedNext),
     },
   };
 }
