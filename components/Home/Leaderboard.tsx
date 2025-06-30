@@ -92,7 +92,7 @@ Spin. Win. Repeat.${bestFriendsText}`;
     try {
       await actions?.composeCast({
         text,
-        embeds: [`${APP_URL}/api/og-image?rank=${rank}&spins=${totalSpins}&winnings=${parseFloat(totalWinnings).toFixed(2)}`],
+        embeds: [`${APP_URL}/api/frame?rank=${rank}&spins=${totalSpins}&winnings=${parseFloat(totalWinnings).toFixed(2)}`],
       });
     } catch (error) {
       console.error('Failed to share:', error);
