@@ -9,7 +9,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default function Frame({ imageUrl, baseUrl }) {
+export default function Frame({ imageUrl, baseUrl }: { imageUrl: string; baseUrl: string }) {
+
   return (
     <html>
       <head>
