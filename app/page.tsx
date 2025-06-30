@@ -36,8 +36,10 @@ export async function generateMetadata({ searchParams }: { searchParams: Record<
         },
       ],
       url: `${APP_URL}?rank=${rank}&spins=${spins}&winnings=${winnings}`,
-      frameEmbedNext,
-    } as any,
+    },
+    other: {
+      frameEmbedNext: JSON.stringify(frameEmbedNext),
+    },
   };
 }
 
