@@ -5,7 +5,7 @@ import { APP_URL } from "@/lib/constants";
 export async function generateMetadata({ searchParams }: { searchParams?: Record<string, string> }): Promise<Metadata> {
   const { rank, spins, winnings, userImg } = searchParams || {};
   let imageUrl = `${APP_URL}/images/feed.png`;
-  if (rank && spins && winnings) {
+  if (rank && spins && winnings && userImg) {
     imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}&userImg=${userImg}`;
   }
 

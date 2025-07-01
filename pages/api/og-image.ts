@@ -58,8 +58,8 @@ export default async function handler(req: Request) {
           {
             style: {
               position: 'absolute',
-              top: 250,
-              left: 80,
+              top: 300,
+              left: 120,
               color: 'white',
               fontSize: 60,
               fontWeight: 'bold',
