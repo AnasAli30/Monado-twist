@@ -11,6 +11,18 @@ export default async function handler(req: Request) {
   const spins = searchParams.get('spins') || '-';
   const winnings = searchParams.get('winnings') || '-';
   const userImg = searchParams.get('userImg') || 'https://monado-twist.vercel.app/images/icon.png'; // fallback user image
+  const wonValue = searchParams.get('wonValue');
+  const wonText = searchParams.get('wonText');
+
+  // Build overlay lines
+  const overlayLines = [];
+  if (wonValue && wonText) {
+    overlayLines.push(`🎉 You won ${wonValue} ${wonText}!`);
+  } else {
+    overlayLines.push(`🏆 Rank #${rank}`);
+    overlayLines.push(`Spins: ${spins}`);
+    overlayLines.push(`Winnings: ${winnings} MON`);
+  }
 
   return new ImageResponse(
     React.createElement(
@@ -66,17 +78,11 @@ export default async function handler(req: Request) {
               textShadow: '2px 2px 8px #000',
               zIndex: 2,
               textAlign: 'left',
-              display: 'flex', // ADD THIS
-              flexDirection: 'column', // Optional, for
+              display: 'flex',
+              flexDirection: 'column',
             },
           },
-          [
-            `🏆 Rank #${rank}`,
-            React.createElement('br'),
-            `Spins: ${spins}`,
-            React.createElement('br'),
-            `Winnings: ${winnings} MON`,
-          ]
+          overlayLines.map((line, idx) => React.createElement('span', { key: idx }, line))
         ),
       ]
     ),

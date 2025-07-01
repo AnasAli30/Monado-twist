@@ -365,11 +365,11 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     if (!wonSegment || wonValue <= 0) return;
 
     const message = `I just won ${wonValue} ${wonSegment.text} from Monado Twist! 🎰\n\nCome spin & earn with me! #BreakTheMonad`;
-    
+    const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.png`;
     try {
         await actions?.composeCast?.({ 
             text: message,
-            embeds: [`${window.location.origin}`], 
+            embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}`], 
         });
         handleClosePopup();
     } catch (error) {
