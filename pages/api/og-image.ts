@@ -21,13 +21,8 @@ export default async function handler(req: Request) {
     overlayLines.push(
       React.createElement(
         'span',
-        { style: { color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
+        { style: { left: 300, color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
         `+${wonValue}`
-      ),
-      React.createElement(
-        'span',
-        { style: { color: 'white', fontWeight: 'bold', fontSize: 60 } },
-        ` ${wonText}! 🎉`
       )
     );
   } else {
