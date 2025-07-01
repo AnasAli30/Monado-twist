@@ -66,6 +66,8 @@ export default async function handler(req: Request) {
               textShadow: '2px 2px 8px #000',
               zIndex: 2,
               textAlign: 'left',
+              display: 'flex', // ADD THIS
+              flexDirection: 'column', // Optional, for
             },
           },
           [
