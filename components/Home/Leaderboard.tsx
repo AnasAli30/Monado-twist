@@ -63,6 +63,9 @@ export function Leaderboard() {
     let bestFriendsText = '';
     const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
 
+    // Get the current user's profile image
+    const userImg = userStats?.pfpUrl || `${APP_URL}/images/icon.png`;
+
     if (currentUserFid && neynarApiKey) {
       try {
         const options = {
@@ -92,7 +95,7 @@ Spin. Win. Repeat.${bestFriendsText}`;
     try {
       await actions?.composeCast({
         text,
-        embeds: [`${APP_URL}/?rank=${rank}&spins=${totalSpins}&winnings=${parseFloat(totalWinnings).toFixed(2)}`],
+        embeds: [`${APP_URL}/?rank=${rank}&spins=${totalSpins}&winnings=${parseFloat(totalWinnings).toFixed(2)}&userImg=${encodeURIComponent(userImg)}`],
       });
     } catch (error) {
       console.error('Failed to share:', error);

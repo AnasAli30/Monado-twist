@@ -7,32 +7,75 @@ export const config = {
 
 export default async function handler(req: Request) {
   const { searchParams } = new URL(req.url);
-  console.log(searchParams);
   const rank = searchParams.get('rank') || '-';
   const spins = searchParams.get('spins') || '-';
   const winnings = searchParams.get('winnings') || '-';
+  const userImg = searchParams.get('userImg') || 'https://monado-twist.vercel.app/images/icon.png'; // fallback user image
 
   return new ImageResponse(
     React.createElement(
       'div',
       {
         style: {
-          fontSize: 60,
-          color: 'white',
-          background: 'linear-gradient(135deg, #480ca8, #7209b7)',
-          width: '100%',
-          height: '100%',
+          width: '1200px',
+          height: '630px',
+          position: 'relative',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
         },
       },
       [
-        React.createElement('div', { style: { fontSize: 80, fontWeight: 'bold', marginBottom: 30 } }, `🏆 Rank #${rank}`),
-        React.createElement('div', { style: { fontSize: 48, marginBottom: 20 } }, `Spins: ${spins}`),
-        React.createElement('div', { style: { fontSize: 48, marginBottom: 20 } }, `Winnings: ${winnings} MON`),
-        React.createElement('div', { style: { fontSize: 32, marginTop: 40 } }, 'Monado Twist Leaderboard'),
+        React.createElement('img', {
+          src: 'https://monado-twist.vercel.app/image/template.png',
+          width: 1200,
+          height: 630,
+          style: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '1200px',
+            height: '630px',
+            objectFit: 'cover',
+            zIndex: 0,
+          },
+        }),
+        React.createElement('img', {
+          src: userImg,
+          width: 120,
+          height: 120,
+          style: {
+            position: 'absolute',
+            top: 80,
+            left: 80,
+            borderRadius: '50%',
+            border: '6px solid #fff',
+            zIndex: 1,
+          },
+        }),
+        React.createElement(
+          'div',
+          {
+            style: {
+              position: 'absolute',
+              top: 250,
+              left: 80,
+              color: 'white',
+              fontSize: 60,
+              fontWeight: 'bold',
+              textShadow: '2px 2px 8px #000',
+              zIndex: 2,
+              textAlign: 'left',
+            },
+          },
+          [
+            `🏆 Rank #${rank}`,
+            React.createElement('br'),
+            `Spins: ${spins}`,
+            React.createElement('br'),
+            `Winnings: ${winnings} MON`,
+          ]
+        ),
       ]
     ),
     {
