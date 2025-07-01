@@ -21,7 +21,7 @@ export default async function handler(req: Request) {
     overlayLines.push(
       React.createElement(
         'span',
-        { style: { left: 300, color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
+        { style: { left: 250, color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
         `+${wonValue}`
       )
     );
@@ -78,7 +78,7 @@ export default async function handler(req: Request) {
           height: 100,
           style: {
             position: 'absolute',
-            bottom: 140,
+            bottom: 170,
             right: 400,
             borderRadius: '50%',
             border: '4px solid #fff',
