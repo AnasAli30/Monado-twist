@@ -78,7 +78,7 @@ export default async function handler(req: Request) {
           },
         }),
         tokenImg && React.createElement('img', {
-          src: `${window.location.origin}${tokenImg}`,
+          src: `https://monado-twist.vercel.app${tokenImg}`,
           width: 100,
           height: 100,
           style: {
