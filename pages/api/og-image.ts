@@ -78,8 +78,8 @@ export default async function handler(req: Request) {
           height: 100,
           style: {
             position: 'absolute',
-            bottom: 170,
-            right: 450,
+            bottom: 220,
+            right: 400,
             borderRadius: '50%',
             border: '4px solid #fff',
             zIndex: 2,
