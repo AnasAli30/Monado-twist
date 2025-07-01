@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       "fc:frame": JSON.stringify(frame),
-      // "frameEmbedNext": JSON.stringify(frameEmbedNext),
+      "frameEmbedNext": JSON.stringify(frameEmbedNext),
     },
   };
 }
