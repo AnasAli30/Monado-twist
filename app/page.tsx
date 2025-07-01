@@ -4,7 +4,7 @@ import { APP_URL } from "@/lib/constants";
 
 const frame = {
   version: "next",
-  imageUrl: `${APP_URL}/images/feed.png`,
+  imageUrl: `https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg`,
   button: {
     title: "Spin to Win",
     action: {
@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: "Monado Twist",
       description: "Spin to Win",
-      images: [`${APP_URL}`],
+      images: [`https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg`],
     },
     other: {
       "fc:frame": JSON.stringify(frame),
