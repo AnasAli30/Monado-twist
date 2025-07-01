@@ -78,7 +78,7 @@ export default async function handler(req: Request) {
           },
         }),
         tokenImg && React.createElement('img', {
-          src: tokenImg,
+          src: `${window.location.origin}${tokenImg}`,
           width: 100,
           height: 100,
           style: {
