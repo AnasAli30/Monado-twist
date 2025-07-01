@@ -4,7 +4,7 @@ import { APP_URL } from "@/lib/constants";
 
 const frame = {
   version: "next",
-  imageUrl: `https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg`,
+  imageUrl: `${APP_URL}/images/feed.png`,
   button: {
     title: "Spin to Win",
     action: {
