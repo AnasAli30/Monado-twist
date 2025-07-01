@@ -46,8 +46,8 @@ export default async function handler(req: Request) {
           height: 120,
           style: {
             position: 'absolute',
-            top: 80,
-            left: 80,
+            top: 100,
+            left: 150,
             borderRadius: '50%',
             border: '6px solid #fff',
             zIndex: 1,
@@ -59,7 +59,7 @@ export default async function handler(req: Request) {
             style: {
               position: 'absolute',
               top: 300,
-              left: 120,
+              left: 200,
               color: 'white',
               fontSize: 60,
               fontWeight: 'bold',
