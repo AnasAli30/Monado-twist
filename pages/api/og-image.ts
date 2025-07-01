@@ -22,7 +22,7 @@ export default async function handler(req: Request) {
       React.createElement(
         'span',
         { style: { color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
-        `🎉 +${wonValue}`
+        `+${wonValue}`
       ),
       React.createElement(
         'span',
@@ -83,8 +83,8 @@ export default async function handler(req: Request) {
           height: 100,
           style: {
             position: 'absolute',
-            bottom: 60,
-            right: 80,
+            bottom: 140,
+            right: 180,
             borderRadius: '20%',
             border: '4px solid #fff',
             zIndex: 2,
