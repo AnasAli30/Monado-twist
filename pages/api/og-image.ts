@@ -27,7 +27,7 @@ export default async function handler(req: Request) {
       },
       [
         React.createElement('img', {
-          src: 'https://monado-twist.vercel.app/image/template.png',
+          src: 'https://monado-twist.vercel.app/images/template.png',
           width: 1200,
           height: 630,
           style: {
