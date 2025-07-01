@@ -597,9 +597,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       case "MON":
         return "/images/mon.png";
       case "YAKI":
-        return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/6679b698-a845-412b-504b-23463a3e1900/public";
+        return "/images/yaki.png";
       case "CHOG":
-        return "https://imagedelivery.net/tWwhAahBw7afBzFUrX5mYQ/5d1206c2-042c-4edc-9f8b-dcef2e9e8f00/public";
+        return "/images/chog.png";
       case "USDC":
         return "/images/usdc.png";
       case "":
