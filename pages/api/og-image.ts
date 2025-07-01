@@ -13,11 +13,23 @@ export default async function handler(req: Request) {
   const userImg = searchParams.get('userImg') || 'https://monado-twist.vercel.app/images/icon.png'; // fallback user image
   const wonValue = searchParams.get('wonValue');
   const wonText = searchParams.get('wonText');
+  const tokenImg = searchParams.get('tokenImg');
 
   // Build overlay lines
-  const overlayLines = [];
+  let overlayLines = [];
   if (wonValue && wonText) {
-    overlayLines.push(`🎉 You won ${wonValue} ${wonText}!`);
+    overlayLines.push(
+      React.createElement(
+        'span',
+        { style: { color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
+        `🎉 +${wonValue}`
+      ),
+      React.createElement(
+        'span',
+        { style: { color: 'white', fontWeight: 'bold', fontSize: 60 } },
+        ` ${wonText}! 🎉`
+      )
+    );
   } else {
     overlayLines.push(`🏆 Rank #${rank}`);
     overlayLines.push(`Spins: ${spins}`);
@@ -63,6 +75,21 @@ export default async function handler(req: Request) {
             borderRadius: '50%',
             border: '6px solid #fff',
             zIndex: 1,
+          },
+        }),
+        tokenImg && React.createElement('img', {
+          src: tokenImg,
+          width: 100,
+          height: 100,
+          style: {
+            position: 'absolute',
+            bottom: 60,
+            right: 80,
+            borderRadius: '20%',
+            border: '4px solid #fff',
+            zIndex: 2,
+            background: '#fff',
+            objectFit: 'contain',
           },
         }),
         React.createElement(
