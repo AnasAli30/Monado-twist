@@ -1461,7 +1461,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           </div>
           
           <div className="spin-ui-card">
-          <EnvelopeReward setClaimed={setClaimed}  />
+          {/* <EnvelopeReward setClaimed={setClaimed}  /> */}
           { claimed && <div>
             <div className="spin-ui-header">MONADO TWIST</div>
            
