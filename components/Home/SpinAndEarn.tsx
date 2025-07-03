@@ -96,6 +96,7 @@ export function SpinAndEarn() {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
   const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
+  const [awaitingLikeRecastVerification, setAwaitingLikeRecastVerification] = useState(false);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -1565,6 +1566,40 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             }}
           >
             Follow to get 1 extra spin! 🎁
+          </button>
+        )}
+        {!hasLikedAndRecast && !awaitingLikeRecastVerification && (
+          <button
+            className="follow-button"
+            onClick={async () => {
+              await actions?.openUrl('https://farcaster.xyz/hackerx/0x2c3df003');
+              setAwaitingLikeRecastVerification(true);
+              setResult("Please like and recast the cast to get your extra spin...");
+              setTimeout(async () => {
+                // Grant spin for like and recast
+                if (fid) {
+                  const res = await fetchWithVerification('/api/spin', {
+                    method: 'POST',
+                    body: JSON.stringify({ fid, mode: "likeAndRecast" }),
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    setSpinsLeft(data.spinsLeft);
+                    setResult("You got 1 extra spin for liking and recasting! 🎁");
+                    setHasLikedAndRecast(true);
+                  } else {
+                    setResult("Error granting spin. Please try again.");
+                  }
+                } else {
+                  setResult("You got 1 extra spin for liking and recasting! 🎁");
+                  setHasLikedAndRecast(true);
+                }
+                setAwaitingLikeRecastVerification(false);
+              }, 5000);
+            }}
+          >
+            Like & Recast to get 1 extra spin! 🎁
           </button>
         )}
             </div>}
