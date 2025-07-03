@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { monadTestnet } from "viem/chains";
@@ -13,6 +13,15 @@ import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
 import { WinNotifications } from "./WinNotifications";
+
+// PERFORMANCE OPTIMIZATION: Debounce utility function
+function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
+  let timeout: NodeJS.Timeout;
+  return ((...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  }) as T;
+}
 
 interface Segment {
   text: string;
@@ -159,6 +168,31 @@ export function SpinAndEarn() {
     }
   }, [isMuted]);
 
+  // PERFORMANCE OPTIMIZATION: Debounce localStorage operations
+  const debouncedUpdateLocalStorage = useCallback(
+    debounce((key: string, value: string) => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(key, value);
+      }
+    }, 300),
+    []
+  );
+
+  // Update localStorage when totalSpins changes (debounced)
+  useEffect(() => {
+    debouncedUpdateLocalStorage('totalSpins', totalSpins.toString());
+  }, [totalSpins, debouncedUpdateLocalStorage]);
+
+  // Update localStorage when totalWins changes (debounced)
+  useEffect(() => {
+    debouncedUpdateLocalStorage('totalWins', totalWins.toString());
+  }, [totalWins, debouncedUpdateLocalStorage]);
+
+  // Save mute state to localStorage (debounced)
+  useEffect(() => {
+    debouncedUpdateLocalStorage('isMuted', isMuted.toString());
+  }, [isMuted, debouncedUpdateLocalStorage]);
+
   useEffect(() => {
     // Sync user data to DB
     if (fid) {
@@ -271,8 +305,8 @@ export function SpinAndEarn() {
       };
 
       fetchData();
-      // Update timers every minute
-      const timer = setInterval(fetchData, 60000);
+      // PERFORMANCE OPTIMIZATION: Reduced API call frequency from 60s to 120s
+      const timer = setInterval(fetchData, 120000);
       return () => clearInterval(timer);
     }
   }, [fid]);
@@ -610,7 +644,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     }
   };
 
-  // Calculate SVG paths for each segment
+  // PERFORMANCE OPTIMIZATION: Reduced SVG complexity
   let startAngle = 0;
   const svgSegments = segments.map((segment, i) => {
     const endAngle = startAngle + segment.degrees;
@@ -764,6 +798,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           </div>
         </div>
       )}
+      {/* PERFORMANCE OPTIMIZATION: Disabled WinNotifications - heavy Pusher connections */}
       {/* <WinNotifications /> */}
       <style>{`
         @keyframes fadeInSlideUp {
@@ -825,7 +860,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             0 0 40px rgba(138, 43, 226, 0.4),
             0 0 60px rgba(75, 0, 130, 0.3),
             inset 0 0 20px rgba(147, 112, 219, 0.4);
-          animation: glowPulse 3s ease-in-out infinite;
+          /* PERFORMANCE OPTIMIZATION: Reduced animation frequency */
+          animation: glowPulse 6s ease-in-out infinite;
           border: 2px solid rgba(147, 112, 219, 0.3);
         }
         @keyframes glowPulse {
@@ -899,7 +935,8 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
            justify-content: space-evenly;
            text-align: center;
            color: #fff;
-           animation: pulse-glow 4s ease-in-out infinite;
+           /* PERFORMANCE OPTIMIZATION: Reduced animation frequency */
+           animation: pulse-glow 8s ease-in-out infinite;
            transition: all 0.3s ease;
            position: relative;
         }
@@ -1029,16 +1066,33 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           border-bottom: 6px solid #2a2138;
         }
         .wheel-spin-anim {
-          animation: wheelIdle 12s linear infinite;
+          /* PERFORMANCE OPTIMIZATION: Smooth idle animation */
+          animation: wheelIdleSmooth 20s linear infinite;
           transition: none;
+          will-change: transform;
+          transform-origin: center;
+          backface-visibility: hidden;
+          perspective: 1000px;
         }
         .wheel-spin-anim.spinning {
           animation: none;
           transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+          will-change: transform;
+          backface-visibility: hidden;
         }
-        @keyframes wheelIdle {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        .wheel-spin-anim:hover {
+          animation-play-state: paused;
+          transition: animation-play-state 0.3s ease;
+        }
+        @keyframes wheelIdleSmooth {
+          0% { 
+            transform: rotate3d(0, 0, 1, 0deg); 
+            opacity: 1;
+          }
+          100% { 
+            transform: rotate3d(0, 0, 1, 360deg); 
+            opacity: 1;
+          }
         }
         .pointer {
 
@@ -1410,10 +1464,11 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
       `}</style>
+      {/* PERFORMANCE OPTIMIZATION: Audio preloading - consider lazy loading */}
       <audio
         ref={audioRef}
         src="/spinning-sound.mp3"
-        preload="auto"
+        preload="metadata"
         muted={isMuted}
       />
       {winSounds.map((src, i) => (
@@ -1423,7 +1478,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             winAudioRefs.current[i] = el;
           }}
           src={src}
-          preload="auto"
+          preload="metadata"
           muted={isMuted}
         />
       ))}
@@ -1434,7 +1489,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             loseAudioRefs.current[i] = el;
           }}
           src={src}
-          preload="auto"
+          preload="metadata"
           muted={isMuted}
         />
       ))}
