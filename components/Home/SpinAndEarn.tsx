@@ -1627,7 +1627,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           <button
             className="follow-button"
             onClick={async () => {
-              await actions?.openUrl('https://farcaster.xyz/hackerx/0x2c3df003');
+              await actions?.openUrl('https://farcaster.xyz/hackerx/0xb5055a11');
               setAwaitingLikeRecastVerification(true);
               setResult("Please like and recast the cast to get your extra spin...");
               setTimeout(async () => {
