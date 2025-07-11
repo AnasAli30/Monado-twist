@@ -9,6 +9,7 @@ import { Leaderboard } from "@/components/Home/Leaderboard";
 import { Confetti } from './Confetti';
 import { CryingEmoji } from './CryingEmoji';
 import { ethers } from "ethers";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
@@ -106,6 +107,7 @@ export function SpinAndEarn() {
   const [hasLikedAndRecast, setHasLikedAndRecast] = useState<boolean>(false);
   const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
   const [awaitingLikeRecastVerification, setAwaitingLikeRecastVerification] = useState(false);
+  const [timeUntilMiniAppOpen, setTimeUntilMiniAppOpen] = useState<string>('');
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -299,6 +301,19 @@ export function SpinAndEarn() {
               setTimeUntilShare(`${hours}h ${minutes}m`);
             }
           }
+
+          if (data.lastMiniAppOpen) {
+            const openTime = new Date(data.lastMiniAppOpen).getTime() + 3 * 60 * 60 * 1000;
+            const now = new Date().getTime();
+            if (openTime > now) {
+              const timeLeft = openTime - now;
+              const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+              const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+              setTimeUntilMiniAppOpen(`${hours}h ${minutes}m`);
+            } else {
+              setTimeUntilMiniAppOpen('');
+            }
+          }
         } catch (error) {
           console.error('Error fetching spin data:', error);
         }
@@ -363,6 +378,8 @@ export function SpinAndEarn() {
     
     return fullRotations + (360 - (startAngle + randomDegreeWithinSegment));
   };
+
+
 
   const handleShare = async (mon: string) => {
     try {
@@ -1589,6 +1606,42 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 {isBuying || isConfirming ? "Processing..." : "Buy 20 Spin (1 MON)"}
               </button>
             )} 
+
+<button
+          className="share-button"
+          onClick={async () => {
+            try {
+              await sdk.actions.openMiniApp({
+                url: "https://farcaster.xyz/~/mini-apps/launch?domain=monad-realm-mini-app.vercel.app"
+              });
+              // Call backend to grant spins if eligible
+              if (!timeUntilMiniAppOpen && fid) {
+                const res = await fetchWithVerification('/api/spin', {
+                  method: 'POST',
+                  body: JSON.stringify({ fid, mode: "miniAppOpen" }),
+                  headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setSpinsLeft(data.spinsLeft);
+                  setResult("You got 2 extra spins for opening the mini app!");
+                  setTimeUntilMiniAppOpen('3h 0m');
+                } else {
+                  setResult(data.error || "Failed to add spins.");
+                }
+              }
+            } catch (error) {
+              console.log(error);
+              setResult("Failed to open mini app.");
+            }
+          }}
+          disabled={!!timeUntilMiniAppOpen}
+        >
+          {timeUntilMiniAppOpen
+            ? `Open mini app available in: 
+            ${timeUntilMiniAppOpen}`
+            : "Open mini app to get 2 extra spins! 🎁"}
+        </button>
         {!follow && !awaitingFollowVerification && (
           <button
             className="follow-button"
@@ -1687,6 +1740,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
             {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}
           </button> 
          
+      
         </>
       ) : view === 'wallet' ? (
         <InnerWallet />

@@ -104,6 +104,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft });
   }
 
+  if (mode === "miniAppOpen") {
+    const now = new Date();
+    const lastMiniAppOpen = user?.lastMiniAppOpen ? new Date(user.lastMiniAppOpen) : new Date(0);
+    if (now.getTime() - lastMiniAppOpen.getTime() < 3 * 60 * 60 * 1000) {
+      // Not enough time has passed
+      const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen.getTime());
+      return res.status(400).json({ 
+        error: "You can only get spins for opening the mini app once every 3 hours.",
+        timeLeft: msLeft,
+        lastMiniAppOpen
+      });
+    }
+    spinsLeft += 2;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, lastMiniAppOpen: now } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, lastMiniAppOpen: now });
+  }
+
   if (checkOnly) {
     const winningsData = await db.collection('winnings').aggregate([
         { $match: { fid: fid } },
@@ -115,6 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       totalMonWon: parseFloat(totalMonWon),
       lastSpinReset: user?.lastSpinReset,
       lastShareSpin: user?.lastShareSpin,
+      lastMiniAppOpen: user?.lastMiniAppOpen,
       follow: user?.follow,
       likeAndRecast: user?.likeAndRecast,
       envelopeClaimed: user?.envelopeClaimed
