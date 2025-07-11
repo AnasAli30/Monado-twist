@@ -67,6 +67,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft });
   }
 
+  if (mode === "followX") {
+    if (user?.hasFollowedX) {
+      return res.status(400).json({ error: "You have already followed on X." });
+    }
+    spinsLeft += 1;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, hasFollowedX: true } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, hasFollowedX: true });
+  }
+
   if (mode === "buy") {
     if (!amount || !address) {
       return res.status(400).json({ error: "Missing amount or address for purchase" });
@@ -139,7 +152,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lastMiniAppOpen: user?.lastMiniAppOpen,
       follow: user?.follow,
       likeAndRecast: user?.likeAndRecast,
-      envelopeClaimed: user?.envelopeClaimed
+      envelopeClaimed: user?.envelopeClaimed,
+      hasFollowedX: user?.hasFollowedX
     });
   }
 

@@ -14,6 +14,7 @@ import { setFips } from "crypto";
 import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
 import { WinNotifications } from "./WinNotifications";
+import { GetSpins } from './GetSpins';
 
 // PERFORMANCE OPTIMIZATION: Debounce utility function
 function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
@@ -79,7 +80,7 @@ export function SpinAndEarn() {
   const [result, setResult] = useState<string | null>(null);
   const [isResultPopupVisible, setIsResultPopupVisible] = useState(false);
   const [rotation, setRotation] = useState<number>(0);
-  const [view, setView] = useState<'spin' | 'wallet' | 'leaderboard'>('spin');
+  const [view, setView] = useState<'spin' | 'wallet' | 'leaderboard' | 'getspins'>('spin');
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
   const [timeUntilShare, setTimeUntilShare] = useState<string>('');
   const [isBuying, setIsBuying] = useState(false);
@@ -108,6 +109,8 @@ export function SpinAndEarn() {
   const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
   const [awaitingLikeRecastVerification, setAwaitingLikeRecastVerification] = useState(false);
   const [timeUntilMiniAppOpen, setTimeUntilMiniAppOpen] = useState<string>('');
+  const [hasFollowedX, setHasFollowedX] = useState(false);
+  const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -279,6 +282,9 @@ export function SpinAndEarn() {
           setClaimed(data.envelopeClaimed);
           SetFollow(data.follow);
           setHasLikedAndRecast(data.likeAndRecast || false);
+          if (data.hasFollowedX) {
+            setHasFollowedX(!!data.hasFollowedX);
+          }
           // Update timers
           if (data.lastSpinReset) {
             const resetTime = new Date(data.lastSpinReset).getTime() + 6 * 60 * 60 * 1000;
@@ -752,6 +758,112 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
   const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3' , '/audio/win-4.mp3', '/audio/win-5.mp3', '/audio/win-6.mp3'];
   const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3', '/audio/lose-3.mp3', '/audio/lose-4.mp3', '/audio/lose-5.mp3', '/audio/lose-6.mp3' , '/audio/lose-7.mp3'];
+
+  // Handlers for GetSpins
+  const handleOpenMiniApp = async () => {
+    try {
+      await sdk.actions.openMiniApp({
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=monad-realm-mini-app.vercel.app"
+      });
+      if (!timeUntilMiniAppOpen && fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "miniAppOpen" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 2 extra spins for opening the mini app!");
+          setTimeUntilMiniAppOpen('3h 0m');
+        } else {
+          setResult(data.error || "Failed to add spins.");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setResult("Failed to open mini app.");
+    }
+  };
+  const handleFollow = async () => {
+    await actions?.viewProfile({ fid: 249702 });
+    setAwaitingFollowVerification(true);
+    setResult("Verifying your follow...");
+    setTimeout(async () => {
+      if (fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "follow" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 1 extra spin for following! 🎁");
+          SetFollow(true);
+        } else {
+          setResult("Error granting spin. Please try again.");
+        }
+      } else {
+        setResult("You got 1 extra spin for following! 🎁");
+        SetFollow(true);
+      }
+      setAwaitingFollowVerification(false);
+    }, 5000);
+  };
+  const handleLikeRecast = async () => {
+    await actions?.openUrl('https://farcaster.xyz/hackerx/0xb5055a11');
+    setAwaitingLikeRecastVerification(true);
+    setResult("Please like and recast the cast to get your extra spin...");
+    setTimeout(async () => {
+      if (fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "likeAndRecast" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 1 extra spin for liking and recasting! 🎁");
+          setHasLikedAndRecast(true);
+        } else {
+          setResult("Error granting spin. Please try again.");
+        }
+      } else {
+        setResult("You got 1 extra spin for liking and recasting! 🎁");
+        setHasLikedAndRecast(true);
+      }
+      setAwaitingLikeRecastVerification(false);
+    }, 5000);
+  };
+
+  const handleFollowX = async () => {
+    await actions?.openUrl('https://x.com/MonadRealm');
+    setAwaitingFollowXVerification(true);
+    setResult('Verifying your X follow...');
+    setTimeout(async () => {
+      if (fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: 'followX' }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult('You got 1 extra spin for following on X! 🎁');
+          setHasFollowedX(true);
+        } else {
+          setResult('Error granting spin. Please try again.');
+        }
+      } else {
+        setResult('You got 1 extra spin for following on X! 🎁');
+        setHasFollowedX(true);
+      }
+      setAwaitingFollowXVerification(false);
+    }, 5000);
+  };
 
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
@@ -1606,146 +1718,31 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
                 {isBuying || isConfirming ? "Processing..." : "Buy 20 Spin (1 MON)"}
               </button>
             )} 
-
-<button
-          className="share-button"
-          onClick={async () => {
-            try {
-              await sdk.actions.openMiniApp({
-                url: "https://farcaster.xyz/~/mini-apps/launch?domain=monad-realm-mini-app.vercel.app"
-              });
-              // Call backend to grant spins if eligible
-              if (!timeUntilMiniAppOpen && fid) {
-                const res = await fetchWithVerification('/api/spin', {
-                  method: 'POST',
-                  body: JSON.stringify({ fid, mode: "miniAppOpen" }),
-                  headers: { 'Content-Type': 'application/json' }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                  setSpinsLeft(data.spinsLeft);
-                  setResult("You got 2 extra spins for opening the mini app!");
-                  setTimeUntilMiniAppOpen('3h 0m');
-                } else {
-                  setResult(data.error || "Failed to add spins.");
-                }
-              }
-            } catch (error) {
-              console.log(error);
-              setResult("Failed to open mini app.");
-            }
-          }}
-          disabled={!!timeUntilMiniAppOpen}
-        >
-          {timeUntilMiniAppOpen
-            ? `Open mini app available in: 
-            ${timeUntilMiniAppOpen}`
-            : "Open mini app to get 2 extra spins! 🎁"}
-        </button>
-        {!follow && !awaitingFollowVerification && (
-          <button
-            className="follow-button"
-            onClick={async () => {
-              await actions?.viewProfile({ fid: 249702 });
-              setAwaitingFollowVerification(true);
-              setResult("Verifying your follow...");
-              setTimeout(async () => {
-                // If follower, grant spin
-                if (fid) {
-                  const res = await fetchWithVerification('/api/spin', {
-                    method: 'POST',
-                    body: JSON.stringify({ fid, mode: "follow" }),
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const data = await res.json();
-                  if (res.ok) {
-                    setSpinsLeft(data.spinsLeft);
-                    setResult("You got 1 extra spin for following! 🎁");
-                    SetFollow(true);
-                  } else {
-                    setResult("Error granting spin. Please try again.");
-                  }
-                } else {
-                  setResult("You got 1 extra spin for following! 🎁");
-                  SetFollow(true);
-                }
-                setAwaitingFollowVerification(false);
-              }, 5000);
-            }}
-          >
-            Follow to get 1 extra spin! 🎁
-          </button>
-        )}
-        {!hasLikedAndRecast && !awaitingLikeRecastVerification && (
-          <button
-            className="follow-button"
-            onClick={async () => {
-              await actions?.openUrl('https://farcaster.xyz/hackerx/0xb5055a11');
-              setAwaitingLikeRecastVerification(true);
-              setResult("Please like and recast the cast to get your extra spin...");
-              setTimeout(async () => {
-                // Grant spin for like and recast
-                if (fid) {
-                  const res = await fetchWithVerification('/api/spin', {
-                    method: 'POST',
-                    body: JSON.stringify({ fid, mode: "likeAndRecast" }),
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const data = await res.json();
-                  if (res.ok) {
-                    setSpinsLeft(data.spinsLeft);
-                    setResult("You got 1 extra spin for liking and recasting! 🎁");
-                    setHasLikedAndRecast(true);
-                  } else {
-                    setResult("Error granting spin. Please try again.");
-                  }
-                } else {
-                  setResult("You got 1 extra spin for liking and recasting! 🎁");
-                  setHasLikedAndRecast(true);
-                }
-                setAwaitingLikeRecastVerification(false);
-              }, 5000);
-            }}
-          >
-            Like & Recast to get 1 extra spin! 🎁
-          </button>
-        )}
             </div>}
           </div>
       
-           <button
-            className="share-button"
-            onClick={async () => {
-              try {
-              const provider = new ethers.JsonRpcProvider("https://testnet-rpc.monad.xyz");
-              const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS;
-              const ABI = [
-                "function balances(address) view returns (uint256)"
-              ];
-              const contract = new ethers.Contract(CONTRACT_ADDRESS as string, ABI, provider);
-              const balance = await contract.balances(address);
-              const balanceinMon = ethers.formatEther(balance);
-              if(Number(balanceinMon) > 0) {
-                handleShare(balanceinMon.toString())
-              } else {
-                handleShare(" ")
-              }
-            } catch (error) {
-              console.log(error)
-              handleShare(" ")
-            }
-            }}
-            disabled={!!timeUntilShare}
-          >
-            {timeUntilShare ? `Share available in: ${timeUntilShare}` : "Share to get 2 extra spins! 🎁"}
-          </button> 
-         
       
         </>
       ) : view === 'wallet' ? (
         <InnerWallet />
-      ) : (
+      ) : view === 'leaderboard' ? (
         <Leaderboard />
+      ) : (
+        <GetSpins
+          timeUntilShare={timeUntilShare}
+          timeUntilMiniAppOpen={timeUntilMiniAppOpen}
+          awaitingFollowVerification={awaitingFollowVerification}
+          awaitingLikeRecastVerification={awaitingLikeRecastVerification}
+          follow={follow}
+          hasLikedAndRecast={hasLikedAndRecast}
+          hasFollowedX={hasFollowedX}
+          awaitingFollowXVerification={awaitingFollowXVerification}
+          handleShare={handleShare}
+          handleOpenMiniApp={handleOpenMiniApp}
+          handleFollow={handleFollow}
+          handleLikeRecast={handleLikeRecast}
+          handleFollowX={handleFollowX}
+        />
       )}
       <div className="switch-bar">
         <button
@@ -1753,6 +1750,13 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           onClick={() => setView('spin')}
         >
           <FaHome />
+        </button>
+        <button
+          className={view === 'getspins' ? 'active' : ''}
+          onClick={() => setView('getspins')}
+          title="Get Spins"
+        >
+          <FaTicketAlt />
         </button>
         <button
           className={view === 'wallet' ? 'active' : ''}
@@ -1766,6 +1770,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         >
           <FaTrophy /> 
         </button>
+      
         <button
           className="mute-button"
           onClick={toggleMute}
