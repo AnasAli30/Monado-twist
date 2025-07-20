@@ -249,6 +249,13 @@ export function SpinAndEarn() {
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
+      case "WBTC":
+        // Use larger values to avoid scientific notation
+        return +(Math.random() * (0.00001 - 0.000001) + 0.000001).toFixed(6);
+      case "WSOL":
+        return +(Math.random() * (0.001 - 0.0001) + 0.0001).toFixed(4);
+      case "WETH":
+        return +(Math.random() * (0.00001 - 0.000001) + 0.00001).toFixed(5);
       case "CHOG":
         return +(Math.random() * (0.3 - 0.01) + 0.01).toFixed(3);
       case "USDC":
@@ -259,11 +266,14 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 72 },  // Gold
-    { text: "YAKI", value: 0, color: "#00E5FF", probability: 20, degrees: 72 },  // Bright Teal
-    { text: "", value: 0, color: "#004D40", probability: 45, degrees: 72 },  // Dark Teal
-    { text: "CHOG", value: 0, color: "#00BFA5", probability: 20, degrees: 72 },  // Medium Teal
-    { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 72 },  // Dark Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 45 },  // Gold
+    { text: "YAKI", value: 0, color: "#00E5FF", probability: 15, degrees: 45 },  // Bright Teal
+    { text: "WBTC", value: 0, color: "#F7931A", probability: 5, degrees: 45 },  // Bitcoin Orange
+    { text: "WSOL", value: 0, color: "#9945FF", probability: 8, degrees: 45 },  // Solana Purple
+    { text: "WETH", value: 0, color: "#627EEA", probability: 7, degrees: 45 },  // Ethereum Blue
+    { text: "", value: 0, color: "#004D40", probability: 35, degrees: 45 },  // Dark Teal
+    { text: "CHOG", value: 0, color: "#00BFA5", probability: 15, degrees: 45 },  // Medium Teal
+    { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 45 },  // Dark Gold
   ];
 
   // Fetch spins and timer data from backend
@@ -656,6 +666,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         return "/images/mon.png";
       case "YAKI":
         return "/images/yaki.png";
+      case "WBTC":
+        return "/images/wbtc.png";
+      case "WSOL":
+        return "/images/wsol.png";
+      case "WETH":
+        return "/images/weth.png";
       case "CHOG":
         return "/images/chog.png";
       case "USDC":
@@ -686,13 +702,13 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         <path d={path} fill={segment.color} stroke="#1a1a2e" strokeWidth="2" />
         <image
           x={iconPos.x-18}
-          y={iconPos.y -35}
+          y={iconPos.y -15}
           width="35"
           height="35"
           href={getTokenImage(segment.text)}
           transform={`rotate(${labelAngle + 180}, ${iconPos.x}, ${iconPos.y })`}
         />
-        <text
+        {/* <text
           x={labelPos.x}
           y={labelPos.y + 0}
           transform={`rotate(${labelAngle + 180}, ${labelPos.x}, ${labelPos.y})`}
@@ -702,7 +718,7 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
           style={{ fontWeight: "bold", textShadow: "2px 2px 4px #000" }}
         >
           {segment.text}
-        </text>
+        </text> */}
       </g>
     );
     startAngle = endAngle;
@@ -718,6 +734,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
       case "YAKI":
         return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
+      case "WBTC":
+        return process.env.NEXT_PUBLIC_WBTC_TOKEN_ADDRESS as string;
+      case "WSOL":
+        return process.env.NEXT_PUBLIC_WSOL_TOKEN_ADDRESS as string;
+      case "WETH":
+        return process.env.NEXT_PUBLIC_WETH_TOKEN_ADDRESS as string;
       default:
         return "";
     }
@@ -728,6 +750,12 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
     switch (token) {
       case "USDC":
         return 6;
+      case "WBTC":
+        return 8;
+      case "WSOL":
+        return 9;
+      case "WETH":
+        return 18;
       default:
         return 18;
     }

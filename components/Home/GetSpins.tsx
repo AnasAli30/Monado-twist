@@ -60,7 +60,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/monad-realm.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title">Play games in Monad Realm</div>
+            <div className="get-spins-card-title"> Play games and Earn upto 2100 $MON</div>
           </div>
           <button
             className="get-spins-action-btn"
