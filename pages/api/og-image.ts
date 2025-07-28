@@ -96,21 +96,47 @@ export default async function handler(req: Request) {
           },
           username || 'Player'
         ),
-        tokenImg && React.createElement('img', {
-          src: `https://monado-twist.vercel.app${tokenImg}`,
-          width: 100,
-          height: 100,
-          style: {
-            position: 'absolute',
-            bottom: 200,
-            right:400,
-            borderRadius: '50%',
-            border: '4px solid #fff',
-            zIndex: 2,
-            background: '#fff',
-            objectFit: 'contain',
+        tokenImg && React.createElement(
+          'div',
+          {
+            style: {
+              position: 'absolute',
+              bottom: 200,
+              right: 350,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '8px',
+              zIndex: 2,
+            },
           },
-        }),
+          [
+            React.createElement('img', {
+              src: `https://monado-twist.vercel.app${tokenImg}`,
+              width: 100,
+              height: 100,
+              style: {
+                borderRadius: '50%',
+                border: '4px solid #fff',
+                background: '#fff',
+                objectFit: 'contain',
+              },
+            }),
+            wonValue && React.createElement(
+              'div',
+              {
+                style: {
+                  color: '#39FF14',
+                  fontSize: 48,
+                  fontWeight: 'bold',
+                  textShadow: '2px 2px 8px #000',
+                  textAlign: 'center',
+                },
+              },
+              `+${wonValue}`
+            ),
+          ]
+        ),
         React.createElement(
           'div',
           {
@@ -137,7 +163,7 @@ export default async function handler(req: Request) {
           {
             style: {
               position: 'absolute',
-              bottom: 100,
+              bottom: 90,
               left: 180,
               color: 'white',
               fontSize: 30,
