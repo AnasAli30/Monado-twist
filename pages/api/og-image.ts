@@ -19,23 +19,23 @@ export default async function handler(req: Request) {
   const totalSpins = searchParams.get('totalSpins');
 
   // Build overlay lines
-  let overlayLines = [];
-  if (wonValue && wonText) {
-    overlayLines.push(
-      React.createElement(
-        'span',
-        { style: { left: 200, color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
-        `+${wonValue}`
-      )
-    );
-  } else {
-    overlayLines.push(`🏆 Rank #${rank}`);
-    overlayLines.push(`Spins: ${spins}`);
-    overlayLines.push(`Winnings: ${winnings} MON`);
-    overlayLines.push(`Win Percentage: ${winPercentage}%`);
-    overlayLines.push(`Total Spins: ${totalSpins}`);
-    overlayLines.push(`Username: ${username}`);
-  }
+  // let overlayLines = [];
+  // if (wonValue && wonText) {
+  //   overlayLines.push(
+  //     React.createElement(
+  //       'span',
+  //       { style: { left: 200, color: '#39FF14', fontWeight: 'bold', fontSize: 80, marginRight: 16 } },
+  //       `+${wonValue}`
+  //     )
+  //   );
+  // } else {
+  //   overlayLines.push(`🏆 Rank #${rank}`);
+  //   overlayLines.push(`Spins: ${spins}`);
+  //   overlayLines.push(`Winnings: ${winnings} MON`);
+  //   overlayLines.push(`Win Percentage: ${winPercentage}%`);
+  //   overlayLines.push(`Total Spins: ${totalSpins}`);
+  //   overlayLines.push(`Username: ${username}`);
+  // }
 
   return new ImageResponse(
     React.createElement(
@@ -150,26 +150,26 @@ export default async function handler(req: Request) {
             ),
           ]
         ),
-        React.createElement(
-          'div',
-          {
-            style: {
-              position: 'absolute',
-              top: 320,
-              left: 250,
-              color: 'white',
-              fontSize: 60,
-              fontWeight: 'bold',
-              textShadow: '2px 2px 8px #000',
-              zIndex: 2,
-              textAlign: 'left',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
-            },
-          },
-          overlayLines.map((line, idx) => React.createElement('span', { key: idx }, line))
-        ),
+        // React.createElement(
+        //   'div',
+        //   {
+        //     style: {
+        //       position: 'absolute',
+        //       top: 320,
+        //       left: 250,
+        //       color: 'white',
+        //       fontSize: 60,
+        //       fontWeight: 'bold',
+        //       textShadow: '2px 2px 8px #000',
+        //       zIndex: 2,
+        //       textAlign: 'left',
+        //       display: 'flex',
+        //       flexDirection: 'column',
+        //       gap: '8px',
+        //     },
+        //   },
+        //   overlayLines.map((line, idx) => React.createElement('span', { key: idx }, line))
+        // ),
         // Stats section
         React.createElement(
           'div',
