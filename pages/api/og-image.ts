@@ -177,7 +177,7 @@ export default async function handler(req: Request) {
             style: {
               position: 'absolute',
               bottom: 100,
-              left: 300,
+              left: 500,
               color: 'white',
               fontSize: 27,
               fontWeight: '600',
@@ -191,6 +191,8 @@ export default async function handler(req: Request) {
               padding: '12px 16px',
               borderRadius: '12px',
               border: '1px solid rgba(255,255,255,0.2)',
+              // width: '200px',
+              // alignItems: 'center',
             },
           },
           [
