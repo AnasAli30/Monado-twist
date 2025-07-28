@@ -102,7 +102,7 @@ export default async function handler(req: Request) {
             style: {
               position: 'absolute',
               top: 120,
-              right: 180,
+              right: 160,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -176,10 +176,10 @@ export default async function handler(req: Request) {
           {
             style: {
               position: 'absolute',
-              bottom: 80,
-              left: 180,
+              bottom: 100,
+              left: 300,
               color: 'white',
-              fontSize: 24,
+              fontSize: 27,
               fontWeight: '600',
               textShadow: '1px 1px 4px #000',
               zIndex: 2,
@@ -194,8 +194,8 @@ export default async function handler(req: Request) {
             },
           },
           [
-            React.createElement('span', { key: 'spins' }, `🎯 Total Spins: ${totalSpins || 0}`),
-            React.createElement('span', { key: 'rate' }, `📊 Win Rate: ${winPercentage || 0}%`),
+            React.createElement('span', { key: 'spins' }, `Total Spins: ${totalSpins || 0}`),
+            React.createElement('span', { key: 'rate' }, `Win Rate: ${winPercentage?.slice(0, 4) || 0}%`),
           ]
         ),
       ]
