@@ -50,7 +50,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Record
     openGraph: {
       title: "Monado Twist",
       description: "Spin to Win",
-      images: [{ url: imageUrl }],
+      images: [{ url: `${APP_URL}/images/feed.png` }],
     },
     other: {
       "fc:frame": JSON.stringify(frame),
