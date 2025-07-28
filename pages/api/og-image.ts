@@ -103,7 +103,7 @@ export default async function handler(req: Request) {
           style: {
             position: 'absolute',
             bottom: 200,
-            right: 400,
+            right: 500,
             borderRadius: '50%',
             border: '4px solid #fff',
             zIndex: 2,
