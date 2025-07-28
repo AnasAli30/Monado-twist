@@ -101,8 +101,8 @@ export default async function handler(req: Request) {
           {
             style: {
               position: 'absolute',
-              bottom: 200,
-              right: 350,
+              top: 120,
+              right: 180,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -117,7 +117,7 @@ export default async function handler(req: Request) {
               height: 100,
               style: {
                 borderRadius: '50%',
-                border: '4px solid #fff',
+                border: '6px solid #fff',
                 background: '#fff',
                 objectFit: 'contain',
               },
@@ -133,21 +133,21 @@ export default async function handler(req: Request) {
                   textAlign: 'center',
                 },
               },
-              `+${wonValue}`
+              `+${wonValue} ${wonText || ''}`
             ),
-            wonText && React.createElement(
-              'div',
-              {
-                style: {
-                  color: '#fff',
-                  fontSize: 32,
-                  fontWeight: 'bold',
-                  textShadow: '2px 2px 8px #000',
-                  textAlign: 'center',
-                },
-              },
-              wonText
-            ),
+            // wonText && React.createElement(
+            //   'div',
+            //   {
+            //     style: {
+            //       color: '#fff',
+            //       fontSize: 32,
+            //       fontWeight: 'bold',
+            //       textShadow: '2px 2px 8px #000',
+            //       textAlign: 'center',
+            //     },
+            //   },
+            //   wonText
+            // ),
           ]
         ),
         // React.createElement(
@@ -179,7 +179,7 @@ export default async function handler(req: Request) {
               bottom: 80,
               left: 180,
               color: 'white',
-              fontSize: 30,
+              fontSize: 24,
               fontWeight: '600',
               textShadow: '1px 1px 4px #000',
               zIndex: 2,
