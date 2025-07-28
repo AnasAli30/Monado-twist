@@ -438,11 +438,15 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
 
     const message = `I just won ${wonValue} ${wonSegment.text} from Monado Twist! 🎰\n\nCome spin & earn with me! #BreakTheMonad`;
     const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.png`;
+    const username = context?.user?.username || "";
+    const totalSpins = parseInt(localStorage.getItem('totalSpins') || '0', 10);
+    const totalWins = parseInt(localStorage.getItem('totalWins') || '0', 10);
+    const winPercentage = (totalWins / totalSpins) * 100;     
     const tokenImg = getTokenImage(wonSegment.text);
     try {
         await actions?.composeCast?.({ 
             text: message,
-            embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}`], 
+            embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`],  
         });
         handleClosePopup();
     } catch (error) {

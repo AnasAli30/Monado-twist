@@ -3,17 +3,17 @@ import App from "@/components/pages/app";
 import { APP_URL } from "@/lib/constants";
 
 export async function generateMetadata({ searchParams }: { searchParams?: Record<string, string> }): Promise<Metadata> {
-  const { rank, spins, winnings, userImg, wonValue, wonText, tokenImg } = searchParams || {};
+  const { rank, spins, winnings, userImg, wonValue, wonText, tokenImg, username, winPercentage , totalSpins } = searchParams || {};  
   let imageUrl = `${APP_URL}/images/feed.png`;
-  // if (wonValue && wonText && userImg && tokenImg) {
-  //   imageUrl = `${APP_URL}/api/og-image?wonValue=${wonValue}&wonText=${encodeURIComponent(wonText)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}`;
-  // } else if (rank && spins && winnings && userImg) {
-  //   imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}&userImg=${encodeURIComponent(userImg)}`;
-  // }
+  if (wonValue && wonText && userImg && tokenImg) {
+    imageUrl = `${APP_URL}/api/og-image?wonValue=${wonValue}&wonText=${encodeURIComponent(wonText)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`;
+  } else if (rank && spins && winnings && userImg) {
+    imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}&userImg=${encodeURIComponent(userImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`;
+  }
 
   const frame = {
     version: "next",
-    imageUrl: `${APP_URL}/images/feed.png`,
+    imageUrl,
     button: {
       title: "Spin to Win",
       action: {
@@ -50,7 +50,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Record
     openGraph: {
       title: "Monado Twist",
       description: "Spin to Win",
-      images: [{ url: `${APP_URL}/images/feed.png` }],
+      images: [{ url: imageUrl }],
     },
     other: {
       "fc:frame": JSON.stringify(frame),

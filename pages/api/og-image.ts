@@ -14,6 +14,9 @@ export default async function handler(req: Request) {
   const wonValue = searchParams.get('wonValue');
   const wonText = searchParams.get('wonText');
   const tokenImg = searchParams.get('tokenImg');
+  const username = searchParams.get('username');
+  const winPercentage = searchParams.get('winPercentage');
+  const totalSpins = searchParams.get('totalSpins');
 
   // Build overlay lines
   let overlayLines = [];
@@ -29,6 +32,9 @@ export default async function handler(req: Request) {
     overlayLines.push(`🏆 Rank #${rank}`);
     overlayLines.push(`Spins: ${spins}`);
     overlayLines.push(`Winnings: ${winnings} MON`);
+    overlayLines.push(`Win Percentage: ${winPercentage}%`);
+    overlayLines.push(`Total Spins: ${totalSpins}`);
+    overlayLines.push(`Username: ${username}`);
   }
 
   return new ImageResponse(
@@ -72,6 +78,24 @@ export default async function handler(req: Request) {
             zIndex: 1,
           },
         }),
+        React.createElement(
+          'div',
+          {
+            style: {
+              position: 'absolute',
+              top: 250,
+              left: 180,
+              color: 'white',
+              fontSize: 32,
+              fontWeight: 'bold',
+              textShadow: '2px 2px 4px #000',
+              zIndex: 2,
+              textAlign: 'center',
+              width: 120,
+            },
+          },
+          username || 'Player'
+        ),
         tokenImg && React.createElement('img', {
           src: `https://monado-twist.vercel.app${tokenImg}`,
           width: 100,
@@ -102,9 +126,38 @@ export default async function handler(req: Request) {
               textAlign: 'left',
               display: 'flex',
               flexDirection: 'column',
+              gap: '8px',
             },
           },
           overlayLines.map((line, idx) => React.createElement('span', { key: idx }, line))
+        ),
+        // Stats section
+        React.createElement(
+          'div',
+          {
+            style: {
+              position: 'absolute',
+              bottom: 120,
+              left: 180,
+              color: 'white',
+              fontSize: 24,
+              fontWeight: '600',
+              textShadow: '1px 1px 4px #000',
+              zIndex: 2,
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              background: 'rgba(0,0,0,0.3)',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.2)',
+            },
+          },
+          [
+            React.createElement('span', { key: 'spins' }, `🎯 Total Spins: ${totalSpins || 0}`),
+            React.createElement('span', { key: 'rate' }, `📊 Win Rate: ${winPercentage || 0}%`),
+          ]
         ),
       ]
     ),
