@@ -5,15 +5,15 @@ import { APP_URL } from "@/lib/constants";
 export async function generateMetadata({ searchParams }: { searchParams?: Record<string, string> }): Promise<Metadata> {
   const { rank, spins, winnings, userImg, wonValue, wonText, tokenImg } = searchParams || {};
   let imageUrl = `${APP_URL}/images/feed.png`;
-  if (wonValue && wonText && userImg && tokenImg) {
-    imageUrl = `${APP_URL}/api/og-image?wonValue=${wonValue}&wonText=${encodeURIComponent(wonText)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}`;
-  } else if (rank && spins && winnings && userImg) {
-    imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}&userImg=${encodeURIComponent(userImg)}`;
-  }
+  // if (wonValue && wonText && userImg && tokenImg) {
+  //   imageUrl = `${APP_URL}/api/og-image?wonValue=${wonValue}&wonText=${encodeURIComponent(wonText)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}`;
+  // } else if (rank && spins && winnings && userImg) {
+  //   imageUrl = `${APP_URL}/api/og-image?rank=${rank}&spins=${spins}&winnings=${winnings}&userImg=${encodeURIComponent(userImg)}`;
+  // }
 
   const frame = {
     version: "next",
-    imageUrl,
+    imageUrl: `${APP_URL}/images/feed.png`,
     button: {
       title: "Spin to Win",
       action: {
