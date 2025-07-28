@@ -177,7 +177,7 @@ export default async function handler(req: Request) {
             style: {
               position: 'absolute',
               bottom: 100,
-              left: 450,
+              left: 460,
               color: 'black',
               fontSize: 27,
               fontWeight: '600',
