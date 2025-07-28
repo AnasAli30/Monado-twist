@@ -404,11 +404,11 @@ export function SpinAndEarn() {
   const handleShare = async (mon: string) => {
     try {
       await actions?.composeCast({
-        text: `Just won ${mon} $MON for free — and you can earn upto 50 mon free !
-  
-It's seriously fun , addictive, and totally worth it.
+        text: `Spin the wheel… BOOM 💥 ${mon} $MON in the bag!
 
-Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
+Up to 50 MON up for grabs 🤑  
+Come play — it’s fun, it’s fast, and it’s free.  
+#BreakTheMonad 🎮💸`,
         embeds: [`${window.location.origin}`],
       });
       
@@ -436,7 +436,9 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
   const handleShareWin = async () => {
     if (!wonSegment || wonValue <= 0) return;
 
-    const message = `I just won ${wonValue} ${wonSegment.text} from Monado Twist! 🎰\n\nCome spin & earn with me! #BreakTheMonad`;
+    const message = `YO I just won ${wonValue} ${wonSegment.text} for FREE on Monado Twist 😱💸
+Spin the wheel, touch grass later — it’s addictive af 🎰
+#BreakTheMonad 🚀`;
     const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.png`;
     const username = context?.user?.username || "";
     const totalSpins = parseInt(localStorage.getItem('totalSpins') || '0', 10);
