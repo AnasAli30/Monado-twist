@@ -3,7 +3,7 @@ import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
-import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
+import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaDice } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { Confetti } from './Confetti';
@@ -15,6 +15,7 @@ import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
 import { WinNotifications } from "./WinNotifications";
 import { GetSpins } from './GetSpins';
+import { SlotMachine } from './SlotMachine';
 
 // PERFORMANCE OPTIMIZATION: Debounce utility function
 function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
@@ -80,7 +81,7 @@ export function SpinAndEarn() {
   const [result, setResult] = useState<string | null>(null);
   const [isResultPopupVisible, setIsResultPopupVisible] = useState(false);
   const [rotation, setRotation] = useState<number>(0);
-  const [view, setView] = useState<'spin' | 'wallet' | 'leaderboard' | 'getspins'>('spin');
+  const [view, setView] = useState<'spin' | 'slots' | 'wallet' | 'leaderboard' | 'getspins'>('spin');
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
   const [timeUntilShare, setTimeUntilShare] = useState<string>('');
   const [isBuying, setIsBuying] = useState(false);
@@ -266,14 +267,16 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 45 },  // Gold
-    { text: "YAKI", value: 0, color: "#00E5FF", probability: 15, degrees: 45 },  // Bright Teal
-    { text: "WBTC", value: 0, color: "#F7931A", probability: 5, degrees: 45 },  // Bitcoin Orange
-    { text: "WSOL", value: 0, color: "#9945FF", probability: 8, degrees: 45 },  // Solana Purple
-    { text: "WETH", value: 0, color: "#627EEA", probability: 7, degrees: 45 },  // Ethereum Blue
-    { text: "", value: 0, color: "#004D40", probability: 35, degrees: 45 },  // Dark Teal
-    { text: "CHOG", value: 0, color: "#00BFA5", probability: 15, degrees: 45 },  // Medium Teal
-    { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 45 },  // Dark Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },  // Gold
+    { text: "WBTC", value: 0, color: "#F7931A", probability: 25, degrees: 60 },  // Bitcoin Orange
+     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
+    { text: "WETH", value: 0, color: "#627EEA", probability: 25, degrees: 60 },  // Ethereum Blue
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
+    { text: "", value: 0, color: "#004D40", probability: 46, degrees: 60 },  // Dark Teal
+     // Gold
+     // { text: "YAKI", value: 0, color: "#00E5FF", probability: 15, degrees: 45 },  // Bright Teal
+    // { text: "CHOG", value: 0, color: "#00BFA5", probability: 15, degrees: 45 },  // Medium Teal
+    // { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 45 },  // Dark Gold
   ];
 
   // Fetch spins and timer data from backend
@@ -1751,6 +1754,22 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
       
       
         </>
+      ) : view === 'slots' ? (
+        <SlotMachine
+          fid={fid}
+          spinsLeft={spinsLeft}
+          setSpinsLeft={setSpinsLeft}
+          setResult={setResult}
+          isResultPopupVisible={isResultPopupVisible}
+          setIsResultPopupVisible={setIsResultPopupVisible}
+          isMuted={isMuted}
+          context={context}
+          actions={actions}
+          switchChain={switchChain}
+          chainId={chainId}
+          isConnected={isConnected}
+          address={address}
+        />
       ) : view === 'wallet' ? (
         <InnerWallet />
       ) : view === 'leaderboard' ? (
@@ -1779,6 +1798,13 @@ Step up, spin the wheel, and join the #BreakTheMonad challenge!`,
         >
           <FaHome />
         </button>
+        {/* <button
+          className={view === 'slots' ? 'active' : ''}
+          onClick={() => setView('slots')}
+          title="Slot Machine"
+        >
+          <FaDice />
+        </button> */}
         <button
           className={view === 'getspins' ? 'active' : ''}
           onClick={() => setView('getspins')}
