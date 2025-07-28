@@ -135,6 +135,19 @@ export default async function handler(req: Request) {
               },
               `+${wonValue}`
             ),
+            wonText && React.createElement(
+              'div',
+              {
+                style: {
+                  color: '#fff',
+                  fontSize: 32,
+                  fontWeight: 'bold',
+                  textShadow: '2px 2px 8px #000',
+                  textAlign: 'center',
+                },
+              },
+              wonText
+            ),
           ]
         ),
         React.createElement(
@@ -163,7 +176,7 @@ export default async function handler(req: Request) {
           {
             style: {
               position: 'absolute',
-              bottom: 90,
+              bottom: 80,
               left: 180,
               color: 'white',
               fontSize: 30,
