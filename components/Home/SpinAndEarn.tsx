@@ -268,12 +268,12 @@ export function SpinAndEarn() {
 
   const segments: Segment[] = [
     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },  // Gold
-         { text: "YAKI", value: 0, color: "#00E5FF", probability: 25, degrees: 45 },  // Bright Teal
+         { text: "YAKI", value: 0, color: "#00E5FF", probability: 25, degrees: 60 },  // Bright Teal
     // { text: "WBTC", value: 0, color: "#F7931A", probability: 25, degrees: 60 },  // Bitcoin Orange
      { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
-    { text: "USDC", value: 0, color: "#B8860B", probability: 25, degrees: 45 },  // Dark Gold
+    { text: "USDC", value: 0, color: "#B8860B", probability: 25, degrees: 60 },  // Dark Gold
     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
-    { text: "", value: 0, color: "#004D40", probability: 46, degrees: 60 },  // Dark Teal
+    { text: "", value: 0, color: "#004D40", probability: 47, degrees: 60 },  // Dark Teal
      // Gold
      // { text: "YAKI", value: 0, color: "#00E5FF", probability: 15, degrees: 45 },  // Bright Teal
     // { text: "CHOG", value: 0, color: "#00BFA5", probability: 15, degrees: 45 },  // Medium Teal
