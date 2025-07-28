@@ -15,7 +15,7 @@ const PRIVATE_KEYS = [
   process.env.WALLET_PRIVATE_KEY_8,
   process.env.WALLET_PRIVATE_KEY_9,
   process.env.WALLET_PRIVATE_KEY_10,
-  process.env.WALLET_PRIVATE_KEY_11,
+  // process.env.,
 ].filter(Boolean) as string[];
 
 // Contract ABI for WinnerVault
