@@ -409,7 +409,7 @@ export function SpinAndEarn() {
 Up to 50 MON up for grabs 🤑  
 Come play — it’s fun, it’s fast, and it’s free.  
 #BreakTheMonad 🎮💸`,
-        embeds: [`${window.location.origin}`],
+        embeds: [`${window.location.origin}`,'https://chain-crush-black.vercel.app'],
       });
       
       // Call backend to add spins
@@ -828,21 +828,6 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       await sdk.actions.openMiniApp({
         url: "https://farcaster.xyz/~/mini-apps/launch?domain=chain-crush-black.vercel.app"
       });
-      if (!timeUntilMiniAppOpen && fid) {
-        const res = await fetchWithVerification('/api/spin', {
-          method: 'POST',
-          body: JSON.stringify({ fid, mode: "miniAppOpen" }),
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setSpinsLeft(data.spinsLeft);
-          setResult("You got 2 extra spins for opening the mini app!");
-          setTimeUntilMiniAppOpen('3h 0m');
-        } else {
-          setResult(data.error || "Failed to add spins.");
-        }
-      }
     } catch (error) {
       console.log(error);
       setResult("Failed to open mini app.");
@@ -902,7 +887,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   };
 
   const handleFollowX = async () => {
-    await actions?.openUrl('https://x.com/MonadRealm');
+    await actions?.openUrl('https://x.com/ChainCrush_');
     setAwaitingFollowXVerification(true);
     setResult('Verifying your X follow...');
     setTimeout(async () => {
@@ -1783,18 +1768,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             )} 
             </div>}
 
-            <div className="get-spins-card">
-              <div className="get-spins-card-header">
-                <img src="images/2.png" alt="Monad Realm" className="" style={{width:"80px",height:"80px"}} />
-                <div className="get-spins-card-title">Play games and Earn up to +4M PEPE</div>
-              </div>
-              <button
-                className="get-spins-action-btn"
-                onClick={handleOpenMiniApp1}
-              >
-              💰Earn Now💰
-              </button>
-            </div>
+            
           </div>
       
       
@@ -1831,6 +1805,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           awaitingFollowXVerification={awaitingFollowXVerification}
           handleShare={handleShare}
           handleOpenMiniApp={handleOpenMiniApp}
+          handleOpenMiniApp1={handleOpenMiniApp1}
           handleFollow={handleFollow}
           handleLikeRecast={handleLikeRecast}
           handleFollowX={handleFollowX}

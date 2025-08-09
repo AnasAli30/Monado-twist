@@ -12,6 +12,7 @@ interface GetSpinsProps {
   awaitingFollowXVerification: boolean;
   handleShare: (mon: string) => Promise<void>;
   handleOpenMiniApp: () => Promise<void>;
+  handleOpenMiniApp1: () => Promise<void>;
   handleFollow: () => Promise<void>;
   handleLikeRecast: () => Promise<void>;
   handleFollowX: () => Promise<void>;
@@ -23,6 +24,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   awaitingFollowVerification,
   awaitingLikeRecastVerification,
   follow,
+  handleOpenMiniApp1,
   hasLikedAndRecast,
   hasFollowedX,
   awaitingFollowXVerification,
@@ -36,6 +38,41 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
+
+      <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/2.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play games and Earn upto 4.45M $PEPE</div>
+          </div>
+          <button
+            className="get-spins-action-btn"
+            onClick={handleOpenMiniApp1}
+          >
+              <span className="spin-badge1">+4.45M $PEPE</span>
+            
+          </button>
+        </div>
+
+        <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <div className="get-spins-card-icon recast"><FaRetweet /></div>
+            <div className="get-spins-card-title">Like & Recast</div>
+          </div>
+          <button
+            className="get-spins-action-btn"
+            onClick={handleLikeRecast}
+            disabled={hasLikedAndRecast || awaitingLikeRecastVerification}
+          >
+            {!(hasLikedAndRecast || awaitingLikeRecastVerification) ? (
+              <span className="spin-badge">+1 Spin</span>
+            ) : hasLikedAndRecast ? (
+              'Already Claimed'
+            ) : (
+              'Verifying...'
+            )}
+          </button>
+        </div>
+        
         {/* Monad Realm X Follow Card */}
         <div className="get-spins-card">
           <div className="get-spins-card-header">
@@ -74,6 +111,8 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             )}
           </button>
         </div>
+
+        
         {/* Share Card */}
         <div className="get-spins-card">
           <div className="get-spins-card-header">
@@ -113,25 +152,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
         {/* Like & Recast Card */}
-        <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <div className="get-spins-card-icon recast"><FaRetweet /></div>
-            <div className="get-spins-card-title">Like & Recast</div>
-          </div>
-          <button
-            className="get-spins-action-btn"
-            onClick={handleLikeRecast}
-            disabled={hasLikedAndRecast || awaitingLikeRecastVerification}
-          >
-            {!(hasLikedAndRecast || awaitingLikeRecastVerification) ? (
-              <span className="spin-badge">+1 Spin</span>
-            ) : hasLikedAndRecast ? (
-              'Already Claimed'
-            ) : (
-              'Verifying...'
-            )}
-          </button>
-        </div>
+        
       </div>
       <style jsx>{`
         .get-spins-section {
@@ -186,11 +207,11 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         }
         .get-spins-card-icon {
           font-size: 2.6rem;
-          border-radius: 16px;
+          // border-radius: 16px;
           background: linear-gradient(135deg, #6C5CE7 60%, #a084ee 100%);
           color: #fff;
-          width: 56px;
-          height: 56px;
+          // width: 56px;
+          // height: 56px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -246,6 +267,19 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         .spin-badge {
           background: #fff;
           color: #6C5CE7;
+          font-weight: 800;
+          font-size: 0.98rem;
+          border-radius: 8px;
+          width: 90%;
+          padding: 4px 12px;
+          margin-right: 6px;
+          box-shadow: 0 2px 8px #a084ee33;
+          letter-spacing: 0.5px;
+          display: inline-block;
+        }
+        .spin-badge1 {
+          background: lightgreen;
+          color: black;
           font-weight: 800;
           font-size: 0.98rem;
           border-radius: 8px;
