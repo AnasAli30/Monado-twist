@@ -45,7 +45,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             <div className="get-spins-card-title"> Play games and Earn upto 4.45M $PEPE</div>
           </div>
           <button
-            className="get-spins-action-btn"
+            className="get-spins-action-btn1"
             onClick={handleOpenMiniApp1}
           >
               <span className="spin-badge1">+4.45M $PEPE</span>
@@ -255,6 +255,24 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           gap: 10px;
           width: 100%;
         }
+        .get-spins-action-btn1 {
+          background: #f9f9f9;
+          color: #fff;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          padding: 10px 0;
+          margin-top: 18px;
+          cursor: pointer;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px #6C5CE755;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+        }
         .get-spins-action-btn:disabled {
           opacity: 0.7;
           cursor: not-allowed;
@@ -278,8 +296,8 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           display: inline-block;
         }
         .spin-badge1 {
-          background: lightgreen;
-          color: black;
+          background: #9dff00;
+          color: #3e2723;
           font-weight: 800;
           font-size: 0.98rem;
           border-radius: 8px;
