@@ -48,7 +48,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             className="get-spins-action-btn1"
             onClick={handleOpenMiniApp1}
           >
-              <span className="spin-badge1">+4.45M $PEPE</span>
+              <span className="spin-badge1">+4.45M $PEPE / +2 spins</span>
             
           </button>
         </div>
