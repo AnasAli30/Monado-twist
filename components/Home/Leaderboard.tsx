@@ -85,7 +85,7 @@ export function Leaderboard() {
       }
     }
 
-    const text = `I'm #${rank} on the Monado Twist leaderboard!
+    const text = `I'm #${rank} on the Monad Twist leaderboard!
 
 - ${totalSpins} spins, ${parseFloat(totalWinnings).toFixed(2)} $MON earned.
 - Try to beat me — if you dare 😂😎

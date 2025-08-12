@@ -77,7 +77,7 @@ export function InnerWallet() {
       
       if (actions?.composeCast) {
         const castMessage = `🎉WITHDREW ${displayBalance} MON 🔥
-Monado Twist ain’t a game — it’s a cheat code 💸
+Monad Twist ain’t a game — it’s a cheat code 💸
 Spin. Win. Withdraw. Repeat.
 `;
         actions.composeCast({

@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('emitting event');
     try{
-    await pusher.trigger('monado-spin', 'withdraw', {
+    await pusher.trigger('Monad-spin', 'withdraw', {
         address: address,
         amount: amount,
         name: name || '',

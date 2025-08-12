@@ -383,7 +383,7 @@ export function SlotMachine({
       {/* Slot Machine UI */}
       <div className="slot-machine">
         <div className="slot-header">
-          <h1>🎰 MONADO SLOTS</h1>
+          <h1>🎰 Monad SLOTS</h1>
           <p>Pull the lever and match 3 symbols to win BIG!</p>
         </div>
 
@@ -440,7 +440,7 @@ export function SlotMachine({
             
             <button
               className="slot-btn"
-              onClick={() => window.open('https://farcaster.xyz/~/mini-apps/launch?domain=monado-twist.vercel.app')}
+              onClick={() => window.open('https://farcaster.xyz/~/mini-apps/launch?domain=Monad-twist.vercel.app')}
             >
               GET MORE SPINS
             </button>

@@ -1,6 +1,6 @@
-# Monado Twist - Spin to Earn Game
+# Monad Twist - Spin to Earn Game
 
-Monado Twist is a modern, purple-themed "spin to earn" dApp built on Monad, featuring a beautiful animated spinner, wallet integration, backend spin/reward logic, and a smart contract vault for winnings. Users can spin to win MON tokens, buy extra spins, share to earn spins, and track their winnings on a leaderboard.
+Monad Twist is a modern, purple-themed "spin to earn" dApp built on Monad, featuring a beautiful animated spinner, wallet integration, backend spin/reward logic, and a smart contract vault for winnings. Users can spin to win MON tokens, buy extra spins, share to earn spins, and track their winnings on a leaderboard.
 
 ## Features
 
@@ -27,8 +27,8 @@ Monado Twist is a modern, purple-themed "spin to earn" dApp built on Monad, feat
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/monado-twist.git
-cd monado-twist
+git clone https://github.com/yourusername/Monad-twist.git
+cd Monad-twist
 ```
 
 ### 2. Install Dependencies
@@ -46,7 +46,7 @@ Create a `.env.local` file in the root with the following:
 ```
 NEXT_PUBLIC_WINNER_VAULT_ADDRESS=0xYourWinnerVaultAddress
 MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net
-MONGODB_DB=monado-twist
+MONGODB_DB=Monad-twist
 MONAD_RPC_URL=https://your-monad-rpc-url
 WALLET_PRIVATE_KEY_1=your_private_key_1
 WALLET_PRIVATE_KEY_2=your_private_key_2

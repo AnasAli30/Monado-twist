@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Emit win event to Pusher
     try{
-    await pusher.trigger('monado-spin', 'win', {
+    await pusher.trigger('Monad-spin', 'win', {
       name: name,
       address: userAddress,
       amount: amount,

@@ -93,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Trigger purchase notification
     try {
-      await pusher.trigger('monado-spin', 'purchase', {
+      await pusher.trigger('Monad-spin', 'purchase', {
         name: user?.name,
         address: address,
         amount: amount,

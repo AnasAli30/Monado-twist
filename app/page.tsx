@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Record
       title: "Spin to Win",
       action: {
         type: "launch_frame",
-        name: "Monado Twist",
+        name: "Monad Twist",
         url: APP_URL,
         splashImageUrl: `${APP_URL}/images/splash.png`,
         splashBackgroundColor: "#14051a",
@@ -35,7 +35,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Record
   //       title: "Spin to Win 🎰",
   //       action: {
   //         type: "launch_frame",
-  //         name: "Monado Twist",
+  //         name: "Monad Twist",
   //         url: APP_URL,
   //         splashImageUrl: `${APP_URL}/images/splash.png`,
   //         splashBackgroundColor: "#14051a",
@@ -46,9 +46,9 @@ export async function generateMetadata({ searchParams }: { searchParams?: Record
   // };
 
   return {
-    title: "Monado Twist",
+    title: "Monad Twist",
     openGraph: {
-      title: "Monado Twist",
+      title: "Monad Twist",
       description: "Spin to Win",
       images: [{ url: imageUrl }],
     },

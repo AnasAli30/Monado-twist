@@ -436,7 +436,7 @@ Come play — it’s fun, it’s fast, and it’s free.
   const handleShareWin = async () => {
     if (!wonSegment || wonValue <= 0) return;
 
-    const message = `YO I just won ${wonValue} ${wonSegment.text} for FREE on Monado Twist 😱💸
+    const message = `YO I just won ${wonValue} ${wonSegment.text} for FREE on Monad Twist 😱💸
 Spin the wheel, touch grass later — it’s addictive af 🎰
 #BreakTheMonad 🚀`;
     const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.png`;
@@ -1696,7 +1696,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           <div className="spin-ui-card">
           <EnvelopeReward setClaimed={setClaimed}  />
           { claimed && <div>
-            <div className="spin-ui-header">MONADO TWIST</div>
+            <div className="spin-ui-header">Monad TWIST</div>
            
            
             <div className="spin-ui-row">
@@ -1731,7 +1731,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               !isConnected ? (
                 <div
                   onClick={() => {
-                    window.open('https://farcaster.xyz/~/mini-apps/launch?domain=monado-twist.vercel.app');
+                    window.open('https://farcaster.xyz/~/mini-apps/launch?domain=Monad-twist.vercel.app');
                   }}
                   className='spin-ui-spin-btn'
                 >

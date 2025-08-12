@@ -10,7 +10,7 @@ export default async function handler(req: Request) {
   const rank = searchParams.get('rank') || '-';
   const spins = searchParams.get('spins') || '-';
   const winnings = searchParams.get('winnings') || '-';
-  const userImg = searchParams.get('userImg') || 'https://monado-twist.vercel.app/images/icon.png'; // fallback user image
+  const userImg = searchParams.get('userImg') || 'https://Monad-twist.vercel.app/images/icon.png'; // fallback user image
   const wonValue = searchParams.get('wonValue');
   const wonText = searchParams.get('wonText');
   const tokenImg = searchParams.get('tokenImg');
@@ -52,7 +52,7 @@ export default async function handler(req: Request) {
       },
       [
         React.createElement('img', {
-          src: 'https://monado-twist.vercel.app/images/template.png',
+          src: 'https://Monad-twist.vercel.app/images/template.png',
           width: 1200,
           height: 630,
           style: {
@@ -112,7 +112,7 @@ export default async function handler(req: Request) {
           },
           [
             React.createElement('img', {
-              src: `https://monado-twist.vercel.app${tokenImg}`,
+              src: `https://Monad-twist.vercel.app${tokenImg}`,
               width: 100,
               height: 100,
               style: {

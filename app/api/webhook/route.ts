@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         await setUserNotificationDetails(fid, event.notificationDetails);
         await sendFrameNotification({
           fid,
-          title: "Welcome to Monado Twist",
+          title: "Welcome to Monad Twist",
 body: `You've just unlocked a new realm on Farcaster.`,
           notificationDetails: event.notificationDetails,
         });
@@ -104,7 +104,7 @@ body: `You've just unlocked a new realm on Farcaster.`,
       await setUserNotificationDetails(fid, event.notificationDetails);
       await sendFrameNotification({
         fid,
-        title: "Monado Twist Activated!",
+        title: "Monad Twist Activated!",
         body: `You're all set! Notifications enabled – let the chaos begin`,        
         notificationDetails: event.notificationDetails,
       });

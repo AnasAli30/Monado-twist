@@ -25,7 +25,7 @@ export function WinNotifications() {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
     });
 
-    const channel = pusher.subscribe('monado-spin');
+    const channel = pusher.subscribe('Monad-spin');
 
     const handleNotification = (data: any, type: 'win' | 'withdraw' | 'purchase') => {
       const newNotification: Notification = {
