@@ -29,7 +29,7 @@ export const NoSpinsPopup: React.FC<NoSpinsPopupProps> = ({
           <h2 className="no-spins-popup-title">No Spins Left! 😢</h2>
           
           <p className="no-spins-popup-message">
-            You've used all your spins! Complete tasks to earn more spins and keep playing.
+            You&apos;ve used all your spins! Complete tasks to earn more spins and keep playing.
           </p>
           
           <button 
