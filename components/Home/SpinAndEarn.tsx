@@ -457,7 +457,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     try {
         await actions?.composeCast?.({ 
             text: message,
-            embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`],  
+            embeds: [`${window.location.origin}`],  
+            // embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`],  
         });
         handleClosePopup();
     } catch (error) {

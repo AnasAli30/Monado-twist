@@ -847,8 +847,15 @@ export function SlotMachine({
           background: linear-gradient(45deg, transparent 30%, rgba(255,215,0,0.1) 50%, transparent 70%);
           border-radius: 25px;
           pointer-events: none;
-        }
-      `}</style>
-    </div>
-  );
+                 }
+       `}</style>
+       
+       {/* No Spins Popup */}
+       <NoSpinsPopup
+         isVisible={showNoSpinsPopup}
+         onClose={handleCloseNoSpinsPopup}
+         onGetSpins={handleGetSpinsFromPopup}
+       />
+     </div>
+   );
 } 
