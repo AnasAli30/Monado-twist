@@ -16,6 +16,7 @@ import { fetchWithVerification } from '@/utils/keyVerification';
 import { WinNotifications } from "./WinNotifications";
 import { GetSpins } from './GetSpins';
 import { SlotMachine } from './SlotMachine';
+import { NoSpinsPopup } from './NoSpinsPopup';
 
 // PERFORMANCE OPTIMIZATION: Debounce utility function
 function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
@@ -112,6 +113,7 @@ export function SpinAndEarn() {
   const [timeUntilMiniAppOpen, setTimeUntilMiniAppOpen] = useState<string>('');
   const [hasFollowedX, setHasFollowedX] = useState(false);
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
+  const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -198,6 +200,13 @@ export function SpinAndEarn() {
   useEffect(() => {
     debouncedUpdateLocalStorage('isMuted', isMuted.toString());
   }, [isMuted, debouncedUpdateLocalStorage]);
+
+  // Show popup when spins reach 0
+  useEffect(() => {
+    if (spinsLeft === 0 && spinsLeft !== null) {
+      setShowNoSpinsPopup(true);
+    }
+  }, [spinsLeft]);
 
   useEffect(() => {
     // Sync user data to DB
@@ -936,6 +945,15 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       }
       setAwaitingFollowXVerification(false);
     }, 5000);
+  };
+
+  const handleCloseNoSpinsPopup = () => {
+    setShowNoSpinsPopup(false);
+  };
+
+  const handleGetSpinsFromPopup = () => {
+    setShowNoSpinsPopup(false);
+    setView('getspins');
   };
 
   return (
@@ -1878,6 +1896,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
       </div>
+      
+      {/* No Spins Popup */}
+      <NoSpinsPopup
+        isVisible={showNoSpinsPopup}
+        onClose={handleCloseNoSpinsPopup}
+        onGetSpins={handleGetSpinsFromPopup}
+      />
     </div>
   );
 }

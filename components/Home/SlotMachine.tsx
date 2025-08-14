@@ -7,6 +7,7 @@ import { parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
 import { Confetti } from './Confetti';
 import { CryingEmoji } from './CryingEmoji';
+import { NoSpinsPopup } from './NoSpinsPopup';
 
 // Slot symbols with their values and payouts
 interface SlotSymbol {
@@ -57,6 +58,7 @@ export function SlotMachine({
   const [totalSpins, setTotalSpins] = useState<number>(0);
   const [winRate, setWinRate] = useState<number>(0);
   const [wins, setWins] = useState<number>(0);
+  const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
 
   const { sendTransaction, isPending: isConfirming, data } = useSendTransaction();
   const publicClient = usePublicClient();
@@ -138,6 +140,13 @@ export function SlotMachine({
     }
     return symbols;
   };
+
+  // Show popup when spins reach 0
+  useEffect(() => {
+    if (spinsLeft === 0 && spinsLeft !== null) {
+      setShowNoSpinsPopup(true);
+    }
+  }, [spinsLeft]);
 
   // Check for wins
   const checkWin = (finalSymbols: number[]): { won: boolean; symbol: SlotSymbol | null; payout: number } => {
@@ -307,6 +316,16 @@ export function SlotMachine({
       console.error('Error claiming token reward:', error);
       setResult(`Failed to claim ${tokenName} reward. Please try again.`);
     }
+  };
+
+  const handleCloseNoSpinsPopup = () => {
+    setShowNoSpinsPopup(false);
+  };
+
+  const handleGetSpinsFromPopup = () => {
+    setShowNoSpinsPopup(false);
+    // Since SlotMachine doesn't have direct access to setView, we'll just close the popup
+    // The user can manually navigate to getspins view
   };
 
   // Update win rate
