@@ -38,7 +38,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
-     <div className="get-spins-card">
+     {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/iq.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Check Your IQ and earn upto 4000 $DEGEN</div>
@@ -54,17 +54,18 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               `Open mini app available in: ${timeUntilMiniAppOpen}`
             )}
           </button>
-        </div>
+        </div> */}
       <div className="get-spins-card">
           <div className="get-spins-card-header">
-            <img src="images/2.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play games and Earn upto 4.45M $PEPE</div>
+            <img src="images/1.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play game and Earn upto 1.55M $BOOP</div>
           </div>
           <button
             className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp1}
+            onClick={handleOpenMiniApp}
+            disabled={!!timeUntilMiniAppOpen}
           >
-              <span className="spin-badge1">+4.45M $PEPE / +2 spins</span>
+              <span className="spin-badge1">+1.55M $BOOP / +2 spins</span>
             
           </button>
         </div>
@@ -110,7 +111,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
         {/* Play Monad Realm Card */}
-        <div className="get-spins-card">
+        {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/monad-realm.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play games and Earn upto 2500 $MON</div>
@@ -126,7 +127,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               `Open mini app available in: ${timeUntilMiniAppOpen}`
             )}
           </button>
-        </div>
+        </div> */}
         
 
         
