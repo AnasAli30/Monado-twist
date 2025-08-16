@@ -1065,7 +1065,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 className="popup-action-btn play-now"
                 onClick={handlePlayNow}
               >
-                Play Now
+                Play Now / +2 Spins
               </button>
               <button
                 className="popup-action-btn play-later"
@@ -1550,7 +1550,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           left: 0;
           right: 0;
           bottom: 0;
-          padding:10px;
+          padding:15px;
           height: 100%;
           background: rgba(18, 18, 45, 0.7);
           backdrop-filter: blur(8px);
