@@ -114,6 +114,7 @@ export function SpinAndEarn() {
   const [hasFollowedX, setHasFollowedX] = useState(false);
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -207,6 +208,16 @@ export function SpinAndEarn() {
       setShowNoSpinsPopup(true);
     }
   }, [spinsLeft]);
+
+  // Show welcome popup on first visit
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasShownWelcome = localStorage.getItem('welcomePopupShown');
+      if (!hasShownWelcome) {
+        setShowWelcomePopup(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Sync user data to DB
@@ -957,6 +968,17 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     setView('getspins');
   };
 
+  const handlePlayNow = () => {
+    setShowWelcomePopup(false);
+    localStorage.setItem('welcomePopupShown', 'true');
+    handleOpenMiniApp();
+  };
+
+  const handlePlayLater = () => {
+    setShowWelcomePopup(false);
+    localStorage.setItem('welcomePopupShown', 'true');
+  };
+
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
       {isResultPopupVisible && result && (
@@ -1016,6 +1038,42 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Popup */}
+      {showWelcomePopup && (
+        <div className="popup-overlay" onClick={handlePlayLater}>
+          <div className="popup-content welcome" onClick={(e) => e.stopPropagation()}>
+            <button className="popup-close-btn" onClick={handlePlayLater}>
+              &times;
+            </button>
+            <div className="popup-icon">
+              <FaDice style={{ color: '#FFD700', fontSize: '3.5rem' }} />
+            </div>
+            <div className="popup-message">
+              <h3 style={{ margin: '0 0 15px 0', fontSize: '1.4rem', fontWeight: '700', color: '#FFD700' }}>
+                Welcome to Monad TWIST! 🎰
+              </h3>
+              <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem', lineHeight: '1.5' }}>
+                You can earn up to <strong style={{ color: '#FFD700' }}>1.55M $BOOP</strong> by just playing the game!
+              </p>
+            </div>
+            <div className="popup-actions">
+              <button
+                className="popup-action-btn play-now"
+                onClick={handlePlayNow}
+              >
+                Play Now
+              </button>
+              <button
+                className="popup-action-btn play-later"
+                onClick={handlePlayLater}
+              >
+                Play Later
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1492,6 +1550,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           left: 0;
           right: 0;
           bottom: 0;
+          padding:10px;
           height: 100%;
           background: rgba(18, 18, 45, 0.7);
           backdrop-filter: blur(8px);
@@ -1595,6 +1654,25 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
         .popup-action-btn.share-win:hover {
             box-shadow: 0 6px 20px rgba(29, 140, 247, 0.4);
+        }
+        .popup-action-btn.play-now {
+          background: linear-gradient(90deg, #FFD700, #FFA500);
+          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+          color: #000;
+          font-weight: 700;
+        }
+        .popup-action-btn.play-now:hover {
+          box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+          transform: translateY(-2px);
+        }
+        .popup-action-btn.play-later {
+          background: linear-gradient(90deg, #6c757d, #495057);
+          box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+          color: #fff;
+        }
+        .popup-action-btn.play-later:hover {
+          box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+          transform: translateY(-2px);
         }
         .popup-action-btn:disabled {
           opacity: 0.6;
