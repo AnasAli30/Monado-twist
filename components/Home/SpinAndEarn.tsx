@@ -822,7 +822,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=wagmi-blaster.vercel.app/"
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=wagmi-blaster.vercel.app"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1057,7 +1057,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 Welcome to Monad TWIST! 🎰
               </h3>
               <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                You can earn up to <strong style={{ color: '#FFD700' }}>1.55M $BOOP</strong> by just playing the game!
+                You can earn up to <strong style={{ color: '#FFD700' }}>100 <img src="images/1.png" alt="" style={{ width: '20px', height: '20px' }} /> $ARB</strong> by just playing the game!
               </p>
             </div>
             <div className="popup-actions">
