@@ -12,7 +12,7 @@ export async function GET() {
     frame: {
       version: "1",
       name: "Monad Twist",
-      iconUrl: `${APP_URL}/images/icon.png`,
+      iconUrl: `${APP_URL}/images/icon.jpg`,
       homeUrl: `${APP_URL}`,
       imageUrl: `${APP_URL}/images/feed.png`,
       screenshotUrls: [],

@@ -10,7 +10,7 @@ export default async function handler(req: Request) {
   const rank = searchParams.get('rank') || '-';
   const spins = searchParams.get('spins') || '-';
   const winnings = searchParams.get('winnings') || '-';
-  const userImg = searchParams.get('userImg') || 'https://Monad-twist.vercel.app/images/icon.png'; // fallback user image
+  const userImg = searchParams.get('userImg') || 'https://Monad-twist.vercel.app/images/icon.jpg'; // fallback user image
   const wonValue = searchParams.get('wonValue');
   const wonText = searchParams.get('wonText');
   const tokenImg = searchParams.get('tokenImg');

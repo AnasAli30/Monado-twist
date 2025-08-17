@@ -64,7 +64,7 @@ export function Leaderboard() {
     const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
 
     // Get the current user's profile image
-    const userImg = userStats?.pfpUrl || `${APP_URL}/images/icon.png`;
+    const userImg = userStats?.pfpUrl || `${APP_URL}/images/icon.jpg`;
 
     if (currentUserFid && neynarApiKey) {
       try {
@@ -123,12 +123,12 @@ Spin. Win. Repeat.${bestFriendsText}`;
         {userStats && (
           <div className="user-stats-card">
               <img 
-                src={userStats.pfpUrl || '/images/icon.png'} 
+                src={userStats.pfpUrl || '/images/icon.jpg'} 
                 alt={userStats.name} 
                 className="leaderboard-pfp"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/images/icon.png';
+                  e.currentTarget.src = '/images/icon.jpg';
                 }}
               />
               <div className="user-info">
@@ -166,12 +166,12 @@ Spin. Win. Repeat.${bestFriendsText}`;
                 </div>
 
               <img
-                  src={entry.pfpUrl || '/images/icon.png'} 
+                  src={entry.pfpUrl || '/images/icon.jpg'} 
                   alt={entry.name} 
                   className="leaderboard-pfp"
                   onError={(e) => {
                     e.currentTarget.onerror = null; // prevents looping
-                    e.currentTarget.src = '/images/icon.png';
+                    e.currentTarget.src = '/images/icon.jpg';
                   }}
                 />
                 

@@ -459,7 +459,7 @@ Come play — it’s fun, it’s fast, and it’s free.
     const message = `YO I just won ${wonValue} ${wonSegment.text} for FREE on Monad Twist 😱💸
 Spin the wheel, touch grass later — it’s addictive af 🎰
 #BreakTheMonad 🚀`;
-    const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.png`;
+    const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.jpg`;
     const username = context?.user?.username || "";
     const totalSpins = parseInt(localStorage.getItem('totalSpins') || '0', 10);
     const totalWins = parseInt(localStorage.getItem('totalWins') || '0', 10);

@@ -8,7 +8,7 @@ const Demo = dynamic(() => import("@/components/Home"), {
     <div className="loader-container">
       <div className="loader-content">
         <div className="loader-icon-wrapper">
-          <img src="/images/icon.png" alt="Loading..." className="loader-icon" />
+          <img src="/images/icon.jpg" alt="Loading..." className="loader-icon" />
         </div>
         <div className="loader-bar-container">
           <div className="loader-bar"></div>

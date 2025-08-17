@@ -149,7 +149,7 @@ Spin. Win. Withdraw. Repeat.
                 className="profile-picture" 
                 onError={(e) => {
                   e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/images/icon.png';
+                  e.currentTarget.src = '/images/icon.jpg';
                 }}
               />
               <div className="profile-info">
