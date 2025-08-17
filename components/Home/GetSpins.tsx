@@ -65,7 +65,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             onClick={handleOpenMiniApp}
             disabled={!!timeUntilMiniAppOpen}
           >
-              <span className="spin-badge1">+1.55M $BOOP / +2 spins</span>
+              <span className="spin-badge1">+100 $ARB / +2 spins</span>
             
           </button>
         </div>
