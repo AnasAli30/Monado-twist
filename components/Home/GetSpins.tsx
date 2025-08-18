@@ -56,6 +56,20 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div> */}
       <div className="get-spins-card">
+      <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/boop.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play game and Earn upto 1.55m $BOOP</div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp1}
+            // disabled={!!timeUntilMiniAppOpen}
+          >
+              <span className="spin-badge1">+1.55m $BOOP</span>
+            
+          </button>
+        </div>
           <div className="get-spins-card-header">
             <img src="images/1.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play game and Earn upto 100 $ARB</div>
@@ -69,6 +83,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             
           </button>
         </div>
+
 
         <div className="get-spins-card">
           <div className="get-spins-card-header">
