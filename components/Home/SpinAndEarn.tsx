@@ -289,12 +289,12 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#FFD700", probability: 7, degrees: 60 },  // Gold
-    { text: "YAKI", value: 0, color: "#00E5FF", probability: 18, degrees: 60 },  // Bright Teal
-    { text: "MON", value: 0, color: "#FFD700", probability: 7, degrees: 60 },
-    { text: "USDC", value: 0, color: "#B8860B", probability: 17, degrees: 60 },  // Dark Gold
-    { text: "MON", value: 0, color: "#FFD700", probability: 6, degrees: 60 },
-    { text: "", value: 0, color: "#004D40", probability: 45, degrees: 60 },  // Dark Teal - No Win
+    { text: "MON", value: 0, color: "#FFD700", probability: 4, degrees: 60 },  // Gold
+    { text: "YAKI", value: 0, color: "#00E5FF", probability: 6, degrees: 60 },  // Bright Teal
+    { text: "MON", value: 0, color: "#FFD700", probability: 4, degrees: 60 },
+    { text: "USDC", value: 0, color: "#B8860B", probability: 6, degrees: 60 },  // Dark Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 4, degrees: 60 },
+    { text: "", value: 0, color: "#004D40", probability: 80, degrees: 60 },  // Dark Teal - No Win
   ];
 
   // Fetch spins and timer data from backend
