@@ -289,17 +289,12 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },  // Gold
-         { text: "YAKI", value: 0, color: "#00E5FF", probability: 25, degrees: 60 },  // Bright Teal
-    // { text: "WBTC", value: 0, color: "#F7931A", probability: 25, degrees: 60 },  // Bitcoin Orange
-     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
-    { text: "USDC", value: 0, color: "#B8860B", probability: 25, degrees: 60 },  // Dark Gold
-    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
-    { text: "", value: 0, color: "#004D40", probability: 47, degrees: 60 },  // Dark Teal
-     // Gold
-     // { text: "YAKI", value: 0, color: "#00E5FF", probability: 15, degrees: 45 },  // Bright Teal
-    // { text: "CHOG", value: 0, color: "#00BFA5", probability: 15, degrees: 45 },  // Medium Teal
-    // { text: "USDC", value: 0, color: "#B8860B", probability: 14, degrees: 45 },  // Dark Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 7, degrees: 60 },  // Gold
+    { text: "YAKI", value: 0, color: "#00E5FF", probability: 18, degrees: 60 },  // Bright Teal
+    { text: "MON", value: 0, color: "#FFD700", probability: 7, degrees: 60 },
+    { text: "USDC", value: 0, color: "#B8860B", probability: 17, degrees: 60 },  // Dark Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 6, degrees: 60 },
+    { text: "", value: 0, color: "#004D40", probability: 45, degrees: 60 },  // Dark Teal - No Win
   ];
 
   // Fetch spins and timer data from backend
@@ -408,21 +403,19 @@ export function SpinAndEarn() {
     const random = Math.random() * 100;
     let cumulativeProbability = 0;
     
-    // Filter out segments with probability -1 (50 and 2 segments) for actual spins
+    // Filter out segments with probability > 0 for actual spins
     const validSegments = segments.filter(segment => segment.probability > 0);
     
-    // Sort segments by probability in descending order to ensure proper distribution
-    const sortedSegments = [...validSegments].sort((a, b) => b.probability - a.probability);
-    
-    for (const segment of sortedSegments) {
+    // Process segments in order (no sorting needed)
+    for (const segment of validSegments) {
       cumulativeProbability += segment.probability;
       if (random <= cumulativeProbability) {
         return segment;
       }
     }
     
-    // If no segment is selected (shouldn't happen), return the lowest probability segment
-    return sortedSegments[sortedSegments.length - 1];
+    // If no segment is selected (shouldn't happen), return the last valid segment
+    return validSegments[validSegments.length - 1];
   };
 
   const getRandomSpin = () => {
