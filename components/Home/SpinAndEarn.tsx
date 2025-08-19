@@ -111,6 +111,8 @@ export function SpinAndEarn() {
   const [awaitingFollowVerification, setAwaitingFollowVerification] = useState(false);
   const [awaitingLikeRecastVerification, setAwaitingLikeRecastVerification] = useState(false);
   const [timeUntilMiniAppOpen, setTimeUntilMiniAppOpen] = useState<string>('');
+  const [timeUntilMiniAppOpen1, setTimeUntilMiniAppOpen1] = useState<string>('');
+  const [timeUntilMiniAppOpen2, setTimeUntilMiniAppOpen2] = useState<string>('');
   const [hasFollowedX, setHasFollowedX] = useState(false);
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
@@ -352,6 +354,32 @@ export function SpinAndEarn() {
               setTimeUntilMiniAppOpen(`${hours}h ${minutes}m`);
             } else {
               setTimeUntilMiniAppOpen('');
+            }
+          }
+
+          if (data.lastMiniAppOpen1) {
+            const openTime = new Date(data.lastMiniAppOpen1).getTime() + 3 * 60 * 60 * 1000;
+            const now = new Date().getTime();
+            if (openTime > now) {
+              const timeLeft = openTime - now;
+              const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+              const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+              setTimeUntilMiniAppOpen1(`${hours}h ${minutes}m`);
+            } else {
+              setTimeUntilMiniAppOpen1('');
+            }
+          }
+
+          if (data.lastMiniAppOpen2) {
+            const openTime = new Date(data.lastMiniAppOpen2).getTime() + 3 * 60 * 60 * 1000;
+            const now = new Date().getTime();
+            if (openTime > now) {
+              const timeLeft = openTime - now;
+              const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+              const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+              setTimeUntilMiniAppOpen2(`${hours}h ${minutes}m`);
+            } else {
+              setTimeUntilMiniAppOpen2('');
             }
           }
         } catch (error) {
@@ -874,6 +902,46 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       await sdk.actions.openMiniApp({
         url: "https://farcaster.xyz/~/mini-apps/launch?domain=chain-crush-black.vercel.app"
       });
+      if (!timeUntilMiniAppOpen1 && fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "miniAppOpen1" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 2 extra spins for opening Chain Crush!");
+          setTimeUntilMiniAppOpen1('3h 0m');
+        } else {
+          setResult(data.error || "Failed to add spins.");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setResult("Failed to open mini app.");
+    }
+  };
+  const handleOpenMiniApp2 = async () => {
+    try {
+      await sdk.actions.openMiniApp({
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=iq-checker-three.vercel.app"
+      });
+      if (!timeUntilMiniAppOpen2 && fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "miniAppOpen2" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 2 extra spins for opening IQ Checker!");
+          setTimeUntilMiniAppOpen2('3h 0m');
+        } else {
+          setResult(data.error || "Failed to add spins.");
+        }
+      }
     } catch (error) {
       console.log(error);
       setResult("Failed to open mini app.");
@@ -1919,6 +1987,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         <GetSpins
           timeUntilShare={timeUntilShare}
           timeUntilMiniAppOpen={timeUntilMiniAppOpen}
+          timeUntilMiniAppOpen1={timeUntilMiniAppOpen1}
+          timeUntilMiniAppOpen2={timeUntilMiniAppOpen2}
           awaitingFollowVerification={awaitingFollowVerification}
           awaitingLikeRecastVerification={awaitingLikeRecastVerification}
           follow={follow}
@@ -1928,6 +1998,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           handleShare={handleShare}
           handleOpenMiniApp={handleOpenMiniApp}
           handleOpenMiniApp1={handleOpenMiniApp1}
+          handleOpenMiniApp2={handleOpenMiniApp2}
           handleFollow={handleFollow}
           handleLikeRecast={handleLikeRecast}
           handleFollowX={handleFollowX}

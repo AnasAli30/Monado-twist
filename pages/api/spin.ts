@@ -138,6 +138,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft, lastMiniAppOpen: now });
   }
 
+  if (mode === "miniAppOpen1") {
+    const now = new Date();
+    const lastMiniAppOpen1 = user?.lastMiniAppOpen1 ? new Date(user.lastMiniAppOpen1) : new Date(0);
+    if (now.getTime() - lastMiniAppOpen1.getTime() < 3 * 60 * 60 * 1000) {
+      // Not enough time has passed
+      const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen1.getTime());
+      return res.status(400).json({ 
+        error: "You can only get spins for opening Chain Crush once every 3 hours.",
+        timeLeft: msLeft,
+        lastMiniAppOpen1
+      });
+    }
+    spinsLeft += 1;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, lastMiniAppOpen1: now } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, lastMiniAppOpen1: now });
+  }
+
+  if (mode === "miniAppOpen2") {
+    const now = new Date();
+    const lastMiniAppOpen2 = user?.lastMiniAppOpen2 ? new Date(user.lastMiniAppOpen2) : new Date(0);
+    if (now.getTime() - lastMiniAppOpen2.getTime() < 3 * 60 * 60 * 1000) {
+      // Not enough time has passed
+      const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen2.getTime());
+      return res.status(400).json({ 
+        error: "You can only get spins for opening IQ Checker once every 3 hours.",
+        timeLeft: msLeft,
+        lastMiniAppOpen2
+      });
+    }
+    spinsLeft += 1;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, lastMiniAppOpen2: now } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, lastMiniAppOpen2: now });
+  }
+
   if (checkOnly) {
     const winningsData = await db.collection('winnings').aggregate([
         { $match: { fid: fid } },
@@ -150,6 +192,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lastSpinReset: user?.lastSpinReset,
       lastShareSpin: user?.lastShareSpin,
       lastMiniAppOpen: user?.lastMiniAppOpen,
+      lastMiniAppOpen1: user?.lastMiniAppOpen1,
+      lastMiniAppOpen2: user?.lastMiniAppOpen2,
       follow: user?.follow,
       likeAndRecast: user?.likeAndRecast,
       envelopeClaimed: user?.envelopeClaimed,

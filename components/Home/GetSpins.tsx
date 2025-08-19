@@ -4,6 +4,8 @@ import { FaShareAlt, FaRocket, FaUserPlus, FaRetweet, FaTwitterSquare } from 're
 interface GetSpinsProps {
   timeUntilShare: string;
   timeUntilMiniAppOpen: string;
+  timeUntilMiniAppOpen1: string;
+  timeUntilMiniAppOpen2: string;
   awaitingFollowVerification: boolean;
   awaitingLikeRecastVerification: boolean;
   follow: boolean;
@@ -13,6 +15,7 @@ interface GetSpinsProps {
   handleShare: (mon: string) => Promise<void>;
   handleOpenMiniApp: () => Promise<void>;
   handleOpenMiniApp1: () => Promise<void>;
+  handleOpenMiniApp2:()=>Promise<void>;
   handleFollow: () => Promise<void>;
   handleLikeRecast: () => Promise<void>;
   handleFollowX: () => Promise<void>;
@@ -21,10 +24,13 @@ interface GetSpinsProps {
 export const GetSpins: React.FC<GetSpinsProps> = ({
   timeUntilShare,
   timeUntilMiniAppOpen,
+  timeUntilMiniAppOpen1,
+  timeUntilMiniAppOpen2,
   awaitingFollowVerification,
   awaitingLikeRecastVerification,
   follow,
   handleOpenMiniApp1,
+  handleOpenMiniApp2,
   hasLikedAndRecast,
   hasFollowedX,
   awaitingFollowXVerification,
@@ -63,10 +69,13 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           <button
             className="get-spins-action-btn1"
             onClick={handleOpenMiniApp1}
-            // disabled={!!timeUntilMiniAppOpen}
+            disabled={!!timeUntilMiniAppOpen1}
           >
-              <span className="spin-badge1">+1.55m $BOOP</span>
-            
+            {!timeUntilMiniAppOpen1 ? (
+              <span className="spin-badge1">+1.55m $BOOP / +1 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen1}</span>
+            )}
           </button>
         </div>
       <div className="get-spins-card">
@@ -79,8 +88,28 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             onClick={handleOpenMiniApp}
             disabled={!!timeUntilMiniAppOpen}
           >
-              <span className="spin-badge1">+100 $ARB / +2 spins</span>
+               {!timeUntilMiniAppOpen ? (
+              <span className="spin-badge1">+100 $ARB / +2 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen}</span>
+            )}
             
+          </button>
+        </div>
+      <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/degen.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Check IQ and Earn upto 4K $DEGEN</div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp2}
+            disabled={!!timeUntilMiniAppOpen2}
+          >
+            {!timeUntilMiniAppOpen2 ? (
+              <span className="spin-badge1">+4k $DEGEN / +1 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen2}</span>            )}
           </button>
         </div>
 
