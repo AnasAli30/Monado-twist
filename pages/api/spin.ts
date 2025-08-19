@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongo';
 import Pusher from 'pusher';
 
-const SPINS_PER_DAY = 10;
+const SPINS_PER_DAY = 7;
 const SPINS_PER_PURCHASE = 20;
 
 const pusher = new Pusher({
