@@ -187,6 +187,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   // Check method
   if (req.method !== 'POST') {
+    console.log("Method not allowed",cleanIP)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -194,13 +195,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!isAllowedOrigin(req)) {
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
+console.log("Forbidden",cleanIP)
     return res.status(403).json({ error: 'Forbidden' });
   }
-  
+  console.log("Allowed origin",cleanIP)
   // Check rate limit
   if (!checkRateLimit(cleanIP)) {
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
+    console.log("Too many requests",cleanIP)
     return res.status(429).json({ error: 'Too many requests' });
   }
 
@@ -211,21 +214,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!verifyRequest(randomKey, fusedKey)) {
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
+      console.log("Invalid request signature",randomKey,fusedKey) 
       return res.status(403).json({ error: 'Invalid request signature' });
     }
 
     // Validate parameters
     if (!to || !amount || !fid) {
+      console.log("Missing required parameters",to,amount,fid)
       return res.status(400).json({ error: 'Missing required parameters' });
     }
     
     // Validate input types
     if (typeof to !== 'string' || typeof fid !== 'number' || typeof amount !== 'number') {
+      console.log("Invalid parameter types",to,amount,fid)
       return res.status(400).json({ error: 'Invalid parameter types' });
     }
     
     // Validate amounts with strict limits
     if (amount > 0.09 || amount <= 0) {
+      console.log("Invalid amount",amount)
       return res.status(400).json({ error: 'Invalid amount' });
     }
 
@@ -235,21 +242,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check if user exists
     const user = await db.collection('monad-users').findOne({ fid: fid });
     if (!user) {
+      console.log("User not found",fid)
       return res.status(404).json({ error: 'User not found' });
     }
 
     // Check if user has shared spin
     if (!user.lastShareSpin) {
+      console.log("Share requirement not met",fid)
       return res.status(400).json({ error: 'Share requirement not met' });
     }
 
     // Check if user has spins left
     if (user.spinsLeft <= 0) {
+      console.log("No spins left",fid)
       return res.status(400).json({ error: 'No spins left' });
     }
 
     // Validate Ethereum address format
     if (!ethers.isAddress(to)) {
+      console.log("Invalid Ethereum address",to)
       return res.status(400).json({ error: 'Invalid Ethereum address' });
     }
 
