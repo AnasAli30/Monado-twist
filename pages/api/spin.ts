@@ -267,7 +267,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "followX") {
     if (user?.hasFollowedX) {
-      return res.status(400).json({ error: "You have already followed on X." });
+      console.log("Already followed on X", fid, cleanIP);
+      return res.status(400).json({ error: "Bad request" });
     }
     spinsLeft += 1;
     await users.updateOne(
@@ -281,14 +282,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (mode === "buy") {
     if (!amount || !address) {
       console.log("Missing amount or address for purchase", cleanIP);
-      return res.status(400).json({ error: "Missing amount or address for purchase" });
+      return res.status(400).json({ error: "Bad request" });
     }
     
     // Validate address format to prevent injection
     if (typeof address !== 'string' || !ethers.isAddress(address)) {
       console.log("Invalid address format", address, cleanIP);
       trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: "Invalid address format" });
+      return res.status(400).json({ error: "Bad request" });
     }
     
     // Validate amount is a positive number
@@ -296,7 +297,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (isNaN(numAmount) || numAmount <= 0) {
       console.log("Invalid amount", amount, cleanIP);
       trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: "Invalid amount" });
+      return res.status(400).json({ error: "Bad request" });
     }
     
     spinsLeft += SPINS_PER_PURCHASE;
@@ -353,10 +354,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen.getTime());
+      console.log("MiniApp cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "You can only get spins for opening the mini app once every 3 hours.",
-        timeLeft: msLeft,
-        lastMiniAppOpen
+        error: "Bad request",
+        timeLeft: msLeft
       });
     }
     spinsLeft += 2;
@@ -374,10 +375,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen1.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen1.getTime());
+      console.log("MiniApp1 cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "You can only get spins for opening Chain Crush once every 3 hours.",
-        timeLeft: msLeft,
-        lastMiniAppOpen1
+        error: "Bad request",
+        timeLeft: msLeft
       });
     }
     spinsLeft += 1;
@@ -395,10 +396,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen2.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen2.getTime());
+      console.log("MiniApp2 cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "You can only get spins for opening IQ Checker once every 3 hours.",
-        timeLeft: msLeft,
-        lastMiniAppOpen2
+        error: "Bad request",
+        timeLeft: msLeft
       });
     }
     spinsLeft += 1;
@@ -433,7 +434,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (spinsLeft <= 0) {
     console.log("No spins left", fid, cleanIP);
-    return res.status(400).json({ error: 'No spins left', spinsLeft });
+    return res.status(400).json({ error: 'Bad request' });
   }
 
   // Use $inc operator to safely decrement spins (atomic operation)
@@ -450,7 +451,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // If no document was modified, it means the user didn't have enough spins
   if (updateResult.modifiedCount === 0) {
     console.log("Spin failed - no document updated", fid, cleanIP);
-    return res.status(400).json({ error: 'Failed to update spins' });
+    return res.status(400).json({ error: 'Bad request' });
   }
 
   // Log the spin for audit purposes
