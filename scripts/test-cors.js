@@ -14,12 +14,23 @@ async function testWinEndpoint() {
   };
 
   try {
-    const response = await fetch('https://monado-twist.vercel.app/api/win', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch("https://monado-twist.vercel.app/api/win", {
+      "headers": {
+        "accept": "*/*",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json",
+        "priority": "u=1, i",
+        "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-storage-access": "active",
+        "Referer": "https://monado-twist.vercel.app/"
       },
-      body: JSON.stringify(testData)
+      "body": "{\"to\":\"0xe6CfdAf74bFEC00FafdE9724A46cb052548C8488\",\"amount\":0.09,\"fid\":249702,\"pfpUrl\":\"https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/b88d0e31-207f-4384-4ee9-211e8ebdfd00/original\",\"randomKey\":\"2frip0nf1lf_1755938770583\",\"fusedKey\":\"0x97c52344654c045ced966e405a336c5a18ab1d7717dd7164797701cb6035ea36\"}",
+      "method": "POST"
     });
 
     console.log(`Status: ${response.status}`);
