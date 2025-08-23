@@ -320,7 +320,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!isValidAmount) {
       console.log("Invalid token amount", {tokenName, amount});
       trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: 'Invalid amount for token type' });
+      return res.status(400).json({ error: 'haha , lol , fuck u bitch' });
     }
 
     // Verify the request authenticity
