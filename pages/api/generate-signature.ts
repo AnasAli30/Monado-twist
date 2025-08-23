@@ -265,16 +265,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
     console.log("Blocked IP",cleanIP)
-    return res.status(403).json({ 
-      error: 'Access blocked due to suspicious activity',
-      blocked: true 
-    });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
 
   // Check method
   if (req.method !== 'POST') {
     console.log("Method not allowed",cleanIP)
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Unauthorized' });
   }
 
   // Check origin
@@ -282,7 +279,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
     console.log("Forbidden",cleanIP)
-    return res.status(403).json({ error: 'Forbidden' });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
   
   // Check rate limit
@@ -290,7 +287,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
     console.log("Too many requests",cleanIP)
-    return res.status(429).json({ error: 'Too many requests' });
+    return res.status(429).json({ error: 'Unauthorized' });
   }
 
   try {
@@ -299,12 +296,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
       console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey)
-      return res.status(400).json({ error: 'Missing required parameters' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     if (!SERVER_PRIVATE_KEY || !SERVER_SECRET_KEY || !PUBLIC_KEY_SALT) {
       console.log("Server configuration error")
-      return res.status(500).json({ error: 'Server configuration error' });
+      return res.status(500).json({ error: 'Internal error' });
     }
     
     // Verify token address matches the expected address for the token name
@@ -312,7 +309,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (expectedTokenAddress.toLowerCase() !== tokenAddress.toLowerCase()) {
       console.log("Token address mismatch", {expected: expectedTokenAddress, received: tokenAddress, tokenName});
       trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: 'Invalid token address for token name' });
+      return res.status(400).json({ error: 'Bad request' });
     }
     
     // Verify amount is within expected range for the token type
@@ -320,7 +317,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!isValidAmount) {
       console.log("Invalid token amount", {tokenName, amount});
       trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: 'haha , lol , fuck u bitch' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     // Verify the request authenticity
@@ -328,7 +325,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
       console.log("Invalid request signature",randomKey,fusedKey)
-      return res.status(403).json({ error: 'Invalid request signature' });
+      return res.status(403).json({ error: 'Unauthorized' });
     }
 
     // Connect to database
@@ -341,7 +338,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (usedKey) {
       console.log("Key already used",randomKey)
-          return res.status(401).json({ error: 'Key already used' });
+          return res.status(401).json({ error: 'Unauthorized' });
     }
 
     // Store the used key with enhanced security audit information
@@ -388,6 +385,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ signature });
   } catch (error) {
     console.error('Error generating signature:', error);
-    res.status(500).json({ error: 'Failed to generate signature' });
+    res.status(500).json({ error: 'Internal error' });
   }
 } 

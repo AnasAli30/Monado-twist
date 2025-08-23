@@ -179,16 +179,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
-    return res.status(403).json({ 
-      error: 'Access blocked due to suspicious activity',
-      blocked: true 
-    });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
   
   // Check method
   if (req.method !== 'POST') {
     console.log("Method not allowed",cleanIP)
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Unauthorized' });
   }
 
   // Check origin
@@ -196,7 +193,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
 console.log("Forbidden",cleanIP)
-    return res.status(403).json({ error: 'Forbidden' });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
   console.log("Allowed origin",cleanIP)
   // Check rate limit
@@ -204,7 +201,7 @@ console.log("Forbidden",cleanIP)
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
     console.log("Too many requests",cleanIP)
-    return res.status(429).json({ error: 'Too many requests' });
+    return res.status(429).json({ error: 'Unauthorized' });
   }
 
   try {
@@ -215,25 +212,25 @@ console.log("Forbidden",cleanIP)
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
       console.log("Invalid request signature",randomKey,fusedKey) 
-      return res.status(403).json({ error: 'Invalid request signature' });
+      return res.status(403).json({ error: 'Unauthorized' });
     }
 
     // Validate parameters
     if (!to || !amount || !fid) {
       console.log("Missing required parameters",to,amount,fid)
-      return res.status(400).json({ error: 'Missing required parameters' });
+      return res.status(400).json({ error: 'Bad request' });
     }
     
     // Validate input types
     if (typeof to !== 'string' || typeof fid !== 'number' || typeof amount !== 'number') {
       console.log("Invalid parameter types",to,amount,fid)
-      return res.status(400).json({ error: 'Invalid parameter types' });
+      return res.status(400).json({ error: 'Bad request' });
     }
     
     // Validate amounts with strict limits
     if (amount > 0.01 || amount <= 0) {
       console.log("Invalid amount",amount)
-      return res.status(400).json({ error: 'haha , fuck u bitch' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     // Connect to database
@@ -243,7 +240,7 @@ console.log("Forbidden",cleanIP)
     const user = await db.collection('monad-users').findOne({ fid: fid });
     if (!user) {
       console.log("User not found",fid)
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Bad request' });
     }
 
     // Check if user has shared spin
@@ -255,13 +252,13 @@ console.log("Forbidden",cleanIP)
     // Check if user has spins left
     if (user.spinsLeft <= 0) {
       console.log("No spins left",fid)
-      return res.status(400).json({ error: 'No spins left' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     // Validate Ethereum address format
     if (!ethers.isAddress(to)) {
       console.log("Invalid Ethereum address",to)
-      return res.status(400).json({ error: 'Invalid Ethereum address' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     // Get random wallet
@@ -314,6 +311,6 @@ console.log("Forbidden",cleanIP)
     res.status(200).json({ success: true, txHash: tx.hash });
   } catch (error) {
     console.error('Error processing win:', error);
-    res.status(500).json({ error: 'Failed to process win' });
+    res.status(500).json({ error: 'Internal error' });
   }
 }
