@@ -247,10 +247,10 @@ console.log("Forbidden",cleanIP)
     }
 
     // Check if user has shared spin
-    if (!user.lastShareSpin) {
-      console.log("Share requirement not met",fid)
-      return res.status(400).json({ error: 'Share requirement not met' });
-    }
+    // if (!user.lastShareSpin) {
+    //   console.log("Share requirement not met",fid)
+    //   return res.status(400).json({ error: 'Share requirement not met' });
+    // }
 
     // Check if user has spins left
     if (user.spinsLeft <= 0) {
