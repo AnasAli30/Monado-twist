@@ -96,7 +96,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             
           </button>
         </div>
-      <div className="get-spins-card">
+      {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/degen.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Check IQ and Earn upto 4K $DEGEN</div>
@@ -111,7 +111,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             ) : (
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen2}</span>            )}
           </button>
-        </div>
+        </div> */}
 
 
         <div className="get-spins-card">
