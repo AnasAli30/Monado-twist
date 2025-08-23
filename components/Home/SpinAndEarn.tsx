@@ -271,7 +271,7 @@ export function SpinAndEarn() {
         const monValues = [ 0.01,0.03,0.05,0.07,0.09];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
+        return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(4);
       case "WBTC":
         // Use larger values to avoid scientific notation
         return +(Math.random() * (0.00001 - 0.000001) + 0.000001).toFixed(6);
@@ -282,7 +282,7 @@ export function SpinAndEarn() {
       case "CHOG":
         return +(Math.random() * (0.3 - 0.01) + 0.01).toFixed(3);
       case "USDC":
-        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(4);
+        return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(5);
       default:
         return 0;
     }

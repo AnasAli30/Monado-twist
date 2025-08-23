@@ -9,6 +9,70 @@ const SERVER_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY_1;
 const SERVER_SECRET_KEY = process.env.SERVER_SECRET_KEY || "";
 const PUBLIC_KEY_SALT = process.env.NEXT_PUBLIC_KEY_SALT || ""; // Salt shared with frontend
 
+// Token address mapping
+function getTokenAddressByName(tokenName: string): string {
+  switch (tokenName) {
+    case "USDC":
+      return process.env.NEXT_PUBLIC_USDC_TOKEN_ADDRESS as string;
+    case "CHOG":
+      return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
+    case "YAKI":
+      return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
+    case "WBTC":
+      return process.env.NEXT_PUBLIC_WBTC_TOKEN_ADDRESS as string;
+    case "WSOL":
+      return process.env.NEXT_PUBLIC_WSOL_TOKEN_ADDRESS as string;
+    case "WETH":
+      return process.env.NEXT_PUBLIC_WETH_TOKEN_ADDRESS as string;
+    default:
+      return "";
+  }
+}
+
+// Token amount validation
+function validateTokenAmount(tokenName: string, amount: string | number): boolean {
+  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  
+  // Guard against non-numeric values or NaN
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return false;
+  }
+  
+  switch (tokenName) {
+    case "MON":
+      // MON values should be in: 0.01, 0.03, 0.05, 0.07, 0.09
+      const validMonValues = [0.01, 0.03, 0.05, 0.07, 0.09];
+      return validMonValues.some(val => Math.abs(numericAmount - val) < 0.0001);
+    
+    case "USDC":
+      // USDC should be between 0.005 and 0.01
+      return numericAmount >= 0.005 && numericAmount <= 0.01;
+      
+    case "YAKI":
+      // YAKI should be between 0.5 and 2.5
+      return numericAmount >= 0.5 && numericAmount <= 2.5;
+      
+    case "WBTC":
+      // WBTC should be between 0.000001 and 0.00001
+      return numericAmount >= 0.000001 && numericAmount <= 0.00001;
+      
+    case "WSOL":
+      // WSOL should be between 0.0001 and 0.001
+      return numericAmount >= 0.0001 && numericAmount <= 0.001;
+      
+    case "WETH":
+      // WETH should be between 0.000001 and 0.00001
+      return numericAmount >= 0.000001 && numericAmount <= 0.00001;
+      
+    case "CHOG":
+      // CHOG should be between 0.01 and 0.3
+      return numericAmount >= 0.01 && numericAmount <= 0.3;
+      
+    default:
+      return false;
+  }
+}
+
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
   key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
@@ -151,6 +215,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
+    console.log("Blocked IP",cleanIP)
     return res.status(403).json({ 
       error: 'Access blocked due to suspicious activity',
       blocked: true 
@@ -159,6 +224,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Check method
   if (req.method !== 'POST') {
+    console.log("Method not allowed",cleanIP)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -166,6 +232,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!isAllowedOrigin(req)) {
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
+    console.log("Forbidden",cleanIP)
     return res.status(403).json({ error: 'Forbidden' });
   }
   
@@ -173,6 +240,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!checkRateLimit(cleanIP)) {
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
+    console.log("Too many requests",cleanIP)
     return res.status(429).json({ error: 'Too many requests' });
   }
 
@@ -181,17 +249,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl });
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
+      console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey)
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
     if (!SERVER_PRIVATE_KEY || !SERVER_SECRET_KEY || !PUBLIC_KEY_SALT) {
+      console.log("Server configuration error")
       return res.status(500).json({ error: 'Server configuration error' });
+    }
+    
+    // Verify token address matches the expected address for the token name
+    const expectedTokenAddress = getTokenAddressByName(tokenName);
+    if (expectedTokenAddress.toLowerCase() !== tokenAddress.toLowerCase()) {
+      console.log("Token address mismatch", {expected: expectedTokenAddress, received: tokenAddress, tokenName});
+      trackForbiddenAttempt(cleanIP);
+      return res.status(400).json({ error: 'Invalid token address for token name' });
+    }
+    
+    // Verify amount is within expected range for the token type
+    const isValidAmount = validateTokenAmount(tokenName, amount);
+    if (!isValidAmount) {
+      console.log("Invalid token amount", {tokenName, amount});
+      trackForbiddenAttempt(cleanIP);
+      return res.status(400).json({ error: 'Invalid amount for token type' });
     }
 
     // Verify the request authenticity
     if (!verifyRequest(randomKey, fusedKey)) {
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
+      console.log("Invalid request signature",randomKey,fusedKey)
       return res.status(403).json({ error: 'Invalid request signature' });
     }
 
@@ -204,7 +291,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (usedKey) {
-      return res.status(401).json({ error: 'Key already used' });
+      console.log("Key already used",randomKey)
+          return res.status(401).json({ error: 'Key already used' });
     }
 
     // Store the used key with enhanced security audit information
