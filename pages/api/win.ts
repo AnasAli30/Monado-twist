@@ -87,11 +87,67 @@ function isAllowedOrigin(req: NextApiRequest): boolean {
   return origin === 'https://monado-twist.vercel.app';
 }
 
-// Rate limiting map (simple in-memory solution)
+// In-memory maps for rate limiting and blocking
 const rateLimitMap = new Map<string, { count: number, timestamp: number }>();
+const forbiddenAttemptsMap = new Map<string, { count: number, timestamp: number }>();
+const blockedIPs = new Map<string, number>(); // IP -> block timestamp
+
+// Check if an IP is blocked
+function isIPBlocked(ip: string): boolean {
+  const blockTimestamp = blockedIPs.get(ip);
+  
+  // If IP is not in the blocklist
+  if (!blockTimestamp) return false;
+  
+  const now = Date.now();
+  const blockDuration = 24 * 60 * 60 * 1000; // 24 hours block
+  
+  // Check if block period is over
+  if (now - blockTimestamp > blockDuration) {
+    // Block period expired, remove from blocklist
+    blockedIPs.delete(ip);
+    return false;
+  }
+  
+  // IP is still blocked
+  return true;
+}
+
+// Track forbidden attempts and block after threshold
+function trackForbiddenAttempt(ip: string): void {
+  const now = Date.now();
+  const trackingWindow = 10 * 60 * 1000; // 10 minutes
+  const maxForbiddenAttempts = 2; // Block after 2 forbidden attempts
+  
+  const record = forbiddenAttemptsMap.get(ip) || { count: 0, timestamp: now };
+  
+  // Reset if window has passed
+  if (now - record.timestamp > trackingWindow) {
+    record.count = 1;
+    record.timestamp = now;
+    forbiddenAttemptsMap.set(ip, record);
+    return;
+  }
+  
+  // Increment count
+  record.count++;
+  record.timestamp = now;
+  forbiddenAttemptsMap.set(ip, record);
+  
+  // Block IP if threshold exceeded
+  if (record.count >= maxForbiddenAttempts) {
+    blockedIPs.set(ip, now);
+    console.log(`Blocked IP ${ip} for suspicious activity`);
+  }
+}
 
 // Check rate limit (5 requests per minute per IP)
 function checkRateLimit(ip: string): boolean {
+  // First check if IP is blocked
+  if (isIPBlocked(ip)) {
+    return false; // Blocked IPs are automatically rate limited
+  }
+  
   const now = Date.now();
   const rateWindow = 60 * 1000; // 1 minute
   const maxRequests = 5;
@@ -117,6 +173,18 @@ function checkRateLimit(ip: string): boolean {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Extract client IP first for tracking
+  const clientIp = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
+  const cleanIP = clientIp.split(',')[0].trim();
+  
+  // Check if IP is blocked
+  if (isIPBlocked(cleanIP)) {
+    return res.status(403).json({ 
+      error: 'Access blocked due to suspicious activity',
+      blocked: true 
+    });
+  }
+  
   // Check method
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -124,12 +192,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Check origin
   if (!isAllowedOrigin(req)) {
+    // Track forbidden attempt
+    trackForbiddenAttempt(cleanIP);
     return res.status(403).json({ error: 'Forbidden' });
   }
   
   // Check rate limit
-  const clientIp = req.headers['x-forwarded-for'] as string || 'unknown';
-  if (!checkRateLimit(clientIp)) {
+  if (!checkRateLimit(cleanIP)) {
+    // Excessive rate could also be suspicious
+    trackForbiddenAttempt(cleanIP);
     return res.status(429).json({ error: 'Too many requests' });
   }
 
@@ -138,6 +209,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Verify request authenticity
     if (!verifyRequest(randomKey, fusedKey)) {
+      // Track forbidden attempt - invalid signatures are highly suspicious
+      trackForbiddenAttempt(cleanIP);
       return res.status(403).json({ error: 'Invalid request signature' });
     }
 
@@ -197,7 +270,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { $inc: { spinsLeft: -1 } }
     );
 
-    // Save winning record to MongoDB
+    // Save winning record to MongoDB with enhanced security tracking
     await db.collection('winnings').insertOne({
       address: to,
       amount: parseFloat(amount.toString()),
@@ -206,7 +279,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       name: user?.name,
       txHash: tx.hash,
       walletAddress: wallet.address,
-      ipAddress: clientIp.split(',')[0].trim() // Store for audit purposes
+      ipAddress: cleanIP, // We're already using the clean IP
+      userAgent: req.headers['user-agent'] || 'unknown',
+      securityChecks: {
+        isKnownIP: Boolean(await db.collection('known-users').findOne({ ipAddress: cleanIP })),
+        isBlocked: isIPBlocked(cleanIP),
+        suspiciousAttempts: (forbiddenAttemptsMap.get(cleanIP)?.count || 0)
+      }
     });
 
     // Trigger the win event
