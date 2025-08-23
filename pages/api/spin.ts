@@ -153,16 +153,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
     console.log("Blocked IP", cleanIP);
-    return res.status(403).json({ 
-      error: 'Access blocked due to suspicious activity',
-      blocked: true 
-    });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
 
   // Check method
   if (req.method !== 'POST') {
     console.log("Method not allowed", cleanIP);
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Unauthorized' });
   }
 
   // Check origin
@@ -170,7 +167,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
     console.log("Forbidden origin", cleanIP);
-    return res.status(403).json({ error: 'Forbidden' });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
   
   // Check rate limit
@@ -178,7 +175,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
     console.log("Too many requests", cleanIP);
-    return res.status(429).json({ error: 'Too many requests' });
+    return res.status(429).json({ error: 'Unauthorized' });
   }
 
   const { fid, checkOnly, mode, amount, address, pfpUrl, randomKey, fusedKey } = req.body;
@@ -187,26 +184,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!randomKey || !fusedKey) {
     trackForbiddenAttempt(cleanIP);
     console.log("Missing verification keys", cleanIP);
-    return res.status(403).json({ error: 'Missing verification keys' });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
   
   if (!verifyRequest(randomKey, fusedKey)) {
     // Track forbidden attempt - invalid signatures are highly suspicious
     trackForbiddenAttempt(cleanIP);
     console.log("Invalid request signature", randomKey, fusedKey);
-    return res.status(403).json({ error: 'Invalid request signature' });
+    return res.status(403).json({ error: 'Unauthorized' });
   }
 
   // Basic parameter validation
   if (!fid) {
     console.log("Missing fid", cleanIP);
-    return res.status(400).json({ error: 'Missing fid' });
+    return res.status(400).json({ error: 'Bad request' });
   }
   
   // Validate FID is a number
   if (typeof fid !== 'number' && isNaN(parseInt(fid as string))) {
     console.log("Invalid fid format", fid, cleanIP);
-    return res.status(400).json({ error: 'Invalid fid format' });
+    return res.status(400).json({ error: 'Bad request' });
   }
   
   // Validate mode parameter to prevent injection attacks
@@ -214,7 +211,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2'].includes(mode)) {
     console.log("Invalid mode", mode, cleanIP);
     trackForbiddenAttempt(cleanIP);
-    return res.status(400).json({ error: 'Invalid mode' });
+    return res.status(400).json({ error: 'Bad request' });
   }
 
   const client = await clientPromise;
@@ -242,7 +239,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date();
     const lastShareSpin = user?.lastShareSpin ? new Date(user.lastShareSpin) : new Date(0);
     if (now.getTime() - lastShareSpin.getTime() < 6 * 60 * 60 * 1000) {
-      return res.status(400).json({ error: "You can only get share spins once every 6 hours." });
+      console.log("Share spin cooldown active", fid, cleanIP);
+      return res.status(400).json({ error: "Bad request" });
     }
     spinsLeft += 2;
     await users.updateOne(
@@ -255,7 +253,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "follow") {
     if (user?.follow) {
-      return res.status(400).json({ error: "You have already followed." });
+      console.log("Already followed", fid, cleanIP);
+      return res.status(400).json({ error: "Bad request" });
     }
     spinsLeft += 1;
     await users.updateOne(
