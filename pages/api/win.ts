@@ -231,7 +231,7 @@ console.log("Forbidden",cleanIP)
     }
     
     // Validate amounts with strict limits
-    if (amount > 0.03 || amount <= 0) {
+    if (amount > 0.001 || amount <= 0) {
       console.log("Invalid amount",amount)
       return res.status(400).json({ error: 'Invalid amount' });
     }
