@@ -918,7 +918,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp2 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=iq-checker-three.vercel.app"
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=flapbitrum.vercel.app"
       });
       if (!timeUntilMiniAppOpen2 && fid) {
         const res = await fetchWithVerification('/api/spin', {
