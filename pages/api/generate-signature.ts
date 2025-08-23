@@ -29,47 +29,96 @@ function getTokenAddressByName(tokenName: string): string {
   }
 }
 
-// Token amount validation
-function validateTokenAmount(tokenName: string, amount: string | number): boolean {
-  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
-  // Guard against non-numeric values or NaN
-  if (isNaN(numericAmount) || numericAmount <= 0) {
-    return false;
-  }
-  
+// Get token decimals based on token name
+function getTokenDecimals(tokenName: string): number {
   switch (tokenName) {
-    case "MON":
-      // MON values should be in: 0.01, 0.03, 0.05, 0.07, 0.09
-      const validMonValues = [0.01, 0.03, 0.05, 0.07, 0.09];
-      return validMonValues.some(val => Math.abs(numericAmount - val) < 0.0001);
-    
     case "USDC":
-      // USDC should be between 0.005 and 0.01
-      return numericAmount >= 0.005 && numericAmount <= 0.01;
-      
-    case "YAKI":
-      // YAKI should be between 0.5 and 2.5
-      return numericAmount >= 0.5 && numericAmount <= 2.5;
-      
+      return 6;
     case "WBTC":
-      // WBTC should be between 0.000001 and 0.00001
-      return numericAmount >= 0.000001 && numericAmount <= 0.00001;
-      
+      return 8;
     case "WSOL":
-      // WSOL should be between 0.0001 and 0.001
-      return numericAmount >= 0.0001 && numericAmount <= 0.001;
-      
+      return 9;
     case "WETH":
-      // WETH should be between 0.000001 and 0.00001
-      return numericAmount >= 0.000001 && numericAmount <= 0.00001;
-      
+    case "MON":
+    case "YAKI":
+      return 18;
     case "CHOG":
-      // CHOG should be between 0.01 and 0.3
-      return numericAmount >= 0.01 && numericAmount <= 0.3;
-      
+      return 18;
     default:
+      return 18;
+  }
+}
+
+// Token amount validation - handling amounts in full token precision
+function validateTokenAmount(tokenName: string, amount: string | number): boolean {
+  try {
+    // Convert to BigNumber to handle large decimals properly
+    const bigAmount = ethers.toBigInt(amount.toString());
+    
+    // Convert to human-readable format based on token decimals
+    const decimals = getTokenDecimals(tokenName);
+    const humanReadable = parseFloat(ethers.formatUnits(bigAmount, decimals));
+    
+    console.log(`Token validation: ${tokenName}, raw amount: ${amount}, decimals: ${decimals}, human readable: ${humanReadable}`);
+    
+    // Guard against non-numeric values, NaN or negative
+    if (isNaN(humanReadable) || humanReadable <= 0) {
+      console.log("Invalid amount: not a number or negative");
       return false;
+    }
+    
+    // Validate based on human-readable amounts
+    switch (tokenName) {
+      case "MON":
+        // MON values should be in: 0.01, 0.03, 0.05, 0.07, 0.09 with small tolerance
+        const validMonValues = [0.01, 0.03, 0.05, 0.07, 0.09];
+        const isValidMon = validMonValues.some(val => Math.abs(humanReadable - val) < 0.0001);
+        console.log(`MON validation: ${isValidMon}, amount: ${humanReadable}`);
+        return isValidMon;
+      
+      case "USDC":
+        // USDC should be between 0.005 and 0.01
+        const isValidUSDC = humanReadable >= 0.005 && humanReadable <= 0.01;
+        console.log(`USDC validation: ${isValidUSDC}, amount: ${humanReadable}`);
+        return isValidUSDC;
+        
+      case "YAKI":
+        // YAKI should be between 0.5 and 2.5
+        const isValidYAKI = humanReadable >= 0.5 && humanReadable <= 2.5;
+        console.log(`YAKI validation: ${isValidYAKI}, amount: ${humanReadable}`);
+        return isValidYAKI;
+        
+      case "WBTC":
+        // WBTC should be between 0.000001 and 0.00001
+        const isValidWBTC = humanReadable >= 0.000001 && humanReadable <= 0.00001;
+        console.log(`WBTC validation: ${isValidWBTC}, amount: ${humanReadable}`);
+        return isValidWBTC;
+        
+      case "WSOL":
+        // WSOL should be between 0.0001 and 0.001
+        const isValidWSOL = humanReadable >= 0.0001 && humanReadable <= 0.001;
+        console.log(`WSOL validation: ${isValidWSOL}, amount: ${humanReadable}`);
+        return isValidWSOL;
+        
+      case "WETH":
+        // WETH should be between 0.000001 and 0.00001
+        const isValidWETH = humanReadable >= 0.000001 && humanReadable <= 0.00001;
+        console.log(`WETH validation: ${isValidWETH}, amount: ${humanReadable}`);
+        return isValidWETH;
+        
+      case "CHOG":
+        // CHOG should be between 0.01 and 0.3
+        const isValidCHOG = humanReadable >= 0.01 && humanReadable <= 0.3;
+        console.log(`CHOG validation: ${isValidCHOG}, amount: ${humanReadable}`);
+        return isValidCHOG;
+        
+      default:
+        console.log(`Unknown token: ${tokenName}`);
+        return false;
+    }
+  } catch (error) {
+    console.error("Error validating token amount:", error);
+    return false;
   }
 }
 
