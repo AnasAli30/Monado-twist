@@ -1032,7 +1032,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
     localStorage.setItem('welcomePopupShown1', 'true');
-    handleOpenMiniApp1();
+    handleOpenMiniApp2();
   };
 
   const handlePlayLater = () => {
@@ -1118,7 +1118,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 Welcome to Monad TWIST! 🎰
               </h3>
               <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                You can earn up to <strong style={{ color: '#FFD700' }}>1.55M<img src="images/boop.png" alt="" style={{ width: '40px', height: '40px',display:"inline-block"}} /> $BOOP</strong> by just playing the game!
+                You can earn up to <strong style={{ color: '#FFD700' }}>50<img src="images/USDC.png" alt="" style={{ width: '40px', height: '40px',display:"inline-block"}} /> $USDC</strong> by just playing the game!
               </p>
             </div>
             <div className="popup-actions">
