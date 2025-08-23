@@ -8,7 +8,11 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY', // Prevents your site from being framed by others
+            value: 'SAMEORIGIN', // Allow embedding from same origin as fallback
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self' https://farcaster.xyz https://*.farcaster.xyz;",
           },
           {
             key: 'X-Content-Type-Options',
