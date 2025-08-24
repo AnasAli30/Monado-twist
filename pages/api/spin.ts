@@ -60,158 +60,32 @@ function isAllowedOrigin(req: NextApiRequest): boolean {
   return origin === 'https://monado-twist.vercel.app';
 }
 
-// In-memory maps for rate limiting and blocking
-const rateLimitMap = new Map<string, { count: number, timestamp: number }>();
-const forbiddenAttemptsMap = new Map<string, { count: number, timestamp: number }>();
-const blockedIPs = new Map<string, number>(); // IP -> block timestamp
-
-// Check if an IP is blocked
-function isIPBlocked(ip: string): boolean {
-  const blockTimestamp = blockedIPs.get(ip);
-  
-  // If IP is not in the blocklist
-  if (!blockTimestamp) return false;
-  
-  const now = Date.now();
-  const blockDuration = 24 * 60 * 60 * 1000; // 24 hours block
-  
-  // Check if block period is over
-  if (now - blockTimestamp > blockDuration) {
-    // Block period expired, remove from blocklist
-    blockedIPs.delete(ip);
-    return false;
-  }
-  
-  // IP is still blocked
-  return true;
-}
-
-// Track forbidden attempts and block after threshold
-function trackForbiddenAttempt(ip: string): void {
-  const now = Date.now();
-  const trackingWindow = 10 * 60 * 1000; // 10 minutes
-  const maxForbiddenAttempts = 2; // Block after 2 forbidden attempts
-  
-  const record = forbiddenAttemptsMap.get(ip) || { count: 0, timestamp: now };
-  
-  // Reset if window has passed
-  if (now - record.timestamp > trackingWindow) {
-    record.count = 1;
-    record.timestamp = now;
-    forbiddenAttemptsMap.set(ip, record);
-    return;
-  }
-  
-  // Increment count
-  record.count++;
-  record.timestamp = now;
-  forbiddenAttemptsMap.set(ip, record);
-  
-  // Block IP if threshold exceeded
-  if (record.count >= maxForbiddenAttempts) {
-    blockedIPs.set(ip, now);
-    console.log(`Blocked IP ${ip} for suspicious activity`);
-  }
-}
-
-// Check rate limit (5 requests per minute per IP)
-function checkRateLimit(ip: string): boolean {
-  // First check if IP is blocked
-  if (isIPBlocked(ip)) {
-    return false; // Blocked IPs are automatically rate limited
-  }
-  
-  const now = Date.now();
-  const rateWindow = 60 * 1000; // 1 minute
-  const maxRequests = 5;
-  
-  const record = rateLimitMap.get(ip) || { count: 0, timestamp: now };
-  
-  // Reset if window has passed
-  if (now - record.timestamp > rateWindow) {
-    record.count = 1;
-    record.timestamp = now;
-    rateLimitMap.set(ip, record);
-    return true;
-  }
-  
-  // Check if under limit
-  if (record.count < maxRequests) {
-    record.count++;
-    rateLimitMap.set(ip, record);
-    return true;
-  }
-  
-  return false;
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Extract client IP first for tracking
-  const clientIp = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
-  const cleanIP = clientIp.split(',')[0].trim();
-  
-  // Check if IP is blocked
-  if (isIPBlocked(cleanIP)) {
-    console.log("Blocked IP", cleanIP);
-    return res.status(403).json({ error: 'Unauthorized' });
-  }
-
   // Check method
   if (req.method !== 'POST') {
-    console.log("Method not allowed", cleanIP);
-    return res.status(405).json({ error: 'Unauthorized' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   // Check origin
   if (!isAllowedOrigin(req)) {
-    // Track forbidden attempt
-    trackForbiddenAttempt(cleanIP);
-    console.log("Forbidden origin", cleanIP);
-    return res.status(403).json({ error: 'Unauthorized' });
-  }
-  
-  // Check rate limit
-  if (!checkRateLimit(cleanIP)) {
-    // Excessive rate could also be suspicious
-    trackForbiddenAttempt(cleanIP);
-    console.log("Too many requests", cleanIP);
-    return res.status(429).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Forbidden origin' });
   }
 
   const { fid, checkOnly, mode, amount, address, pfpUrl, randomKey, fusedKey } = req.body;
 
   // Verify request authenticity
   if (!randomKey || !fusedKey) {
-    trackForbiddenAttempt(cleanIP);
-    console.log("Missing verification keys", cleanIP);
-    return res.status(403).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Missing verification keys' });
   }
   
   if (!verifyRequest(randomKey, fusedKey)) {
-    // Track forbidden attempt - invalid signatures are highly suspicious
-    trackForbiddenAttempt(cleanIP);
-    console.log("Invalid request signature", randomKey, fusedKey);
-    return res.status(403).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Invalid request signature' });
   }
 
-  // Basic parameter validation
-  // if (!fid) {
-  //   console.log("Missing fid", cleanIP);
-  //   return res.status(400).json({ error: 'Bad request' });
-  // }
-  
-  // Validate FID is a number
-  // if (typeof fid !== 'number' && isNaN(parseInt(fid as string))) {
-  //   console.log("Invalid fid format", fid, cleanIP);
-  //   return res.status(400).json({ error: 'Bad request' });
-  // }
-  
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
                 'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2'].includes(mode)) {
-    console.log("Invalid mode", mode, cleanIP);
-    trackForbiddenAttempt(cleanIP);
-    return res.status(400).json({ error: 'Bad request' });
+    return res.status(400).json({ error: 'Invalid mode' });
   }
 
   const client = await clientPromise;
@@ -239,8 +113,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date();
     const lastShareSpin = user?.lastShareSpin ? new Date(user.lastShareSpin) : new Date(0);
     if (now.getTime() - lastShareSpin.getTime() < 6 * 60 * 60 * 1000) {
-      console.log("Share spin cooldown active", fid, cleanIP);
-      return res.status(400).json({ error: "Bad request" });
+      return res.status(400).json({ error: "Share spin cooldown active" });
     }
     spinsLeft += 2;
     await users.updateOne(
@@ -253,8 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "follow") {
     if (user?.follow) {
-      console.log("Already followed", fid, cleanIP);
-      return res.status(400).json({ error: "Bad request" });
+      return res.status(400).json({ error: "Already followed" });
     }
     spinsLeft += 1;
     await users.updateOne(
@@ -267,8 +139,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "followX") {
     if (user?.hasFollowedX) {
-      console.log("Already followed on X", fid, cleanIP);
-      return res.status(400).json({ error: "Bad request" });
+      return res.status(400).json({ error: "Already followed on X" });
     }
     spinsLeft += 1;
     await users.updateOne(
@@ -281,23 +152,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "buy") {
     if (!amount || !address) {
-      console.log("Missing amount or address for purchase", cleanIP);
-      return res.status(400).json({ error: "Bad request" });
+      return res.status(400).json({ error: "Missing amount or address for purchase" });
     }
-    
-    // Validate address format to prevent injection
-    // if (typeof address !== 'string' || !ethers.isAddress(address)) {
-    //   console.log("Invalid address format", address, cleanIP);
-    //   trackForbiddenAttempt(cleanIP);
-    //   return res.status(400).json({ error: "Bad request" });
-    // }
     
     // Validate amount is a positive number
     const numAmount = parseFloat(amount.toString());
     if (isNaN(numAmount) || numAmount <= 0) {
-      console.log("Invalid amount", amount, cleanIP);
-      trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: "Bad request" });
+      return res.status(400).json({ error: "Invalid amount" });
     }
     
     spinsLeft += SPINS_PER_PURCHASE;
@@ -312,14 +173,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       fid,
       action: "buy",
       timestamp: new Date(),
-      ipAddress: cleanIP,
-      userAgent: req.headers['user-agent'] || 'unknown',
       amount: numAmount,
-      address,
-      securityChecks: {
-        isBlocked: isIPBlocked(cleanIP),
-        suspiciousAttempts: (forbiddenAttemptsMap.get(cleanIP)?.count || 0)
-      }
+      address
     });
 
     // Trigger purchase notification
@@ -354,9 +209,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen.getTime());
-      console.log("MiniApp cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "Bad request",
+        error: "MiniApp cooldown active",
         timeLeft: msLeft
       });
     }
@@ -375,9 +229,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen1.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen1.getTime());
-      console.log("MiniApp1 cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "Bad request",
+        error: "MiniApp1 cooldown active",
         timeLeft: msLeft
       });
     }
@@ -396,9 +249,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen2.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen2.getTime());
-      console.log("MiniApp2 cooldown active", fid, msLeft, cleanIP);
       return res.status(400).json({ 
-        error: "Bad request",
+        error: "MiniApp2 cooldown active",
         timeLeft: msLeft
       });
     }
@@ -433,8 +285,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (spinsLeft <= 0) {
-    console.log("No spins left", fid, cleanIP);
-    return res.status(400).json({ error: 'Bad request' });
+    return res.status(400).json({ error: 'No spins left' });
   }
 
   // Use $inc operator to safely decrement spins (atomic operation)
@@ -448,24 +299,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     { upsert: false } // Don't create new record if not found
   );
 
-  // If no document was modified, it means the user didn't have enough spins
-  // if (updateResult.modifiedCount === 0) {
-  //   console.log("Spin failed - no document updated", fid, cleanIP);
-  //   return res.status(400).json({ error: 'Bad request' });
-  // }
-
   // Log the spin for audit purposes
   await db.collection('spin-history').insertOne({
     fid,
     action: "spin",
     timestamp: new Date(),
-    ipAddress: cleanIP,
-    userAgent: req.headers['user-agent'] || 'unknown',
-    remainingSpins: spinsLeft - 1,
-    securityChecks: {
-      isBlocked: isIPBlocked(cleanIP),
-      suspiciousAttempts: (forbiddenAttemptsMap.get(cleanIP)?.count || 0)
-    }
+    remainingSpins: spinsLeft - 1
   });
 
   // Return the updated spins left value
