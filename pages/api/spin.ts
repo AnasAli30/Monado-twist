@@ -195,16 +195,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Basic parameter validation
-  if (!fid) {
-    console.log("Missing fid", cleanIP);
-    return res.status(400).json({ error: 'Bad request' });
-  }
+  // if (!fid) {
+  //   console.log("Missing fid", cleanIP);
+  //   return res.status(400).json({ error: 'Bad request' });
+  // }
   
   // Validate FID is a number
-  if (typeof fid !== 'number' && isNaN(parseInt(fid as string))) {
-    console.log("Invalid fid format", fid, cleanIP);
-    return res.status(400).json({ error: 'Bad request' });
-  }
+  // if (typeof fid !== 'number' && isNaN(parseInt(fid as string))) {
+  //   console.log("Invalid fid format", fid, cleanIP);
+  //   return res.status(400).json({ error: 'Bad request' });
+  // }
   
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
@@ -449,10 +449,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   );
 
   // If no document was modified, it means the user didn't have enough spins
-  if (updateResult.modifiedCount === 0) {
-    console.log("Spin failed - no document updated", fid, cleanIP);
-    return res.status(400).json({ error: 'Bad request' });
-  }
+  // if (updateResult.modifiedCount === 0) {
+  //   console.log("Spin failed - no document updated", fid, cleanIP);
+  //   return res.status(400).json({ error: 'Bad request' });
+  // }
 
   // Log the spin for audit purposes
   await db.collection('spin-history').insertOne({
