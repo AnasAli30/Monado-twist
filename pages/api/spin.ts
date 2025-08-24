@@ -60,6 +60,27 @@ function isAllowedOrigin(req: NextApiRequest): boolean {
   return origin === 'https://monado-twist.vercel.app';
 }
 
+// Calculate spins left with reset logic
+function calculateSpinsLeft(user: any, now: Date): { spinsLeft: number, lastSpinReset: Date, needsUpdate: boolean } {
+  let spinsLeft = SPINS_PER_DAY;
+  let lastSpinReset = now;
+  let needsUpdate = false;
+
+  if (user) {
+    lastSpinReset = user.lastSpinReset ? new Date(user.lastSpinReset) : now;
+    // Reset spins if 6h passed
+    if (now.getTime() - lastSpinReset.getTime() > 6 * 60 * 60 * 1000) {
+      spinsLeft = SPINS_PER_DAY;
+      lastSpinReset = now;
+      needsUpdate = true; // Database needs to be updated with new reset time
+    } else {
+      spinsLeft = user.spinsLeft ?? SPINS_PER_DAY;
+    }
+  }
+
+  return { spinsLeft, lastSpinReset, needsUpdate };
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Check method
   if (req.method !== 'POST') {
@@ -72,6 +93,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { fid, checkOnly, mode, amount, address, pfpUrl, randomKey, fusedKey } = req.body;
+
+  // Validate FID
+  if (!fid) {
+    return res.status(400).json({ error: 'Missing FID' });
+  }
 
   // Verify request authenticity
   if (!randomKey || !fusedKey) {
@@ -94,23 +120,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   let user = await users.findOne({ fid });
   const now = new Date();
-  let spinsLeft = SPINS_PER_DAY;
-  let lastSpinReset = now;
+  
+  // Calculate spins left with consistent logic
+  let { spinsLeft, lastSpinReset, needsUpdate } = calculateSpinsLeft(user, now);
 
-  if (user) {
-    lastSpinReset = user.lastSpinReset ? new Date(user.lastSpinReset) : now;
-    // Reset spins if 6h passed
-    if (now.getTime() - lastSpinReset.getTime() > 6 * 60 * 60 * 1000) {
-      spinsLeft = SPINS_PER_DAY;
-      lastSpinReset = now;
-    } else {
-      spinsLeft = user.spinsLeft ?? SPINS_PER_DAY;
-    }
+  // Update database if spins were reset
+  if (needsUpdate) {
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset } },
+      { upsert: true }
+    );
   }
 
   if (mode === "add") {
     // Check last share spin time
-    const now = new Date();
     const lastShareSpin = user?.lastShareSpin ? new Date(user.lastShareSpin) : new Date(0);
     if (now.getTime() - lastShareSpin.getTime() < 6 * 60 * 60 * 1000) {
       return res.status(400).json({ error: "Share spin cooldown active" });
@@ -131,7 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     spinsLeft += 1;
     await users.updateOne(
       { fid },
-      { $set: { spinsLeft, lastSpinReset,follow:true } },
+      { $set: { spinsLeft, lastSpinReset, follow: true } },
       { upsert: true }
     );
     return res.status(200).json({ spinsLeft });
@@ -204,7 +228,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "miniAppOpen") {
-    const now = new Date();
     const lastMiniAppOpen = user?.lastMiniAppOpen ? new Date(user.lastMiniAppOpen) : new Date(0);
     if (now.getTime() - lastMiniAppOpen.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
@@ -224,7 +247,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "miniAppOpen1") {
-    const now = new Date();
     const lastMiniAppOpen1 = user?.lastMiniAppOpen1 ? new Date(user.lastMiniAppOpen1) : new Date(0);
     if (now.getTime() - lastMiniAppOpen1.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
@@ -244,7 +266,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "miniAppOpen2") {
-    const now = new Date();
     const lastMiniAppOpen2 = user?.lastMiniAppOpen2 ? new Date(user.lastMiniAppOpen2) : new Date(0);
     if (now.getTime() - lastMiniAppOpen2.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
@@ -266,19 +287,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (checkOnly) {
     // Fetch fresh user data to get current spinsLeft
     const currentUser = await users.findOne({ fid });
-    let currentSpinsLeft = SPINS_PER_DAY;
-    let currentLastSpinReset = now;
-
-    if (currentUser) {
-      currentLastSpinReset = currentUser.lastSpinReset ? new Date(currentUser.lastSpinReset) : now;
-      // Reset spins if 6h passed
-      if (now.getTime() - currentLastSpinReset.getTime() > 6 * 60 * 60 * 1000) {
-        currentSpinsLeft = SPINS_PER_DAY;
-        currentLastSpinReset = now;
-      } else {
-        currentSpinsLeft = currentUser.spinsLeft ?? SPINS_PER_DAY;
-      }
-    }
+    const { spinsLeft: currentSpinsLeft } = calculateSpinsLeft(currentUser, now);
 
     const winningsData = await db.collection('winnings').aggregate([
         { $match: { fid: fid } },
@@ -320,14 +329,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'No spins left' });
   }
 
+  // Get the actual remaining spins from the database
+  const updatedUser = await users.findOne({ fid });
+  const actualSpinsLeft = updatedUser?.spinsLeft ?? 0;
+
   // Log the spin for audit purposes
   await db.collection('spin-history').insertOne({
     fid,
     action: "spin",
     timestamp: new Date(),
-    remainingSpins: spinsLeft - 1
+    remainingSpins: actualSpinsLeft
   });
 
-  // Return the updated spins left value
-  res.status(200).json({ spinsLeft: spinsLeft - 1 });
+  // Return the actual updated spins left value
+  res.status(200).json({ spinsLeft: actualSpinsLeft });
 }
