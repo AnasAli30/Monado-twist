@@ -250,10 +250,10 @@ console.log("Forbidden",cleanIP)
     // }
 
     // Check if user has spins left
-    if (user.spinsLeft <= 0) {
-      console.log("No spins left",fid,user)
-      return res.status(400).json({ error: 'Bad request' });
-    }
+    // if (user.spinsLeft <= 0) {
+    //   console.log("No spins left",fid,user)
+    //   return res.status(400).json({ error: 'Bad request' });
+    // }
 
     // Validate Ethereum address format
     if (!ethers.isAddress(to)) {
