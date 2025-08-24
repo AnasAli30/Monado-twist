@@ -299,6 +299,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     { upsert: false } // Don't create new record if not found
   );
 
+  // If no document was modified, it means the user didn't have enough spins
+  if (updateResult.modifiedCount === 0) {
+    return res.status(400).json({ error: 'No spins left' });
+  }
+
   // Log the spin for audit purposes
   await db.collection('spin-history').insertOne({
     fid,
