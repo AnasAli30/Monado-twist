@@ -286,11 +286,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     // Validate address format to prevent injection
-    if (typeof address !== 'string' || !ethers.isAddress(address)) {
-      console.log("Invalid address format", address, cleanIP);
-      trackForbiddenAttempt(cleanIP);
-      return res.status(400).json({ error: "Bad request" });
-    }
+    // if (typeof address !== 'string' || !ethers.isAddress(address)) {
+    //   console.log("Invalid address format", address, cleanIP);
+    //   trackForbiddenAttempt(cleanIP);
+    //   return res.status(400).json({ error: "Bad request" });
+    // }
     
     // Validate amount is a positive number
     const numAmount = parseFloat(amount.toString());
