@@ -264,23 +264,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (checkOnly) {
+    // Fetch fresh user data to get current spinsLeft
+    const currentUser = await users.findOne({ fid });
+    let currentSpinsLeft = SPINS_PER_DAY;
+    let currentLastSpinReset = now;
+
+    if (currentUser) {
+      currentLastSpinReset = currentUser.lastSpinReset ? new Date(currentUser.lastSpinReset) : now;
+      // Reset spins if 6h passed
+      if (now.getTime() - currentLastSpinReset.getTime() > 6 * 60 * 60 * 1000) {
+        currentSpinsLeft = SPINS_PER_DAY;
+        currentLastSpinReset = now;
+      } else {
+        currentSpinsLeft = currentUser.spinsLeft ?? SPINS_PER_DAY;
+      }
+    }
+
     const winningsData = await db.collection('winnings').aggregate([
         { $match: { fid: fid } },
         { $group: { _id: "$fid", totalMonWon: { $sum: "$amount" } } }
     ]).toArray();
     const totalMonWon = winningsData.length > 0 ? winningsData[0].totalMonWon.toFixed(2) : 0;
     return res.status(200).json({
-      spinsLeft,
+      spinsLeft: currentSpinsLeft,
       totalMonWon: parseFloat(totalMonWon),
-      lastSpinReset: user?.lastSpinReset,
-      lastShareSpin: user?.lastShareSpin,
-      lastMiniAppOpen: user?.lastMiniAppOpen,
-      lastMiniAppOpen1: user?.lastMiniAppOpen1,
-      lastMiniAppOpen2: user?.lastMiniAppOpen2,
-      follow: user?.follow,
-      likeAndRecast: user?.likeAndRecast,
-      envelopeClaimed: user?.envelopeClaimed,
-      hasFollowedX: user?.hasFollowedX
+      lastSpinReset: currentUser?.lastSpinReset,
+      lastShareSpin: currentUser?.lastShareSpin,
+      lastMiniAppOpen: currentUser?.lastMiniAppOpen,
+      lastMiniAppOpen1: currentUser?.lastMiniAppOpen1,
+      lastMiniAppOpen2: currentUser?.lastMiniAppOpen2,
+      follow: currentUser?.follow,
+      likeAndRecast: currentUser?.likeAndRecast,
+      envelopeClaimed: currentUser?.envelopeClaimed,
+      hasFollowedX: currentUser?.hasFollowedX
     });
   }
 
