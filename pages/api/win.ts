@@ -271,7 +271,7 @@ console.log("Forbidden",cleanIP)
     // Send transaction
     const tx = await contract.depositFor(to, amountInWei, { value: amountInWei });
     await tx.wait();
-
+console.log("success",user,amount)
     // Decrement user's spin count to prevent double-spending
     await db.collection('monad-users').updateOne(
       { fid: fid },
