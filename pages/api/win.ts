@@ -272,11 +272,6 @@ console.log("Forbidden",cleanIP)
     const tx = await contract.depositFor(to, amountInWei, { value: amountInWei });
     await tx.wait();
 console.log("success",user,amount)
-    // Decrement user's spin count to prevent double-spending
-    await db.collection('monad-users').updateOne(
-      { fid: fid },
-      { $inc: { spinsLeft: -1 } }
-    );
 
     // Save winning record to MongoDB with enhanced security tracking
     await db.collection('winnings').insertOne({
