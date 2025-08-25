@@ -96,22 +96,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Validate FID
   if (!fid) {
+    console.log("Missing FID",req.body)
     return res.status(400).json({ error: 'Missing FID' });
   }
 
   // Verify request authenticity
   if (!randomKey || !fusedKey) {
+    console.log("Missing verification keys",req.body)
     return res.status(403).json({ error: 'Missing verification keys' });
   }
   
   if (!verifyRequest(randomKey, fusedKey)) {
+    console.log("Invalid request signature",req.body)
     return res.status(403).json({ error: 'Invalid request signature' });
   }
 
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
                 'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2'].includes(mode)) {
-    return res.status(400).json({ error: 'Invalid mode' });
+    console.log("Invalid mode",req.body)
+        return res.status(400).json({ error: 'Invalid mode' });
   }
 
   const client = await clientPromise;
@@ -137,6 +141,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check last share spin time
     const lastShareSpin = user?.lastShareSpin ? new Date(user.lastShareSpin) : new Date(0);
     if (now.getTime() - lastShareSpin.getTime() < 6 * 60 * 60 * 1000) {
+      console.log("Share spin cooldown active",req.body)
       return res.status(400).json({ error: "Share spin cooldown active" });
     }
     spinsLeft += 2;
@@ -150,6 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "follow") {
     if (user?.follow) {
+      console.log("Already followed",req.body)
       return res.status(400).json({ error: "Already followed" });
     }
     spinsLeft += 1;
@@ -163,6 +169,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "followX") {
     if (user?.hasFollowedX) {
+      console.log("Already followed on X",req.body)
       return res.status(400).json({ error: "Already followed on X" });
     }
     spinsLeft += 1;
@@ -176,12 +183,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (mode === "buy") {
     if (!amount || !address) {
+      console.log("Missing amount or address for purchase",req.body)
       return res.status(400).json({ error: "Missing amount or address for purchase" });
     }
     
     // Validate amount is a positive number
     const numAmount = parseFloat(amount.toString());
     if (isNaN(numAmount) || numAmount <= 0) {
+      console.log("Invalid amount",req.body)
       return res.status(400).json({ error: "Invalid amount" });
     }
     
@@ -224,6 +233,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
       { upsert: true }
     );
+    console.log("MiniApp cooldown active",req.body)
     return res.status(200).json({ spinsLeft });
   }
 
@@ -251,6 +261,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen1.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen1.getTime());
+      console.log("MiniApp1 cooldown active",req.body)
       return res.status(400).json({ 
         error: "MiniApp1 cooldown active",
         timeLeft: msLeft
@@ -270,6 +281,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (now.getTime() - lastMiniAppOpen2.getTime() < 3 * 60 * 60 * 1000) {
       // Not enough time has passed
       const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen2.getTime());
+      console.log("MiniApp2 cooldown active",req.body)
       return res.status(400).json({ 
         error: "MiniApp2 cooldown active",
         timeLeft: msLeft
@@ -310,6 +322,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (spinsLeft <= 0) {
+    console.log("No spins left",req.body)
     return res.status(400).json({ error: 'No spins left' });
   }
 
@@ -326,7 +339,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // If no document was modified, it means the user didn't have enough spins
   if (updateResult.modifiedCount === 0) {
-    return res.status(400).json({ error: 'No spins left' });
+    console.log("No spins left",req.body)
+      return res.status(400).json({ error: 'No spins left' });
   }
 
   // Get the actual remaining spins from the database
