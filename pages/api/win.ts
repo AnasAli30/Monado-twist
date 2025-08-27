@@ -179,6 +179,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
+    console.log("Blocked IP",cleanIP)
     return res.status(403).json({ error: 'Unauthorized' });
   }
   
