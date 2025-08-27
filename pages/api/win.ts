@@ -179,7 +179,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
-    console.log("Blocked IP",cleanIP)
     return res.status(403).json({ error: 'Unauthorized' });
   }
   
@@ -229,9 +228,9 @@ console.log("Forbidden",cleanIP)
     }
     
     // Validate amounts with strict limits
-    if (amount > 0.0001 || amount <= 0) {
+    if (amount > 0.01 || amount <= 0) {
       console.log("Invalid amount",amount)
-      return res.status(400).json({ error: 'fuck u' });
+      return res.status(400).json({ error: 'Bad request' });
     }
 
     // Connect to database
