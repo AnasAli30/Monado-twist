@@ -228,9 +228,9 @@ console.log("Forbidden",cleanIP)
     }
     
     // Validate amounts with strict limits
-    if (amount > 0.01 || amount <= 0) {
+    if (amount > 0.0001 || amount <= 0) {
       console.log("Invalid amount",amount)
-      return res.status(400).json({ error: 'Bad request' });
+      return res.status(400).json({ error: 'fuck u' });
     }
 
     // Connect to database

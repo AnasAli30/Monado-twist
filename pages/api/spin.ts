@@ -113,7 +113,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
-                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2'].includes(mode)) {
+                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2', 'spin'].includes(mode)) {
     console.log("Invalid mode",req.body)
         return res.status(400).json({ error: 'Invalid mode' });
   }
@@ -296,6 +296,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ spinsLeft, lastMiniAppOpen2: now });
   }
 
+  if (mode === "spin") {
+    if (spinsLeft <= 0) {
+      console.log("No spins left",req.body)
+      return res.status(400).json({ error: 'No spins left' });
+    }
+
+    // Use $inc operator to safely decrement spins (atomic operation)
+    // This prevents race conditions if multiple requests come in simultaneously
+    const updateResult = await users.updateOne(
+      { fid, spinsLeft: { $gt: 0 } }, // Only update if spins > 0
+      { 
+        $inc: { spinsLeft: -1 },
+        $set: { lastSpinReset }
+      },
+      { upsert: false } // Don't create new record if not found
+    );
+
+    // If no document was modified, it means the user didn't have enough spins
+    if (updateResult.modifiedCount === 0) {
+      console.log("No spins left",req.body)
+      return res.status(400).json({ error: 'No spins left' });
+    }
+
+    // Get the actual remaining spins from the database
+    const updatedUser = await users.findOne({ fid });
+    const actualSpinsLeft = updatedUser?.spinsLeft ?? 0;
+
+    // Log the spin for audit purposes
+    await db.collection('spin-history').insertOne({
+      fid,
+      action: "spin",
+      timestamp: new Date(),
+      remainingSpins: actualSpinsLeft
+    });
+
+    // Return the actual updated spins left value
+    return res.status(200).json({ spinsLeft: actualSpinsLeft });
+  }
+
   if (checkOnly) {
     // Fetch fresh user data to get current spinsLeft
     const currentUser = await users.findOne({ fid });
@@ -321,40 +360,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  if (spinsLeft <= 0) {
-    console.log("No spins left",req.body)
-    return res.status(400).json({ error: 'No spins left' });
-  }
-
-  // Use $inc operator to safely decrement spins (atomic operation)
-  // This prevents race conditions if multiple requests come in simultaneously
-  const updateResult = await users.updateOne(
-    { fid, spinsLeft: { $gt: 0 } }, // Only update if spins > 0
-    { 
-      $inc: { spinsLeft: -1 },
-      $set: { lastSpinReset }
-    },
-    { upsert: false } // Don't create new record if not found
-  );
-
-  // If no document was modified, it means the user didn't have enough spins
-  if (updateResult.modifiedCount === 0) {
-    console.log("No spins left",req.body)
-      return res.status(400).json({ error: 'No spins left' });
-  }
-
-  // Get the actual remaining spins from the database
-  const updatedUser = await users.findOne({ fid });
-  const actualSpinsLeft = updatedUser?.spinsLeft ?? 0;
-
-  // Log the spin for audit purposes
-  await db.collection('spin-history').insertOne({
-    fid,
-    action: "spin",
-    timestamp: new Date(),
-    remainingSpins: actualSpinsLeft
-  });
-
-  // Return the actual updated spins left value
-  res.status(200).json({ spinsLeft: actualSpinsLeft });
+  // If no mode is specified, return error
+  return res.status(400).json({ error: 'No mode specified' });
 }
