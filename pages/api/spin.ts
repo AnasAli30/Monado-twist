@@ -227,7 +227,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "likeAndRecast") {
-    spinsLeft += 1;
+    // spinsLeft += 1;
+    if(user?.likeAndRecast) {
+      console.log("Already liked and recast",req.body)
+      return res.status(400).json({ error: "Already liked and recast" });
+    }
     await users.updateOne(
       { fid },
       { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
