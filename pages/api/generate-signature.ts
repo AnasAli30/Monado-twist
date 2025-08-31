@@ -52,64 +52,101 @@ function getTokenDecimals(tokenName: string): number {
 // Token amount validation - handling amounts in full token precision
 function validateTokenAmount(tokenName: string, amount: string | number): boolean {
   try {
-    // Convert to BigNumber to handle large decimals properly
-    const bigAmount = ethers.toBigInt(amount.toString());
-    
-    // Convert to human-readable format based on token decimals
-    const decimals = getTokenDecimals(tokenName);
-    const humanReadable = parseFloat(ethers.formatUnits(bigAmount, decimals));
-    
-    console.log(`Token validation: ${tokenName}, raw amount: ${amount}, decimals: ${decimals}, human readable: ${humanReadable}`);
-    
-    // Guard against non-numeric values, NaN or negative
-    if (isNaN(humanReadable) || humanReadable <= 0) {
-      console.log("Invalid amount: not a number or negative");
+    // Input sanitization - ensure amount is a valid string or number
+    if (amount === null || amount === undefined || amount === '') {
+      console.log("Invalid amount: null, undefined, or empty");
       return false;
     }
+
+    // Convert to string and validate format
+    const amountStr = amount.toString().trim();
+    if (!/^\d+$/.test(amountStr)) {
+      console.log("Invalid amount: not a positive integer");
+      return false;
+    }
+
+    // Convert to BigInt for precise integer arithmetic
+    const bigAmount = ethers.toBigInt(amountStr);
     
-    // Validate based on human-readable amounts
+    // Guard against zero or negative values
+    if (bigAmount <= BigInt(0)) {
+      console.log("Invalid amount: zero or negative");
+      return false;
+    }
+
+    // Get token decimals
+    const decimals = getTokenDecimals(tokenName);
+    
+    console.log(`Token validation: ${tokenName}, raw amount: ${amountStr}, decimals: ${decimals}`);
+    
+    // Validate based on raw integer amounts (in smallest units)
     switch (tokenName) {
       case "MON":
-        // MON values should be in: 0.01, 0.03, 0.05, 0.07, 0.09 with small tolerance
-        const validMonValues = [0.01, 0.03, 0.05, 0.07, 0.09];
-        const isValidMon = validMonValues.some(val => Math.abs(humanReadable - val) < 0.0001);
-        console.log(`MON validation: ${isValidMon}, amount: ${humanReadable}`);
+        // MON values should be exactly: 0.01, 0.03, 0.05, 0.07, 0.09
+        // In wei (18 decimals): 10000000000000000, 30000000000000000, 50000000000000000, 70000000000000000, 90000000000000000
+        const validMonAmounts = [
+          BigInt("10000000000000000"), // 0.01 MON
+          BigInt("30000000000000000"), // 0.03 MON
+          BigInt("50000000000000000"), // 0.05 MON
+          BigInt("70000000000000000"), // 0.07 MON
+          BigInt("90000000000000000")  // 0.09 MON
+        ];
+        const isValidMon = validMonAmounts.includes(bigAmount);
+        console.log(`MON validation: ${isValidMon}, amount: ${bigAmount.toString()}`);
         return isValidMon;
       
       case "USDC":
-        // USDC should be between 0.005 and 0.01
-        const isValidUSDC = humanReadable >= 0.005 && humanReadable <= 0.01;
-        console.log(`USDC validation: ${isValidUSDC}, amount: ${humanReadable}`);
+        // USDC should be between 0.005 and 0.01 (6 decimals)
+        // In smallest units: 5000 to 10000
+        const minUSDC = BigInt("5000");
+        const maxUSDC = BigInt("10000");
+        const isValidUSDC = bigAmount >= minUSDC && bigAmount <= maxUSDC;
+        console.log(`USDC validation: ${isValidUSDC}, amount: ${bigAmount.toString()}`);
         return isValidUSDC;
         
       case "YAKI":
-        // YAKI should be between 0.5 and 2.5
-        const isValidYAKI = humanReadable >= 0.5 && humanReadable <= 2.5;
-        console.log(`YAKI validation: ${isValidYAKI}, amount: ${humanReadable}`);
+        // YAKI should be between 0.5 and 2.5 (18 decimals)
+        // In smallest units: 500000000000000000 to 2500000000000000000
+        const minYAKI = BigInt("500000000000000000");
+        const maxYAKI = BigInt("2500000000000000000");
+        const isValidYAKI = bigAmount >= minYAKI && bigAmount <= maxYAKI;
+        console.log(`YAKI validation: ${isValidYAKI}, amount: ${bigAmount.toString()}`);
         return isValidYAKI;
         
       case "WBTC":
-        // WBTC should be between 0.000001 and 0.00001
-        const isValidWBTC = humanReadable >= 0.000001 && humanReadable <= 0.00001;
-        console.log(`WBTC validation: ${isValidWBTC}, amount: ${humanReadable}`);
+        // WBTC should be between 0.000001 and 0.00001 (8 decimals)
+        // In smallest units: 100 to 1000
+        const minWBTC = BigInt("100");
+        const maxWBTC = BigInt("1000");
+        const isValidWBTC = bigAmount >= minWBTC && bigAmount <= maxWBTC;
+        console.log(`WBTC validation: ${isValidWBTC}, amount: ${bigAmount.toString()}`);
         return isValidWBTC;
         
       case "WSOL":
-        // WSOL should be between 0.0001 and 0.001
-        const isValidWSOL = humanReadable >= 0.0001 && humanReadable <= 0.001;
-        console.log(`WSOL validation: ${isValidWSOL}, amount: ${humanReadable}`);
+        // WSOL should be between 0.0001 and 0.001 (9 decimals)
+        // In smallest units: 100000 to 1000000
+        const minWSOL = BigInt("100000");
+        const maxWSOL = BigInt("1000000");
+        const isValidWSOL = bigAmount >= minWSOL && bigAmount <= maxWSOL;
+        console.log(`WSOL validation: ${isValidWSOL}, amount: ${bigAmount.toString()}`);
         return isValidWSOL;
         
       case "WETH":
-        // WETH should be between 0.000001 and 0.00001
-        const isValidWETH = humanReadable >= 0.000001 && humanReadable <= 0.00001;
-        console.log(`WETH validation: ${isValidWETH}, amount: ${humanReadable}`);
+        // WETH should be between 0.000001 and 0.00001 (18 decimals)
+        // In smallest units: 1000000000000 to 10000000000000
+        const minWETH = BigInt("1000000000000");
+        const maxWETH = BigInt("10000000000000");
+        const isValidWETH = bigAmount >= minWETH && bigAmount <= maxWETH;
+        console.log(`WETH validation: ${isValidWETH}, amount: ${bigAmount.toString()}`);
         return isValidWETH;
         
       case "CHOG":
-        // CHOG should be between 0.01 and 0.3
-        const isValidCHOG = humanReadable >= 0.01 && humanReadable <= 0.3;
-        console.log(`CHOG validation: ${isValidCHOG}, amount: ${humanReadable}`);
+        // CHOG should be between 0.01 and 0.3 (18 decimals)
+        // In smallest units: 10000000000000000 to 300000000000000000
+        const minCHOG = BigInt("10000000000000000");
+        const maxCHOG = BigInt("300000000000000000");
+        const isValidCHOG = bigAmount >= minCHOG && bigAmount <= maxCHOG;
+        console.log(`CHOG validation: ${isValidCHOG}, amount: ${bigAmount.toString()}`);
         return isValidCHOG;
         
       default:
