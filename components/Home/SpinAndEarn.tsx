@@ -214,7 +214,7 @@ export function SpinAndEarn() {
   // Show welcome popup on first visit
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasShownWelcome = localStorage.getItem('welcomePopupShown1');
+      const hasShownWelcome = localStorage.getItem('welcomePopupShown2');
       if (!hasShownWelcome) {
         setShowWelcomePopup(true);
       }
@@ -268,7 +268,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.01,0.005,0.001,0.002, 0.008];
+        const monValues = [0.1,0.05,0.01,0.02, 0.08,0.2];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(4);
@@ -893,7 +893,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp1 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=chain-crush-black.vercel.app"
+        url: "https://farcaster.xyz/miniapps/efPuNxgasRTJ/recess"
       });
       if (!timeUntilMiniAppOpen1 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1031,13 +1031,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown1', 'true');
+    localStorage.setItem('welcomePopupShown2', 'true');
     handleOpenMiniApp1();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown1', 'true');
+    localStorage.setItem('welcomePopupShown2', 'true');
   };
 
   return (
@@ -1118,7 +1118,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 Welcome to Monad TWIST! 🎰
               </h3>
               <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                You can earn up to <strong style={{ color: '#FFD700' }}>100<img src="images/1.png" alt="" style={{ width: '40px', height: '40px',display:"inline-block"}} /> $ARB</strong> by just playing the game!
+                You can earn up to <strong style={{ color: '#FFD700' }}>150<img src="images/usdc.png" alt="" style={{ width: '40px', height: '40px',display:"inline-block"}} /> $USDC</strong> by just playing the game!
               </p>
             </div>
             <div className="popup-actions">
@@ -1126,7 +1126,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 className="popup-action-btn play-now"
                 onClick={handlePlayNow}
               >
-                Play Now / +2 Spins
+                Play Now / +5 Spins
               </button>
               <button
                 className="popup-action-btn play-later"

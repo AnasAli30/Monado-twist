@@ -3,8 +3,8 @@ import clientPromise from '../../lib/mongo';
 import Pusher from 'pusher';
 import { ethers } from 'ethers';
 
-const SPINS_PER_DAY = 15;
-const SPINS_PER_PURCHASE = 30;
+const SPINS_PER_DAY = 10;
+const SPINS_PER_PURCHASE = 15;
 
 // Use server-only environment variable - not exposed to browser
 const SERVER_SECRET_KEY = process.env.SERVER_SECRET_KEY || "";
@@ -267,7 +267,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         timeLeft: msLeft
       });
     }
-    spinsLeft += 1;
+    spinsLeft += 5;
     await users.updateOne(
       { fid },
       { $set: { spinsLeft, lastSpinReset, lastMiniAppOpen1: now } },
