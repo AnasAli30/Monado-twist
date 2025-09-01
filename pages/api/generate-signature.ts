@@ -83,14 +83,14 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
     // Validate based on raw integer amounts (in smallest units)
     switch (tokenName) {
       case "MON":
-        // MON values should be exactly: 0.01, 0.03, 0.05, 0.07, 0.09
-        // In wei (18 decimals): 10000000000000000, 30000000000000000, 50000000000000000, 70000000000000000, 90000000000000000
+        // MON values should be exactly: 0.01, 0.005, 0.001, 0.002, 0.008
+        // In wei (18 decimals): 10000000000000000, 5000000000000000, 1000000000000000, 2000000000000000, 8000000000000000
         const validMonAmounts = [
           BigInt("10000000000000000"), // 0.01 MON
-          BigInt("30000000000000000"), // 0.03 MON
-          BigInt("50000000000000000"), // 0.05 MON
-          BigInt("70000000000000000"), // 0.07 MON
-          BigInt("90000000000000000")  // 0.09 MON
+          BigInt("5000000000000000"),  // 0.005 MON
+          BigInt("1000000000000000"),  // 0.001 MON
+          BigInt("2000000000000000"),  // 0.002 MON
+          BigInt("8000000000000000")   // 0.008 MON
         ];
         const isValidMon = validMonAmounts.includes(bigAmount);
         console.log(`MON validation: ${isValidMon}, amount: ${bigAmount.toString()}`);
