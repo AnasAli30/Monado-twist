@@ -62,36 +62,37 @@ console.log('PAYLOAD_SALT_SECRET=' + crypto.randomBytes(16).toString('hex'));
 
 ## API Usage
 
-### Frontend (Encrypting Requests)
+### Frontend (Automatic Encryption)
+
+The encryption is now **automatically handled** by the `fetchWithVerification` function. No changes needed to existing code!
+
+```typescript
+// This automatically encrypts for /api/win and /api/generate-signature
+const response = await fetchWithVerification('/api/win', {
+  method: 'POST',
+  body: JSON.stringify({
+    to: userAddress,
+    amount: winAmount,
+    fid: userId,
+    pfpUrl: profilePicUrl
+  }),
+  headers: { 'Content-Type': 'application/json' }
+});
+```
+
+### Manual Encryption (Optional)
+
+If you need to manually encrypt other requests:
 
 ```typescript
 import { makeEncryptedRequest } from '@/lib/frontend-crypto';
 
-// For win.ts API
-const winData = {
+const response = await makeEncryptedRequest('/api/win', {
   to: userAddress,
   amount: winAmount,
   fid: userId,
-  pfpUrl: profilePicUrl,
-  randomKey: generatedRandomKey,
-  fusedKey: generatedFusedKey
-};
-
-const response = await makeEncryptedRequest('/api/win', winData);
-
-// For generate-signature.ts API  
-const signatureData = {
-  userAddress: address,
-  tokenAddress: tokenAddr,
-  amount: tokenAmount,
-  tokenName: token,
-  name: userName,
-  randomKey: generatedRandomKey,
-  fusedKey: generatedFusedKey,
   pfpUrl: profilePicUrl
-};
-
-const response = await makeEncryptedRequest('/api/generate-signature', signatureData);
+});
 ```
 
 ### Backend (Automatic Decryption)

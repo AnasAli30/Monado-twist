@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { encryptPayload, validateFrontendCryptoConfig } from '@/lib/frontend-crypto';
 
 // Only use the public key salt in the frontend
 // The SERVER_SECRET_KEY remains server-side only
@@ -28,16 +29,42 @@ export async function fetchWithVerification(url: string, options: RequestInit = 
   const body = options.body ? JSON.parse(options.body as string) : {};
   
   // Add verification keys to the body
-  const newBody = {
+  const bodyWithKeys = {
     ...body,
     randomKey,
     fusedKey
   };
 
+  // Check if this is a request to win or generate-signature APIs that support encryption
+  const shouldEncrypt = url.includes('/api/win') || url.includes('/api/generate-signature');
+  
+  let finalBody;
+  if (shouldEncrypt) {
+    // Validate encryption config before attempting to encrypt
+    if (validateFrontendCryptoConfig()) {
+      try {
+        // Encrypt the payload for secure APIs
+        const encryptedPayload = await encryptPayload(bodyWithKeys);
+        finalBody = JSON.stringify({ encryptedPayload });
+        console.log('🔐 Sending encrypted payload to:', url);
+      } catch (error) {
+        console.error('Encryption failed, falling back to unencrypted:', error);
+        // Fall back to unencrypted if encryption fails
+        finalBody = JSON.stringify(bodyWithKeys);
+      }
+    } else {
+      console.warn('Encryption not configured, sending unencrypted payload to:', url);
+      finalBody = JSON.stringify(bodyWithKeys);
+    }
+  } else {
+    // Use unencrypted for other APIs
+    finalBody = JSON.stringify(bodyWithKeys);
+  }
+
   // Create new options with updated body
   const newOptions = {
     ...options,
-    body: JSON.stringify(newBody)
+    body: finalBody
   };
 
   return fetch(url, newOptions);
