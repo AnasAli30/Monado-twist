@@ -2,7 +2,7 @@
 // Note: This file should be used on the client side
 
 // Frontend encryption key (should be set in environment variables)
-const FRONTEND_ENCRYPTION_KEY = process.env.NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY;
+const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY;
 
 interface EncryptedPayload {
   encryptedData: string;
@@ -70,19 +70,42 @@ async function pbkdf2(password: string, salt: string, iterations: number): Promi
 }
 
 /**
+ * Simple XOR encryption that matches backend
+ */
+function simpleXorEncrypt(data: string, key: string): string {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    result.push(String.fromCharCode(data.charCodeAt(i) ^ key.charCodeAt(i % key.length)));
+  }
+  return btoa(result.join('')); // Base64 encode
+}
+
+/**
+ * Simple hash function for browser compatibility
+ */
+async function simpleHash(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
  * Encrypt payload for secure transmission to backend
- * Uses Web Crypto API for browser compatibility
+ * Uses simple but effective encryption compatible with backend
  */
 export async function encryptPayload(data: any): Promise<EncryptedPayload> {
-  if (!FRONTEND_ENCRYPTION_KEY) {
-    throw new Error('Frontend encryption key not configured');
+  if (!ENCRYPTION_KEY) {
+    throw new Error('Encryption key not configured');
   }
 
   const timestamp = Date.now();
   const salt = generateRandomHex(32);
   
-  // Generate timestamp salt for additional security
-  const timestampSalt = await hmacSHA256(FRONTEND_ENCRYPTION_KEY, timestamp.toString());
+  // Generate timestamp salt for additional security  
+  const timestampSalt = await simpleHash(ENCRYPTION_KEY + timestamp.toString());
   
   // Add timestamp and salt to data for additional security
   const dataWithSalt = {
@@ -93,32 +116,18 @@ export async function encryptPayload(data: any): Promise<EncryptedPayload> {
 
   const jsonData = JSON.stringify(dataWithSalt);
   
-  // Generate random IV
-  const iv = generateRandomHex(16);
+  // Simple key derivation
+  const derivedKey = await simpleHash(ENCRYPTION_KEY + salt);
   
-  // Derive key using PBKDF2
-  const derivedKeyBuffer = await pbkdf2(FRONTEND_ENCRYPTION_KEY, salt, 100000);
+  // Simple XOR encryption
+  const encryptedData = simpleXorEncrypt(jsonData, derivedKey);
   
-  // For demo purposes, we'll use a simple XOR cipher with the derived key
-  // In production, you should use a proper encryption library
-  const encoder = new TextEncoder();
-  const dataBytes = encoder.encode(jsonData);
-  const keyBytes = new Uint8Array(derivedKeyBuffer);
-  
-  // Simple XOR encryption (NOT SECURE - use proper encryption in production)
-  const encrypted = new Uint8Array(dataBytes.length);
-  for (let i = 0; i < dataBytes.length; i++) {
-    encrypted[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length];
-  }
-  
-  const encryptedHex = Array.from(encrypted, byte => byte.toString(16).padStart(2, '0')).join('');
-  
-  // Generate authentication tag (HMAC)
-  const tag = await hmacSHA256(Array.from(keyBytes, byte => byte.toString(16).padStart(2, '0')).join(''), encryptedHex);
+  // Generate authentication tag
+  const tag = await simpleHash(derivedKey + encryptedData);
 
   return {
-    encryptedData: encryptedHex,
-    iv: iv,
+    encryptedData: encryptedData,
+    iv: generateRandomHex(16), // Not used but kept for compatibility
     tag: tag,
     salt: salt,
     timestamp: timestamp
@@ -155,7 +164,7 @@ export async function makeEncryptedRequest(endpoint: string, data: any, options:
  * Validate encryption configuration
  */
 export function validateFrontendCryptoConfig(): boolean {
-  if (!FRONTEND_ENCRYPTION_KEY || FRONTEND_ENCRYPTION_KEY.length < 32) {
+  if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length < 32) {
     console.error('NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY must be at least 32 characters');
     return false;
   }

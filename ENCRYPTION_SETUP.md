@@ -19,21 +19,18 @@ The system uses AES-256-GCM encryption with separate keys for frontend encryptio
 ### Backend Environment Variables (.env.local or server environment)
 
 ```bash
-# Backend decryption key (server-only, never expose to frontend)
-BACKEND_DECRYPTION_KEY=your_64_character_hex_string_here_backend_key_secret
+# Shared encryption key (used by both frontend and backend)
+FRONTEND_ENCRYPTION_KEY=your_64_character_hex_string_here_shared_key_secret
 
-# Frontend encryption key (this will be exposed to frontend)
-FRONTEND_ENCRYPTION_KEY=your_64_character_hex_string_here_frontend_key_secret
-
-# Salt secret for additional security
+# Salt secret for additional security (server-only)
 PAYLOAD_SALT_SECRET=your_32_character_secret_for_salt_generation_here
 ```
 
 ### Frontend Environment Variables (.env.local)
 
 ```bash
-# Frontend encryption key (exposed to browser)
-NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY=your_64_character_hex_string_here_frontend_key_secret
+# Frontend encryption key (exposed to browser - same as backend key)
+NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY=your_64_character_hex_string_here_shared_key_secret
 ```
 
 ## Key Generation
