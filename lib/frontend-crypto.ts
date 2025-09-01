@@ -1,0 +1,163 @@
+// Frontend encryption utilities
+// Note: This file should be used on the client side
+
+// Frontend encryption key (should be set in environment variables)
+const FRONTEND_ENCRYPTION_KEY = process.env.NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY;
+
+interface EncryptedPayload {
+  encryptedData: string;
+  iv: string;
+  tag: string;
+  salt: string;
+  timestamp: number;
+}
+
+/**
+ * Generate random hex string
+ */
+function generateRandomHex(length: number): string {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Simple HMAC-SHA256 implementation using Web Crypto API
+ */
+async function hmacSHA256(key: string, message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(key);
+  const messageData = encoder.encode(message);
+  
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  
+  const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+  return Array.from(new Uint8Array(signature), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Simple PBKDF2 implementation using Web Crypto API
+ */
+async function pbkdf2(password: string, salt: string, iterations: number): Promise<ArrayBuffer> {
+  const encoder = new TextEncoder();
+  const passwordData = encoder.encode(password);
+  const saltData = encoder.encode(salt);
+  
+  const baseKey = await crypto.subtle.importKey(
+    'raw',
+    passwordData,
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  
+  return await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: saltData,
+      iterations: iterations,
+      hash: 'SHA-256'
+    },
+    baseKey,
+    256
+  );
+}
+
+/**
+ * Encrypt payload for secure transmission to backend
+ * Uses Web Crypto API for browser compatibility
+ */
+export async function encryptPayload(data: any): Promise<EncryptedPayload> {
+  if (!FRONTEND_ENCRYPTION_KEY) {
+    throw new Error('Frontend encryption key not configured');
+  }
+
+  const timestamp = Date.now();
+  const salt = generateRandomHex(32);
+  
+  // Generate timestamp salt for additional security
+  const timestampSalt = await hmacSHA256(FRONTEND_ENCRYPTION_KEY, timestamp.toString());
+  
+  // Add timestamp and salt to data for additional security
+  const dataWithSalt = {
+    ...data,
+    _timestamp: timestamp,
+    _salt: timestampSalt
+  };
+
+  const jsonData = JSON.stringify(dataWithSalt);
+  
+  // Generate random IV
+  const iv = generateRandomHex(16);
+  
+  // Derive key using PBKDF2
+  const derivedKeyBuffer = await pbkdf2(FRONTEND_ENCRYPTION_KEY, salt, 100000);
+  
+  // For demo purposes, we'll use a simple XOR cipher with the derived key
+  // In production, you should use a proper encryption library
+  const encoder = new TextEncoder();
+  const dataBytes = encoder.encode(jsonData);
+  const keyBytes = new Uint8Array(derivedKeyBuffer);
+  
+  // Simple XOR encryption (NOT SECURE - use proper encryption in production)
+  const encrypted = new Uint8Array(dataBytes.length);
+  for (let i = 0; i < dataBytes.length; i++) {
+    encrypted[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  const encryptedHex = Array.from(encrypted, byte => byte.toString(16).padStart(2, '0')).join('');
+  
+  // Generate authentication tag (HMAC)
+  const tag = await hmacSHA256(Array.from(keyBytes, byte => byte.toString(16).padStart(2, '0')).join(''), encryptedHex);
+
+  return {
+    encryptedData: encryptedHex,
+    iv: iv,
+    tag: tag,
+    salt: salt,
+    timestamp: timestamp
+  };
+}
+
+/**
+ * Example usage for API calls
+ */
+export async function makeEncryptedRequest(endpoint: string, data: any, options: RequestInit = {}) {
+  try {
+    const encryptedPayload = encryptPayload(data);
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      body: JSON.stringify({
+        encryptedPayload: encryptedPayload
+      }),
+      ...options
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Encrypted request failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Validate encryption configuration
+ */
+export function validateFrontendCryptoConfig(): boolean {
+  if (!FRONTEND_ENCRYPTION_KEY || FRONTEND_ENCRYPTION_KEY.length < 32) {
+    console.error('NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY must be at least 32 characters');
+    return false;
+  }
+  return true;
+}

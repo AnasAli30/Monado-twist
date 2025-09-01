@@ -3,6 +3,7 @@ import { useAccount } from "wagmi";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchWithVerification } from "@/utils/keyVerification";
+import { safePost, handleApiError } from "@/utils/api-helpers";
 interface EnvelopeRewardProps {
   setClaimed: Dispatch<SetStateAction<boolean>>;
 }
@@ -18,14 +19,16 @@ export function EnvelopeReward({ setClaimed }: EnvelopeRewardProps) {
 
   useEffect(() => {
     if (isConnected && address && fid) {
-      fetch("/api/check-envelope", {
-        method: "POST",
-        body: JSON.stringify({ fid }),
-        headers: { "Content-Type": "application/json" },
-      })
-        .then((res) => res.json())
+      safePost("/api/check-envelope", { fid })
         .then((data) => {
-          if (!data.claimed) setShowEnvelope(true);
+          if (data && !data.claimed) {
+            setShowEnvelope(true);
+          }
+        })
+        .catch((error) => {
+          const errorMessage = handleApiError(error, 'Check envelope');
+          console.error(errorMessage);
+          // Optionally show user-friendly error message
         });
     }
   }, [isConnected, address, fid]);

@@ -6,7 +6,7 @@ const PRIVATE_KEY = process.env.ENVELOPE_PRIVATE_KEY!;
 const PROVIDER_URL = process.env.MONAD_RPC_URL!;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   const { to, amount, fid ,name} = req.body
   if (!to || !amount) return res.status(400).json({ error: 'Missing params' });
   if(amount > 0.11) return res.status(400).json({ error: 'Amount must be less than 0.1' });

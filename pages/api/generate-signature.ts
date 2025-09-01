@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import Pusher from 'pusher';
 import { connectToDatabase } from '@/lib/mongodb';
+import { decryptPayload, validateCryptoConfig } from '@/lib/crypto-utils';
 
 const SERVER_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY_1;
 
@@ -328,7 +329,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl } = req.body;
+    // Validate crypto configuration on first request
+    const cryptoValidation = validateCryptoConfig();
+    if (!cryptoValidation.isValid) {
+      console.log("Crypto configuration error:", cryptoValidation.errors);
+      return res.status(500).json({ error: 'Internal error' });
+    }
+
+    // Check if payload is encrypted
+    let decryptedData;
+    if (req.body.encryptedPayload) {
+      try {
+        const decryptResult = decryptPayload(req.body.encryptedPayload);
+        decryptedData = decryptResult.data;
+        console.log("Payload successfully decrypted for signature request");
+      } catch (decryptError) {
+        console.log("Failed to decrypt payload:", decryptError);
+        trackForbiddenAttempt(cleanIP);
+        return res.status(400).json({ error: 'Bad request' });
+      }
+    } else {
+      // Fallback to unencrypted payload (for backward compatibility during transition)
+      decryptedData = req.body;
+      console.log("Processing unencrypted payload (deprecated)");
+    }
+
+    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl } = decryptedData;
     console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl });
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 import { connectToDatabase } from '@/lib/mongodb';
 import Pusher from 'pusher';
+import { decryptPayload, validateCryptoConfig } from '@/lib/crypto-utils';
 
 // Array of private keys for multiple wallets
 const PRIVATE_KEYS = [
@@ -205,7 +206,32 @@ console.log("Forbidden",cleanIP)
   }
 
   try {
-    const { to, amount, fid, pfpUrl, randomKey, fusedKey } = req.body;
+    // Validate crypto configuration on first request
+    const cryptoValidation = validateCryptoConfig();
+    if (!cryptoValidation.isValid) {
+      console.log("Crypto configuration error:", cryptoValidation.errors);
+      return res.status(500).json({ error: 'Internal error' });
+    }
+
+    // Check if payload is encrypted
+    let decryptedData;
+    if (req.body.encryptedPayload) {
+      try {
+        const decryptResult = decryptPayload(req.body.encryptedPayload);
+        decryptedData = decryptResult.data;
+        console.log("Payload successfully decrypted for win request");
+      } catch (decryptError) {
+        console.log("Failed to decrypt payload:", decryptError);
+        trackForbiddenAttempt(cleanIP);
+        return res.status(400).json({ error: 'Bad request' });
+      }
+    } else {
+      // Fallback to unencrypted payload (for backward compatibility during transition)
+      decryptedData = req.body;
+      console.log("Processing unencrypted payload (deprecated)");
+    }
+
+    const { to, amount, fid, pfpUrl, randomKey, fusedKey } = decryptedData;
 
     // Verify request authenticity
     if (!verifyRequest(randomKey, fusedKey)) {
@@ -226,15 +252,43 @@ console.log("Forbidden",cleanIP)
       console.log("Invalid parameter types",to,amount,fid)
       return res.status(400).json({ error: 'Bad request' });
     }
+
+    // Input sanitization - validate amount format
+    const amountStr = amount.toString().trim();
+    if (!/^\d+(\.\d{1,18})?$/.test(amountStr)) {
+      console.log("Invalid amount format", amountStr);
+      return res.status(400).json({ error: 'Bad request' });
+    }
+
+    // Validate amount precision (max 18 decimal places)
+    const decimalPlaces = amountStr.includes('.') ? amountStr.split('.')[1].length : 0;
+    if (decimalPlaces > 18) {
+      console.log("Amount has too many decimal places", decimalPlaces);
+      return res.status(400).json({ error: 'Bad request' });
+    }
     
-    // Validate amounts with strict limits
-    if (amount > 0.01 || amount <= 0) {
-      console.log("Invalid amount",amount)
+    // Validate amounts with strict limits and exact values for MON
+    const validMonAmounts = [0.01, 0.03, 0.05, 0.07, 0.09];
+    const isValidMonAmount = validMonAmounts.includes(amount);
+    
+    if (!isValidMonAmount) {
+      console.log("Invalid MON amount", amount);
       return res.status(400).json({ error: 'Bad request' });
     }
 
     // Connect to database
     const { db } = await connectToDatabase();
+    
+    // Check if this win has already been processed (replay attack protection)
+    const existingWin = await db.collection('winnings').findOne({ 
+      fid: fid,
+      randomKey: randomKey 
+    });
+    
+    if (existingWin) {
+      console.log("Win already processed", fid, randomKey);
+      return res.status(400).json({ error: 'Win already processed' });
+    }
     
     // Check if user exists
     const user = await db.collection('monad-users').findOne({ fid: fid });
@@ -242,12 +296,6 @@ console.log("Forbidden",cleanIP)
       console.log("User not found",fid)
       return res.status(404).json({ error: 'Bad request' });
     }
-
-    // Check if user has shared spin
-    // if (!user.lastShareSpin) {
-    //   console.log("Share requirement not met",fid)
-    //   return res.status(400).json({ error: 'Share requirement not met' });
-    // }
 
     // Check if user has spins left
     if (user.spinsLeft <= 0) {
@@ -265,8 +313,20 @@ console.log("Forbidden",cleanIP)
     const wallet = getRandomWallet();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
 
-    // Convert amount to wei
-    const amountInWei = ethers.parseEther(amount.toString());
+    // Convert amount to wei with validation
+    let amountInWei;
+    try {
+      amountInWei = ethers.parseEther(amountStr);
+      
+      // Validate the converted amount is reasonable
+      if (amountInWei <= BigInt(0)) {
+        console.log("Invalid wei amount", amountInWei.toString());
+        return res.status(400).json({ error: 'Bad request' });
+      }
+    } catch (error) {
+      console.log("Error converting amount to wei", error);
+      return res.status(400).json({ error: 'Bad request' });
+    }
 
     // Send transaction
     const tx = await contract.depositFor(to, amountInWei, { value: amountInWei });
@@ -276,13 +336,14 @@ console.log("success",user,amount)
     // Save winning record to MongoDB with enhanced security tracking
     await db.collection('winnings').insertOne({
       address: to,
-      amount: parseFloat(amount.toString()),
+      amount: parseFloat(amountStr),
       fid: fid,
+      randomKey: randomKey, // Store for replay protection
       timestamp: new Date(),
       name: user?.name,
       txHash: tx.hash,
       walletAddress: wallet.address,
-      ipAddress: cleanIP, // We're already using the clean IP
+      ipAddress: cleanIP,
       userAgent: req.headers['user-agent'] || 'unknown',
       securityChecks: {
         isKnownIP: Boolean(await db.collection('known-users').findOne({ ipAddress: cleanIP })),
