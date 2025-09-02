@@ -865,31 +865,31 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       setResult("Failed to open mini app.");
     }
   };
-  // const handleOpenMiniApp = async () => {
-  //   try {
-  //     await sdk.actions.openMiniApp({
-  //       url: "https://farcaster.xyz/~/mini-apps/launch?domain=monad-realm-mini-app.vercel.app"
-  //     });
-  //     if (!timeUntilMiniAppOpen && fid) {
-  //       const res = await fetchWithVerification('/api/spin', {
-  //         method: 'POST',
-  //         body: JSON.stringify({ fid, mode: "miniAppOpen" }),
-  //         headers: { 'Content-Type': 'application/json' }
-  //       });
-  //       const data = await res.json();
-  //       if (res.ok) {
-  //         setSpinsLeft(data.spinsLeft);
-  //         setResult("You got 2 extra spins for opening the mini app!");
-  //         setTimeUntilMiniAppOpen('3h 0m');
-  //       } else {
-  //         setResult(data.error || "Failed to add spins.");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setResult("Failed to open mini app.");
-  //   }
-  // };
+  const handleOpenMiniApp = async () => {
+    try {
+      await sdk.actions.openMiniApp({
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=base-jump-five.vercel.app"
+      });
+      if (!timeUntilMiniAppOpen && fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "miniAppOpen" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 2 extra spins for opening the mini app!");
+          setTimeUntilMiniAppOpen('3h 0m');
+        } else {
+          setResult(data.error || "Failed to add spins.");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setResult("Failed to open mini app.");
+    }
+  };
   const handleOpenMiniApp1 = async () => {
     try {
       await sdk.actions.openMiniApp({
