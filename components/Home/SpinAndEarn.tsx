@@ -840,31 +840,31 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3', '/audio/lose-3.mp3', '/audio/lose-4.mp3', '/audio/lose-5.mp3', '/audio/lose-6.mp3' , '/audio/lose-7.mp3'];
 
   // Handlers for GetSpins
-  const handleOpenMiniApp = async () => {
-    try {
-      await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=wagmi-blaster.vercel.app"
-      });
-      if (!timeUntilMiniAppOpen && fid) {
-        const res = await fetchWithVerification('/api/spin', {
-          method: 'POST',
-          body: JSON.stringify({ fid, mode: "miniAppOpen" }),
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setSpinsLeft(data.spinsLeft);
-          setResult("You got 2 extra spins for opening the mini app!");
-          setTimeUntilMiniAppOpen('3h 0m');
-        } else {
-          setResult(data.error || "Failed to add spins.");
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      setResult("Failed to open mini app.");
-    }
-  };
+  // const handleOpenMiniApp = async () => {
+  //   try {
+  //     await sdk.actions.openMiniApp({
+  //       url: "https://farcaster.xyz/~/mini-apps/launch?domain=wagmi-blaster.vercel.app"
+  //     });
+  //     if (!timeUntilMiniAppOpen && fid) {
+  //       const res = await fetchWithVerification('/api/spin', {
+  //         method: 'POST',
+  //         body: JSON.stringify({ fid, mode: "miniAppOpen" }),
+  //         headers: { 'Content-Type': 'application/json' }
+  //       });
+  //       const data = await res.json();
+  //       if (res.ok) {
+  //         setSpinsLeft(data.spinsLeft);
+  //         setResult("You got 2 extra spins for opening the mini app!");
+  //         setTimeUntilMiniAppOpen('3h 0m');
+  //       } else {
+  //         setResult(data.error || "Failed to add spins.");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setResult("Failed to open mini app.");
+  //   }
+  // };
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
