@@ -111,7 +111,16 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const minYAKI = BigInt("500000000000000000");
         const maxYAKI = BigInt("2500000000000000000");
         const isValidYAKI = bigAmount >= minYAKI && bigAmount <= maxYAKI;
-        console.log(`YAKI validation: ${isValidYAKI}, amount: ${bigAmount.toString()}`);
+        console.log(`YAKI validation: ${isValidYAKI}, amount: ${bigAmount.toString()}, range: ${minYAKI.toString()} - ${maxYAKI.toString()}`);
+        
+        // Additional debugging for YAKI
+        if (!isValidYAKI) {
+          console.log(`YAKI validation failed: amount ${bigAmount.toString()} is outside valid range`);
+          console.log(`Expected range: ${minYAKI.toString()} to ${maxYAKI.toString()}`);
+          console.log(`Amount too small: ${bigAmount < minYAKI}`);
+          console.log(`Amount too large: ${bigAmount > maxYAKI}`);
+        }
+        
         return isValidYAKI;
         
       case "WBTC":
@@ -356,6 +365,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl } = decryptedData;
     console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl });
+    
+    // Additional logging for YAKI token requests
+    if (tokenName === "YAKI") {
+      console.log(`[YAKI] Request received:`, {
+        amount,
+        amountType: typeof amount,
+        amountString: amount.toString(),
+        tokenAddress,
+        userAddress
+      });
+    }
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
       console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey)
@@ -378,9 +398,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Verify amount is within expected range for the token type
     const isValidAmount = validateTokenAmount(tokenName, amount);
     if (!isValidAmount) {
-      console.log("Invalid token amount", {tokenName, amount});
+      console.log(`[${tokenName}] Invalid token amount validation failed`, {tokenName, amount, userAddress});
       trackForbiddenAttempt(cleanIP);
       return res.status(400).json({ error: 'Bad request' });
+    }
+
+    // Additional logging for YAKI token debugging
+    if (tokenName === "YAKI") {
+      console.log(`[YAKI] Request validated successfully:`, {
+        userAddress,
+        tokenAddress,
+        amount,
+        amountType: typeof amount,
+        amountString: amount.toString(),
+        expectedRange: "0.5 to 2.5 YAKI (18 decimals)",
+        expectedRangeWei: "500000000000000000 to 2500000000000000000"
+      });
     }
 
     // Verify the request authenticity

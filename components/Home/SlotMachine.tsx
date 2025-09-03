@@ -116,7 +116,9 @@ export function SlotMachine({
         const monValues = [0.01, 0.03, 0.05, 0.07, 0.09];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
-        return +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
+        const yakiAmount = +(Math.random() * (2.5 - 0.5) + 0.5).toFixed(3);
+        console.log(`[YAKI] Generated amount: ${yakiAmount}`);
+        return yakiAmount;
       case "WBTC":
         return +(Math.random() * (0.00001 - 0.000001) + 0.000001).toFixed(6);
       case "WSOL":
