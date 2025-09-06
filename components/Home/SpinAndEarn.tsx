@@ -15,7 +15,7 @@ import { parseEther, parseUnits } from 'viem';
 import { fetchWithVerification } from '@/utils/keyVerification';
 import { WinNotifications } from "./WinNotifications";
 import { GetSpins } from './GetSpins';
-import { SlotMachine } from './SlotMachine';
+// SlotMachine component removed
 import { NoSpinsPopup } from './NoSpinsPopup';
 
 // PERFORMANCE OPTIMIZATION: Debounce utility function
@@ -530,10 +530,11 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
+    let spinToken: string | null = null; // Declare spinToken outside the if block
     if (res.ok) {
       setSpinsLeft(data.spinsLeft);
       // Store the spin token for win verification
-      const spinToken = data.spinToken;
+      spinToken = data.spinToken;
       const newRotation = getRandomSpin();
       setRotation(prev => prev + newRotation);
 
@@ -577,7 +578,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         setTotalWins(prev => prev + 1);
         setResult(`🎉 You won ${wonValue} ${wonSegment.text}!`);
         setIsSpinning(false);
-        if (wonValue > 0 && address) {
+        if (wonValue > 0 && address && spinToken) {
           if (wonSegment.text === "MON") {
             setTotalMonWon(prev => prev + wonValue);
             // Keep existing MON token handling
@@ -1959,22 +1960,6 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       
       
         </>
-      ) : view === 'slots' ? (
-        <SlotMachine
-          fid={fid}
-          spinsLeft={spinsLeft}
-          setSpinsLeft={setSpinsLeft}
-          setResult={setResult}
-          isResultPopupVisible={isResultPopupVisible}
-          setIsResultPopupVisible={setIsResultPopupVisible}
-          isMuted={isMuted}
-          context={context}
-          actions={actions}
-          switchChain={switchChain}
-          chainId={chainId}
-          isConnected={isConnected}
-          address={address}
-        />
       ) : view === 'wallet' ? (
         <InnerWallet />
       ) : view === 'leaderboard' ? (

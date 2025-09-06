@@ -241,6 +241,9 @@ console.log("Forbidden",cleanIP)
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
+    // Connect to database early for spin token verification
+    const { db } = await connectToDatabase();
+
     // Verify spin token exists and is valid
     if (!spinToken) {
       console.log("Missing spin token", fid);
@@ -309,8 +312,7 @@ console.log("Forbidden",cleanIP)
       return res.status(400).json({ error: 'Bad request' });
     }
 
-    // Connect to database
-    const { db } = await connectToDatabase();
+    // Database already connected above for spin token verification
     
     // Check if this win has already been processed (replay attack protection)
     const existingWin = await db.collection('winnings').findOne({ 
