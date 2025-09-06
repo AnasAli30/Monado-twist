@@ -192,6 +192,8 @@ export function SlotMachine({
     const data = await res.json();
     if (res.ok) {
       setSpinsLeft(data.spinsLeft);
+      // Store the spin token for win verification
+      const spinToken = data.spinToken;
 
       // Generate new reel symbols
       const newReels = [
@@ -236,7 +238,7 @@ export function SlotMachine({
           if (address && winResult.symbol.name !== "MON") {
             handleTokenClaim(winResult.symbol.name, tokenAmount);
           } else if (address && winResult.symbol.name === "MON") {
-            handleMONClaim(tokenAmount);
+            handleMONClaim(tokenAmount, spinToken);
           }
         } else {
           setResult("😢 No win this time. Try again!");
@@ -251,7 +253,7 @@ export function SlotMachine({
   };
 
   // Handle MON token claim
-  const handleMONClaim = async (amount: number) => {
+  const handleMONClaim = async (amount: number, spinToken: string) => {
     try {
       await fetchWithVerification('/api/win', {
         method: 'POST',
@@ -259,7 +261,8 @@ export function SlotMachine({
           to: address,
           amount: amount,
           fid,
-          pfpUrl: context?.user?.pfpUrl
+          pfpUrl: context?.user?.pfpUrl,
+          spinToken: spinToken
         }),
         headers: { 'Content-Type': 'application/json' }
       });

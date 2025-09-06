@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../lib/mongo';
 import Pusher from 'pusher';
 import { ethers } from 'ethers';
+import crypto from 'crypto';
 
 const SPINS_PER_DAY = 10;
 const SPINS_PER_PURCHASE = 15;
@@ -347,14 +348,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const updatedUser = await users.findOne({ fid });
   const actualSpinsLeft = updatedUser?.spinsLeft ?? 0;
 
-  // Log the spin for audit purposes
+  // Generate a unique spin token for this spin
+  const spinToken = crypto.randomUUID();
+  const spinExpiry = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes expiry
+
+  // Log the spin for audit purposes with spin token
   await db.collection('spin-history').insertOne({
     fid,
     action: "spin",
     timestamp: new Date(),
-    remainingSpins: actualSpinsLeft
+    remainingSpins: actualSpinsLeft,
+    spinToken: spinToken,
+    spinExpiry: spinExpiry
   });
 
-  // Return the actual updated spins left value
-  res.status(200).json({ spinsLeft: actualSpinsLeft });
+  // Return the actual updated spins left value and spin token
+  res.status(200).json({ 
+    spinsLeft: actualSpinsLeft,
+    spinToken: spinToken 
+  });
 }

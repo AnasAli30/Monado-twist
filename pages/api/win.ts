@@ -231,13 +231,45 @@ console.log("Forbidden",cleanIP)
       console.log("Processing unencrypted payload (deprecated)");
     }
 
-    const { to, amount, fid, pfpUrl, randomKey, fusedKey } = decryptedData;
+    const { to, amount, fid, pfpUrl, randomKey, fusedKey, spinToken } = decryptedData;
 
     // Verify request authenticity
     if (!verifyRequest(randomKey, fusedKey)) {
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
       console.log("Invalid request signature",randomKey,fusedKey) 
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Verify spin token exists and is valid
+    if (!spinToken) {
+      console.log("Missing spin token", fid);
+      trackForbiddenAttempt(cleanIP);
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Check if spin token exists in recent spin history
+    const spinRecord = await db.collection('spin-history').findOne({
+      fid: fid,
+      spinToken: spinToken,
+      action: "spin",
+      spinExpiry: { $gt: new Date() } // Token must not be expired
+    });
+
+    if (!spinRecord) {
+      console.log("Invalid or expired spin token", fid, spinToken);
+      trackForbiddenAttempt(cleanIP);
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Check if this spin token has already been used for a win
+    const existingWinWithToken = await db.collection('winnings').findOne({
+      spinToken: spinToken
+    });
+
+    if (existingWinWithToken) {
+      console.log("Spin token already used for win", fid, spinToken);
+      trackForbiddenAttempt(cleanIP);
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -298,11 +330,8 @@ console.log("Forbidden",cleanIP)
       return res.status(404).json({ error: 'Bad request' });
     }
 
-    // Check if user has spins left
-    if (user.spinsLeft <= 0) {
-      console.log("No spins left",fid,user)
-      return res.status(400).json({ error: 'Bad request' });
-    }
+    // Note: We don't check spins left here anymore since the spin token verification
+    // already ensures that a valid spin occurred. The spin count is decremented in spin.ts
 
     // Validate Ethereum address format
     if (!ethers.isAddress(to)) {
@@ -340,6 +369,7 @@ console.log("success",user,amount)
       amount: parseFloat(amountStr),
       fid: fid,
       randomKey: randomKey, // Store for replay protection
+      spinToken: spinToken, // Store spin token to prevent reuse
       timestamp: new Date(),
       name: user?.name,
       txHash: tx.hash,

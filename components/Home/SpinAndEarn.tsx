@@ -532,6 +532,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     const data = await res.json();
     if (res.ok) {
       setSpinsLeft(data.spinsLeft);
+      // Store the spin token for win verification
+      const spinToken = data.spinToken;
       const newRotation = getRandomSpin();
       setRotation(prev => prev + newRotation);
 
@@ -585,7 +587,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 to: address,
                 amount: wonValue,
                 fid,
-                pfpUrl: context?.user?.pfpUrl
+                pfpUrl: context?.user?.pfpUrl,
+                spinToken: spinToken
               }),
               headers: { 'Content-Type': 'application/json' }
             });
