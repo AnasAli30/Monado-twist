@@ -77,6 +77,24 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen2}</span>            )}
           </button>
         </div> */}
+            <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/arb.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play game and Earn upto 100 $ARB</div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp}
+            disabled={!!timeUntilMiniAppOpen}
+          >
+               {!timeUntilMiniAppOpen ? (
+              <span className="spin-badge1">+3 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen}</span>
+            )}
+            
+          </button>
+        </div>
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -94,27 +112,8 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             )}
           </button>
         </div>
-      <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <img src="images/arb.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play game and Earn upto 100 $ARB</div>
-          </div>
-          <button
-            className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp}
-            disabled={!!timeUntilMiniAppOpen}
-          >
-               {!timeUntilMiniAppOpen ? (
-              <span className="spin-badge1">+2 Spins</span>
-            ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen}</span>
-            )}
-            
-          </button>
-        </div>
+  
     
-
-
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <div className="get-spins-card-icon recast"><FaRetweet /></div>
