@@ -922,7 +922,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp2 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=flapbitrum.vercel.app"
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=base-jump-five.vercel.app"
       });
       if (!timeUntilMiniAppOpen2 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -933,7 +933,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         const data = await res.json();
         if (res.ok) {
           setSpinsLeft(data.spinsLeft);
-          setResult("You got 2 extra spins for opening IQ Checker!");
+          setResult("You got 2 extra spins for opening Base Jump!");
           setTimeUntilMiniAppOpen2('3h 0m');
         } else {
           setResult(data.error || "Failed to add spins.");

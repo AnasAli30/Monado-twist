@@ -44,23 +44,23 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
-     {/* <div className="get-spins-card">
+     <div className="get-spins-card">
           <div className="get-spins-card-header">
-            <img src="images/iq.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Check Your IQ and earn upto 4000 $DEGEN</div>
+            <img src="images/degen.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play Base Jump and earn upto 3500 $DEGEN</div>
           </div>
           <button
             className="get-spins-action-btn"
-            onClick={handleOpenMiniApp}
-            disabled={!!timeUntilMiniAppOpen}
+            onClick={handleOpenMiniApp2}
+            disabled={!!timeUntilMiniAppOpen2}
           >
-            {!timeUntilMiniAppOpen ? (
+            {!timeUntilMiniAppOpen2 ? (
               <span className="spin-badge">+2 Spins</span>
             ) : (
-              `Open mini app available in: ${timeUntilMiniAppOpen}`
+              `Open mini app available in: ${timeUntilMiniAppOpen2}`
             )}
           </button>
-        </div> */}
+        </div>
           {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />

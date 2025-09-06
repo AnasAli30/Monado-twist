@@ -71,7 +71,8 @@ const response = await fetchWithVerification('/api/win', {
     to: userAddress,
     amount: winAmount,
     fid: userId,
-    pfpUrl: profilePicUrl
+    pfpUrl: profilePicUrl,
+    spinToken: spinToken  // Security token from spin request
   }),
   headers: { 'Content-Type': 'application/json' }
 });
@@ -88,7 +89,8 @@ const response = await makeEncryptedRequest('/api/win', {
   to: userAddress,
   amount: winAmount,
   fid: userId,
-  pfpUrl: profilePicUrl
+  pfpUrl: profilePicUrl,
+  spinToken: spinToken  // Security token from spin request
 });
 ```
 
