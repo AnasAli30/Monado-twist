@@ -109,7 +109,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         // YAKI should be between 0.5 and 2.5 (18 decimals)
         // In smallest units: 500000000000000000 to 2500000000000000000
         const minYAKI = BigInt("500000000000000000");
-        const maxYAKI = BigInt("2500000000000000000");
+        const maxYAKI = BigInt("1200000000000000000");
         const isValidYAKI = bigAmount >= minYAKI && bigAmount <= maxYAKI;
         console.log(`YAKI validation: ${isValidYAKI}, amount: ${bigAmount.toString()}, range: ${minYAKI.toString()} - ${maxYAKI.toString()}`);
         
