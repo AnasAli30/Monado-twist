@@ -113,6 +113,7 @@ export function SpinAndEarn() {
   const [timeUntilMiniAppOpen, setTimeUntilMiniAppOpen] = useState<string>('');
   const [timeUntilMiniAppOpen1, setTimeUntilMiniAppOpen1] = useState<string>('');
   const [timeUntilMiniAppOpen2, setTimeUntilMiniAppOpen2] = useState<string>('');
+  const [timeUntilMiniAppOpen3, setTimeUntilMiniAppOpen3] = useState<string>('');
   const [hasFollowedX, setHasFollowedX] = useState(false);
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
@@ -935,6 +936,31 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           setSpinsLeft(data.spinsLeft);
           setResult("You got 2 extra spins for opening Base Jump!");
           setTimeUntilMiniAppOpen2('3h 0m');
+        } else {
+          setResult(data.error || "Failed to add spins.");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setResult("Failed to open mini app.");
+    }
+  };
+  const handleOpenMiniApp3 = async () => {
+    try {
+      await sdk.actions.openMiniApp({
+        url: "https://farcaster.xyz/~/mini-apps/launch?domain=flapbitrum.vercel.app"
+      });
+      if (!timeUntilMiniAppOpen3 && fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: "miniAppOpen3" }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult("You got 2 extra spins for opening Flapbitrum!");
+          setTimeUntilMiniAppOpen3('3h 0m');
         } else {
           setResult(data.error || "Failed to add spins.");
         }
@@ -1980,6 +2006,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           handleOpenMiniApp={handleOpenMiniApp}
           handleOpenMiniApp1={handleOpenMiniApp1}
           handleOpenMiniApp2={handleOpenMiniApp2}
+          handleOpenMiniApp3={handleOpenMiniApp3}
+          timeUntilMiniAppOpen3={timeUntilMiniAppOpen3}
           handleFollow={handleFollow}
           handleLikeRecast={handleLikeRecast}
           handleFollowX={handleFollowX}

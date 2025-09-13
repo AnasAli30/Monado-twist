@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
-                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2'].includes(mode)) {
+                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2', 'miniAppOpen3'].includes(mode)) {
     console.log("Invalid mode",req.body)
         return res.status(400).json({ error: 'Invalid mode' });
   }
@@ -296,6 +296,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     return res.status(200).json({ spinsLeft, lastMiniAppOpen2: now });
   }
+  if (mode === "miniAppOpen3") {
+    const lastMiniAppOpen3 = user?.lastMiniAppOpen3 ? new Date(user.lastMiniAppOpen3) : new Date(0);
+    if (now.getTime() - lastMiniAppOpen3.getTime() < 3 * 60 * 60 * 1000) {
+      // Not enough time has passed
+      const msLeft = 3 * 60 * 60 * 1000 - (now.getTime() - lastMiniAppOpen3.getTime());
+      console.log("MiniApp3 cooldown active",req.body)
+      return res.status(400).json({ 
+        error: "MiniApp3 cooldown active",
+        timeLeft: msLeft
+      });
+    }
+    spinsLeft += 1;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, lastMiniAppOpen3: now } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, lastMiniAppOpen3: now });
+  }
 
   if (checkOnly) {
     // Fetch fresh user data to get current spinsLeft
@@ -315,6 +334,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lastMiniAppOpen: currentUser?.lastMiniAppOpen,
       lastMiniAppOpen1: currentUser?.lastMiniAppOpen1,
       lastMiniAppOpen2: currentUser?.lastMiniAppOpen2,
+      lastMiniAppOpen3: currentUser?.lastMiniAppOpen3,
       follow: currentUser?.follow,
       likeAndRecast: currentUser?.likeAndRecast,
       envelopeClaimed: currentUser?.envelopeClaimed,
