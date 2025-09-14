@@ -228,6 +228,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (mode === "likeAndRecast") {
+    if(user?.likeAndRecast){
+      console.log("Already liked and recasted",req.body)
+      return res.status(400).json({ error: "lol" });
+    }
     spinsLeft += 1;
     await users.updateOne(
       { fid },
