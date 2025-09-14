@@ -48,58 +48,46 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
-         <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play Flapbitrum and Earn upto 50$ $USDC</div>
-          </div>
-          <button
-            className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp3}
-            disabled={!!timeUntilMiniAppOpen3}
-          >
-            {!timeUntilMiniAppOpen3 ? (
-              <span className="spin-badge1">+50$ $USDC / +2 Spins</span>
-            ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
-          </button>
-        </div>
-     <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <img src="images/degen.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play Base Jump and earn upto 3500 $DEGEN</div>
-          </div>
-          <button
-            className="get-spins-action-btn"
-            onClick={handleOpenMiniApp2}
-            disabled={!!timeUntilMiniAppOpen2}
-          >
-            {!timeUntilMiniAppOpen2 ? (
-              <span className="spin-badge">+2 Spins</span>
-            ) : (
-              `Open mini app available in: ${timeUntilMiniAppOpen2}`
-            )}
-          </button>
-        </div>
+        <div className="get-spins-card">
+  <div className="get-spins-card-header">
+    <img src="images/chaincrush.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
+    <div className="get-spins-card-title">
+      🎮 Play <b>Chain Crush</b> → Win up to <span style={{color: "#FFD700"}}>$50 Daily!</span>
+    </div>
+  </div>
+  <button
+    className="get-spins-action-btn"
+    onClick={handleOpenMiniApp1}
+    disabled={!!timeUntilMiniAppOpen1}
+  >
+    {!timeUntilMiniAppOpen1 ? (
+      <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
+    ) : (
+      `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
+    )}
+  </button>
+</div>
          
-            <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <img src="images/1.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play game and Earn upto 100 $ARB</div>
-          </div>
-          <button
-            className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp}
-            disabled={!!timeUntilMiniAppOpen}
-          >
-               {!timeUntilMiniAppOpen ? (
-              <span className="spin-badge1">+3 Spins</span>
-            ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen}</span>
-            )}
-            
-          </button>
-        </div>
+<div className="get-spins-card">
+  <div className="get-spins-card-header">
+    <img src="images/wagmi.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
+    <div className="get-spins-card-title">
+      🚀 Play Wagmi & Earn <span style={{color:"#FFD700"}}>up to $50 Daily</span> in $ARB/$PEPE
+    </div>
+  </div>
+  <button
+    className="get-spins-action-btn1"
+    onClick={handleOpenMiniApp}
+    disabled={!!timeUntilMiniAppOpen}
+  >
+    {!timeUntilMiniAppOpen ? (
+      <span className="spin-badge1">🔥 +3 Free Spins – Start Winning Now</span>
+    ) : (
+      <span style={{color:"black"}}>⏳ Opens in: {timeUntilMiniAppOpen}</span>
+    )}
+  </button>
+</div>
+{/* 
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -115,6 +103,23 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             ) : (
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen1}</span>
             )}
+          </button>
+        </div> */}
+
+        <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play Flapbitrum and Earn upto 50$ $USDC</div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp3}
+            disabled={!!timeUntilMiniAppOpen3}
+          >
+            {!timeUntilMiniAppOpen3 ? (
+              <span className="spin-badge1">+50$ $USDC / +2 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
           </button>
         </div>
   

@@ -215,7 +215,7 @@ export function SpinAndEarn() {
   // Show welcome popup on first visit
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasShownWelcome = localStorage.getItem('welcomePopupShown2');
+      const hasShownWelcome = localStorage.getItem('welcomePopupShown3');
       if (!hasShownWelcome) {
         setShowWelcomePopup(true);
       }
@@ -269,7 +269,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.01,0.005,0.001,0.002, 0.008];
+        const monValues = [0.1,0.05,0.01,0.02, 0.08];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (1 - 0.5) + 0.5).toFixed(4);
@@ -873,7 +873,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=arbjump.vercel.app"
+        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -898,7 +898,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp1 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/efPuNxgasRTJ/recess"
+        url: "https://farcaster.xyz/miniapps/djk3nS-wYTQu/chain-crush"
       });
       if (!timeUntilMiniAppOpen1 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1061,13 +1061,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown2', 'true');
+    localStorage.setItem('welcomePopupShown3', 'true');
     handleOpenMiniApp1();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown2', 'true');
+    localStorage.setItem('welcomePopupShown3', 'true');
   };
 
   return (
@@ -1135,39 +1135,64 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
       {/* Welcome Popup */}
       {showWelcomePopup && (
-        <div className="popup-overlay" onClick={handlePlayLater}>
-          <div className="popup-content welcome" onClick={(e) => e.stopPropagation()}>
-            <button className="popup-close-btn" onClick={handlePlayLater}>
-              &times;
-            </button>
-            <div className="popup-icon">
-              <FaDice style={{ color: '#FFD700', fontSize: '3.5rem' }} />
-            </div>
-            <div className="popup-message">
-              <h3 style={{ margin: '0 0 15px 0', fontSize: '1.4rem', fontWeight: '700', color: '#FFD700' }}>
-                Welcome to Monad TWIST! 🎰
-              </h3>
-              <p style={{ margin: '0 0 20px 0', fontSize: '1.1rem', lineHeight: '1.5' }}>
-                You can earn up to <strong style={{ color: '#FFD700' }}>150<img src="images/usdc.png" alt="" style={{ width: '40px', height: '40px',display:"inline-block"}} /> $USDC</strong> by just playing the game!
-              </p>
-            </div>
-            <div className="popup-actions">
-              <button
-                className="popup-action-btn play-now"
-                onClick={handlePlayNow}
-              >
-                Play Now / +5 Spins
-              </button>
-              <button
-                className="popup-action-btn play-later"
-                onClick={handlePlayLater}
-              >
-                Play Later
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="popup-overlay" onClick={handlePlayLater}>
+    <div className="popup-content welcome" onClick={(e) => e.stopPropagation()}>
+      <button className="popup-close-btn" onClick={handlePlayLater}>
+        &times;
+      </button>
+
+      <div className="popup-icon">
+        <FaDice style={{ color: '#FFD700', fontSize: '4rem' }} />
+      </div>
+
+      <div className="popup-message">
+        <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
+          🎉 Welcome to <span style={{color:"#fff"}}>Monad TWIST</span> 🎰
+        </h3>
+        <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
+          Spin, Match & Win! 💎  
+          Earn up to <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
+            100 <img src="images/chaincrush.jpg" alt="" style={{ width: '35px', height: '35px', display: 'inline-block', verticalAlign: 'middle' }} /> $USDC
+          </strong> daily by just playing <b>Chain Crush</b>.
+        </p>
+      </div>
+
+      <div className="popup-actions">
+        <button
+          className="popup-action-btn play-now"
+          style={{
+            background: 'linear-gradient(90deg, #ff9900, #ff0000)',
+            color: '#fff',
+            fontWeight: '700',
+            fontSize: '1.1rem',
+            padding: '12px 18px',
+            borderRadius: '10px',
+            boxShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
+            animation: 'pulse 1.5s infinite'
+          }}
+          onClick={handlePlayNow}
+        >
+          🚀 Play Now & Claim +5 Free Spins
+        </button>
+
+        <button
+          className="popup-action-btn play-later"
+          style={{
+            background: '#f2f2f2',
+            color: '#444',
+            fontWeight: '600',
+            padding: '10px 16px',
+            borderRadius: '8px'
+          }}
+          onClick={handlePlayLater}
+        >
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       {/* PERFORMANCE OPTIMIZATION: Disabled WinNotifications - heavy Pusher connections */}
       {/* <WinNotifications /> */}
       <style>{`
