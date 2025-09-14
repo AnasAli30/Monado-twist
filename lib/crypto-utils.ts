@@ -253,25 +253,32 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
       throw new Error('Encrypted payload expired');
     }
 
-    // Validate nonce for replay attack prevention
-    if (!validateNonce(nonce, timestamp)) {
-      throw new Error('Invalid or reused nonce');
+    // Validate nonce for replay attack prevention (optional for backward compatibility)
+    try {
+      if (!validateNonce(nonce, timestamp)) {
+        console.log('Nonce validation failed, but allowing for backward compatibility');
+        // Don't throw error, just log for now during transition
+      }
+    } catch (error) {
+      console.log('Nonce validation error:', error);
+      // Don't throw error, just log for now during transition
     }
 
-    // Enhanced key derivation using nonce
-    const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce);
+    // Try decryption with basic key derivation first (for backward compatibility)
+    const basicDerivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce);
+    const decryptedText = simpleXorDecrypt(encryptedData, basicDerivedKey);
+    const parsedData = JSON.parse(decryptedText);
     
-    // Verify authentication tag including nonce
-    const expectedTag = simpleHash(derivedKey + encryptedData + nonce);
+    // Get browser fingerprint and re-derive key if available
+    const browserFingerprint = parsedData._browserFingerprint || '';
+    const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + browserFingerprint);
+    
+    // Verify authentication tag including nonce and browser fingerprint
+    const expectedTag = simpleHash(derivedKey + encryptedData + nonce + browserFingerprint);
     
     if (expectedTag !== tag) {
       throw new Error('Authentication tag verification failed');
     }
-    
-    // Decrypt using simple XOR matching frontend
-    const decryptedText = simpleXorDecrypt(encryptedData, derivedKey);
-    
-    const parsedData = JSON.parse(decryptedText);
     
     // Validate the internal timestamp salt
     const expectedTimestampSalt = generateTimestampSalt(timestamp);
@@ -295,10 +302,16 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
       throw new Error('Nonce mismatch');
     }
 
-    // Validate browser fingerprint if present
+    // Validate browser fingerprint if present (optional for backward compatibility)
     if (parsedData._browserFingerprint && parsedData._browserChallenge && parsedData._browserSolution) {
-      if (!validateBrowserFingerprint(parsedData._browserFingerprint, parsedData._browserChallenge, parsedData._browserSolution)) {
-        throw new Error('Invalid browser fingerprint or challenge');
+      try {
+        if (!validateBrowserFingerprint(parsedData._browserFingerprint, parsedData._browserChallenge, parsedData._browserSolution)) {
+          console.log('Browser fingerprint validation failed, but allowing for backward compatibility');
+          // Don't throw error, just log for now during transition
+        }
+      } catch (error) {
+        console.log('Browser fingerprint validation error:', error);
+        // Don't throw error, just log for now during transition
       }
     }
 

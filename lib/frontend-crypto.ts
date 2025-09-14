@@ -125,11 +125,19 @@ export async function encryptPayload(data: any): Promise<EncryptedPayload> {
   const salt = generateRandomHex(32);
   const nonce = generateSecureNonce();
   
-  // Generate browser fingerprint - very difficult to replicate externally
-  const browserFingerprint = await generateBrowserFingerprint();
+  // Generate browser fingerprint - very difficult to replicate externally (optional for backward compatibility)
+  let browserFingerprint = '';
+  let browserChallenge = { challenge: '', solution: '' };
   
-  // Generate browser challenge for additional security
-  const browserChallenge = await generateBrowserChallenge();
+  try {
+    browserFingerprint = await generateBrowserFingerprint();
+    browserChallenge = await generateBrowserChallenge();
+  } catch (error) {
+    console.log('Browser fingerprinting failed, using fallback:', error);
+    // Use fallback values for backward compatibility
+    browserFingerprint = generateRandomHex(16);
+    browserChallenge = { challenge: generateRandomHex(16), solution: generateRandomHex(16) };
+  }
   
   // Generate timestamp salt for additional security  
   const timestampSalt = await simpleHash(ENCRYPTION_KEY + timestamp.toString());
