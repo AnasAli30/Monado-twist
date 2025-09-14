@@ -1232,7 +1232,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 <span className="crown-icon">👑</span>
               </div>
               <h2 className="loyal-user-title">Loyal User Detected!</h2>
-              <p className="loyal-user-subtitle">You're a valued member of our community</p>
+              <p className="loyal-user-subtitle">You&apos;re a valued member of our community</p>
             </div>
 
             <div className="boost-offer">
@@ -1242,9 +1242,25 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               </div>
               <h3 className="boost-title">Limited Time Offer!</h3>
               <p className="boost-description">
-                Get <strong>20x enhanced rewards</strong> on your next spins! 
+                Complete the task below to unlock <strong>20x enhanced rewards</strong> on your next spins! 
                 This exclusive boost is only available for our most loyal users.
               </p>
+            </div>
+
+            <div className="loyal-user-task">
+              <div className="task-header">
+                <span className="task-icon">🎯</span>
+                <h4 className="task-title">Complete This Task</h4>
+              </div>
+              <div className="task-content">
+                <div className="task-item">
+                  <span className="task-checkbox">☐</span>
+                  <span className="task-text">Add Mini App: <strong>Chain Crush</strong></span>
+                </div>
+                <p className="task-description">
+                   open the Chain Crush mini app and add it to unlock your 20x boost reward!
+                </p>
+              </div>
             </div>
 
             <div className="loyal-user-features">
@@ -1264,11 +1280,11 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
             <div className="popup-actions">
               <button
-                className="popup-action-btn claim-boost"
-                onClick={handleClaimBoost}
+                className="popup-action-btn complete-task"
+                onClick={handlePlayNow}
               >
-                <span className="btn-icon">🚀</span>
-                Claim 20x Boost Now
+                <span className="btn-icon">🎮</span>
+                Complete Task & Get 20x Boost
               </button>
 
               <button
@@ -1976,9 +1992,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         .popup-content.loyal-user {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           border-radius: 24px;
-          padding: 32px 24px;
-          max-width: 400px;
+          padding: 24px 20px;
+          max-width: 380px;
           width: 90%;
+          max-height: 85vh;
           text-align: center;
           position: relative;
           box-shadow: 
@@ -1986,6 +2003,29 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             0 0 0 1px rgba(255, 255, 255, 0.1),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
           animation: loyalPopupSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+          overflow-y: auto;
+          overflow-x: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Custom scrollbar for the popup */
+        .popup-content.loyal-user::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .popup-content.loyal-user::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+        }
+
+        .popup-content.loyal-user::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, #FFD700, #FFA500);
+          border-radius: 3px;
+        }
+
+        .popup-content.loyal-user::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(135deg, #FFA500, #FFD700);
         }
 
         @keyframes loyalPopupSlideIn {
@@ -2000,15 +2040,16 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .loyal-user-header {
-          margin-bottom: 24px;
+          margin-bottom: 20px;
+          flex-shrink: 0;
         }
 
         .loyal-user-crown {
-          margin-bottom: 16px;
+          margin-bottom: 12px;
         }
 
         .crown-icon {
-          font-size: 3rem;
+          font-size: 2.5rem;
           display: inline-block;
           animation: crownBounce 2s ease-in-out infinite;
           filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
@@ -2024,43 +2065,46 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .loyal-user-title {
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           font-weight: 900;
           color: #fff;
-          margin: 0 0 8px 0;
+          margin: 0 0 6px 0;
           text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
           background: linear-gradient(45deg, #FFD700, #FFA500);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          line-height: 1.2;
         }
 
         .loyal-user-subtitle {
-          font-size: 1rem;
+          font-size: 0.9rem;
           color: rgba(255, 255, 255, 0.9);
           margin: 0;
           font-weight: 500;
+          line-height: 1.3;
         }
 
         .boost-offer {
           background: rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          padding: 24px;
-          margin-bottom: 24px;
+          border-radius: 16px;
+          padding: 18px;
+          margin-bottom: 18px;
           border: 2px solid rgba(255, 215, 0, 0.3);
           backdrop-filter: blur(10px);
+          flex-shrink: 0;
         }
 
         .boost-badge {
           display: inline-flex;
           flex-direction: column;
           align-items: center;
-          margin-bottom: 16px;
-          padding: 16px;
+          margin-bottom: 12px;
+          padding: 12px;
           background: linear-gradient(135deg, #FFD700, #FFA500);
           border-radius: 50%;
-          width: 80px;
-          height: 80px;
+          width: 70px;
+          height: 70px;
           justify-content: center;
           box-shadow: 
             0 0 30px rgba(255, 215, 0, 0.6),
@@ -2084,14 +2128,14 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .boost-number {
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           font-weight: 900;
           color: #000;
           line-height: 1;
         }
 
         .boost-text {
-          font-size: 0.7rem;
+          font-size: 0.6rem;
           font-weight: 700;
           color: #000;
           letter-spacing: 1px;
@@ -2099,18 +2143,19 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .boost-title {
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           font-weight: 800;
           color: #fff;
-          margin: 0 0 12px 0;
+          margin: 0 0 8px 0;
           text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          line-height: 1.2;
         }
 
         .boost-description {
-          font-size: 1rem;
+          font-size: 0.9rem;
           color: rgba(255, 255, 255, 0.9);
           margin: 0;
-          line-height: 1.5;
+          line-height: 1.4;
         }
 
         .boost-description strong {
@@ -2118,43 +2163,117 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           font-weight: 700;
         }
 
+        .loyal-user-task {
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 18px;
+          margin-bottom: 18px;
+          border: 2px solid rgba(255, 215, 0, 0.2);
+          backdrop-filter: blur(5px);
+          flex-shrink: 0;
+        }
+
+        .task-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .task-icon {
+          font-size: 1.2rem;
+        }
+
+        .task-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #fff;
+          margin: 0;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-content {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .task-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 12px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-checkbox {
+          font-size: 1.2rem;
+          color: #FFD700;
+          font-weight: bold;
+        }
+
+        .task-text {
+          font-size: 0.9rem;
+          color: #fff;
+          font-weight: 600;
+          line-height: 1.2;
+        }
+
+        .task-text strong {
+          color: #FFD700;
+          font-weight: 700;
+        }
+
+        .task-description {
+          font-size: 0.8rem;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0;
+          line-height: 1.3;
+          font-style: italic;
+        }
+
         .loyal-user-features {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          margin-bottom: 24px;
+          gap: 8px;
+          margin-bottom: 18px;
+          flex-shrink: 0;
         }
 
         .feature-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
+          gap: 10px;
+          padding: 10px 14px;
           background: rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
+          border-radius: 10px;
           backdrop-filter: blur(5px);
           border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .feature-icon {
-          font-size: 1.2rem;
-          width: 24px;
+          font-size: 1rem;
+          width: 20px;
           text-align: center;
+          flex-shrink: 0;
         }
 
         .feature-text {
-          font-size: 0.95rem;
+          font-size: 0.85rem;
           color: #fff;
           font-weight: 600;
+          line-height: 1.2;
         }
 
-        .popup-action-btn.claim-boost {
+        .popup-action-btn.complete-task {
           background: linear-gradient(135deg, #FFD700, #FFA500);
           color: #000;
           font-weight: 800;
-          font-size: 1.1rem;
-          padding: 16px 24px;
-          border-radius: 16px;
+          font-size: 1rem;
+          padding: 14px 20px;
+          border-radius: 14px;
           box-shadow: 
             0 8px 25px rgba(255, 215, 0, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -2162,9 +2281,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 6px;
           transition: all 0.3s ease;
           animation: claimButtonGlow 2s ease-in-out infinite;
+          flex-shrink: 0;
         }
 
         @keyframes claimButtonGlow {
@@ -2180,14 +2300,14 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           }
         }
 
-        .popup-action-btn.claim-boost:hover {
+        .popup-action-btn.complete-task:hover {
           transform: translateY(-3px);
           box-shadow: 
             0 15px 40px rgba(255, 215, 0, 0.6),
             inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
-        .popup-action-btn.claim-boost:active {
+        .popup-action-btn.complete-task:active {
           transform: translateY(-1px);
         }
 
@@ -2200,9 +2320,11 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           color: rgba(255, 255, 255, 0.8);
           border: 1px solid rgba(255, 255, 255, 0.2);
           font-weight: 600;
-          padding: 12px 20px;
-          border-radius: 12px;
+          padding: 10px 18px;
+          border-radius: 10px;
           transition: all 0.3s ease;
+          font-size: 0.9rem;
+          flex-shrink: 0;
         }
 
         .popup-action-btn.maybe-later:hover {
@@ -2212,16 +2334,18 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .loyal-user-footer {
-          margin-top: 20px;
-          padding-top: 16px;
+          margin-top: 16px;
+          padding-top: 12px;
           border-top: 1px solid rgba(255, 255, 255, 0.1);
+          flex-shrink: 0;
         }
 
         .footer-text {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           color: rgba(255, 255, 255, 0.8);
           margin: 0;
           font-style: italic;
+          line-height: 1.3;
         }
       `}</style>
       {/* PERFORMANCE OPTIMIZATION: Audio preloading - consider lazy loading */}
