@@ -118,6 +118,7 @@ export function SpinAndEarn() {
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [showLoyalUserPopup, setShowLoyalUserPopup] = useState(false);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -218,6 +219,19 @@ export function SpinAndEarn() {
       const hasShownWelcome = localStorage.getItem('welcomePopupShown3');
       if (!hasShownWelcome) {
         setShowWelcomePopup(true);
+      }
+    }
+  }, []);
+
+  // Show loyal user popup on first visit
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasShownLoyalPopup = localStorage.getItem('loyalUserPopupShown');
+      if (!hasShownLoyalPopup) {
+        // Show popup after a short delay for better UX
+        setTimeout(() => {
+          setShowLoyalUserPopup(true);
+        }, 2000);
       }
     }
   }, []);
@@ -1070,6 +1084,18 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     localStorage.setItem('welcomePopupShown3', 'true');
   };
 
+  const handleClaimBoost = () => {
+    setShowLoyalUserPopup(false);
+    localStorage.setItem('loyalUserPopupShown', 'true');
+    // Add boost logic here if needed
+    setResult("🎉 20x Boost Activated! Your next spins have enhanced rewards!");
+  };
+
+  const handleCloseLoyalPopup = () => {
+    setShowLoyalUserPopup(false);
+    localStorage.setItem('loyalUserPopupShown', 'true');
+  };
+
   return (
     <div className="spin-glass-card relative flex flex-col items-center w-full max-w-xl mx-auto">
       {isResultPopupVisible && result && (
@@ -1192,6 +1218,73 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     </div>
   </div>
 )}
+
+      {/* Loyal User Popup */}
+      {showLoyalUserPopup && (
+        <div className="popup-overlay" onClick={handleCloseLoyalPopup}>
+          <div className="popup-content loyal-user" onClick={(e) => e.stopPropagation()}>
+            <button className="popup-close-btn" onClick={handleCloseLoyalPopup}>
+              &times;
+            </button>
+
+            <div className="loyal-user-header">
+              <div className="loyal-user-crown">
+                <span className="crown-icon">👑</span>
+              </div>
+              <h2 className="loyal-user-title">Loyal User Detected!</h2>
+              <p className="loyal-user-subtitle">You're a valued member of our community</p>
+            </div>
+
+            <div className="boost-offer">
+              <div className="boost-badge">
+                <span className="boost-number">20x</span>
+                <span className="boost-text">BOOST</span>
+              </div>
+              <h3 className="boost-title">Limited Time Offer!</h3>
+              <p className="boost-description">
+                Get <strong>20x enhanced rewards</strong> on your next spins! 
+                This exclusive boost is only available for our most loyal users.
+              </p>
+            </div>
+
+            <div className="loyal-user-features">
+              <div className="feature-item">
+                <span className="feature-icon">⚡</span>
+                <span className="feature-text">Enhanced Win Rates</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">💰</span>
+                <span className="feature-text">Bigger Rewards</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">🎯</span>
+                <span className="feature-text">Limited Time Only</span>
+              </div>
+            </div>
+
+            <div className="popup-actions">
+              <button
+                className="popup-action-btn claim-boost"
+                onClick={handleClaimBoost}
+              >
+                <span className="btn-icon">🚀</span>
+                Claim 20x Boost Now
+              </button>
+
+              <button
+                className="popup-action-btn maybe-later"
+                onClick={handleCloseLoyalPopup}
+              >
+                Maybe Later
+              </button>
+            </div>
+
+            <div className="loyal-user-footer">
+              <p className="footer-text">Thank you for being part of our community! 💜</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PERFORMANCE OPTIMIZATION: Disabled WinNotifications - heavy Pusher connections */}
       {/* <WinNotifications /> */}
@@ -1877,6 +1970,258 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           font-size: 1.4rem;
           font-weight: 700;
           text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        /* Loyal User Popup Styles */
+        .popup-content.loyal-user {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 24px;
+          padding: 32px 24px;
+          max-width: 400px;
+          width: 90%;
+          text-align: center;
+          position: relative;
+          box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          animation: loyalPopupSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes loyalPopupSlideIn {
+          0% {
+            opacity: 0;
+            transform: translateY(-50px) scale(0.8);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .loyal-user-header {
+          margin-bottom: 24px;
+        }
+
+        .loyal-user-crown {
+          margin-bottom: 16px;
+        }
+
+        .crown-icon {
+          font-size: 3rem;
+          display: inline-block;
+          animation: crownBounce 2s ease-in-out infinite;
+          filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes crownBounce {
+          0%, 100% {
+            transform: translateY(0) rotate(-5deg);
+          }
+          50% {
+            transform: translateY(-10px) rotate(5deg);
+          }
+        }
+
+        .loyal-user-title {
+          font-size: 1.8rem;
+          font-weight: 900;
+          color: #fff;
+          margin: 0 0 8px 0;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          background: linear-gradient(45deg, #FFD700, #FFA500);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .loyal-user-subtitle {
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-weight: 500;
+        }
+
+        .boost-offer {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 24px;
+          margin-bottom: 24px;
+          border: 2px solid rgba(255, 215, 0, 0.3);
+          backdrop-filter: blur(10px);
+        }
+
+        .boost-badge {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 16px;
+          padding: 16px;
+          background: linear-gradient(135deg, #FFD700, #FFA500);
+          border-radius: 50%;
+          width: 80px;
+          height: 80px;
+          justify-content: center;
+          box-shadow: 
+            0 0 30px rgba(255, 215, 0, 0.6),
+            inset 0 2px 4px rgba(255, 255, 255, 0.3);
+          animation: boostPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes boostPulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 
+              0 0 30px rgba(255, 215, 0, 0.6),
+              inset 0 2px 4px rgba(255, 255, 255, 0.3);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 
+              0 0 40px rgba(255, 215, 0, 0.8),
+              inset 0 2px 4px rgba(255, 255, 255, 0.4);
+          }
+        }
+
+        .boost-number {
+          font-size: 1.4rem;
+          font-weight: 900;
+          color: #000;
+          line-height: 1;
+        }
+
+        .boost-text {
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #000;
+          letter-spacing: 1px;
+          line-height: 1;
+        }
+
+        .boost-title {
+          font-size: 1.4rem;
+          font-weight: 800;
+          color: #fff;
+          margin: 0 0 12px 0;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .boost-description {
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .boost-description strong {
+          color: #FFD700;
+          font-weight: 700;
+        }
+
+        .loyal-user-features {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          backdrop-filter: blur(5px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+          font-size: 1.2rem;
+          width: 24px;
+          text-align: center;
+        }
+
+        .feature-text {
+          font-size: 0.95rem;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .popup-action-btn.claim-boost {
+          background: linear-gradient(135deg, #FFD700, #FFA500);
+          color: #000;
+          font-weight: 800;
+          font-size: 1.1rem;
+          padding: 16px 24px;
+          border-radius: 16px;
+          box-shadow: 
+            0 8px 25px rgba(255, 215, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all 0.3s ease;
+          animation: claimButtonGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes claimButtonGlow {
+          0%, 100% {
+            box-shadow: 
+              0 8px 25px rgba(255, 215, 0, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+          }
+          50% {
+            box-shadow: 
+              0 12px 35px rgba(255, 215, 0, 0.6),
+              inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          }
+        }
+
+        .popup-action-btn.claim-boost:hover {
+          transform: translateY(-3px);
+          box-shadow: 
+            0 15px 40px rgba(255, 215, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .popup-action-btn.claim-boost:active {
+          transform: translateY(-1px);
+        }
+
+        .btn-icon {
+          font-size: 1.2rem;
+        }
+
+        .popup-action-btn.maybe-later {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          font-weight: 600;
+          padding: 12px 20px;
+          border-radius: 12px;
+          transition: all 0.3s ease;
+        }
+
+        .popup-action-btn.maybe-later:hover {
+          background: rgba(255, 255, 255, 0.2);
+          color: #fff;
+          transform: translateY(-2px);
+        }
+
+        .loyal-user-footer {
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-text {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0;
+          font-style: italic;
         }
       `}</style>
       {/* PERFORMANCE OPTIMIZATION: Audio preloading - consider lazy loading */}
