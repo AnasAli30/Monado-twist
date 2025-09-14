@@ -264,20 +264,54 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
       // Don't throw error, just log for now during transition
     }
 
-    // Try decryption with basic key derivation first (for backward compatibility)
-    const basicDerivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce);
-    const decryptedText = simpleXorDecrypt(encryptedData, basicDerivedKey);
-    const parsedData = JSON.parse(decryptedText);
+    // Try decryption with enhanced key derivation first (new format)
+    let decryptedText = '';
+    let parsedData: any = null;
+    let browserFingerprint = '';
     
-    // Get browser fingerprint and re-derive key if available
-    const browserFingerprint = parsedData._browserFingerprint || '';
-    const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + browserFingerprint);
-    
-    // Verify authentication tag including nonce and browser fingerprint
-    const expectedTag = simpleHash(derivedKey + encryptedData + nonce + browserFingerprint);
-    
-    if (expectedTag !== tag) {
-      throw new Error('Authentication tag verification failed');
+    try {
+      // First try with empty browser fingerprint (new format without fingerprint)
+      const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + '');
+      decryptedText = simpleXorDecrypt(encryptedData, derivedKey);
+      parsedData = JSON.parse(decryptedText);
+      browserFingerprint = parsedData._browserFingerprint || '';
+      
+      console.log('Successfully decrypted with new format, browserFingerprint:', browserFingerprint ? 'present' : 'absent');
+      
+      // If we got a browser fingerprint, re-derive key and verify
+      if (browserFingerprint) {
+        const enhancedDerivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + browserFingerprint);
+        const expectedTag = simpleHash(enhancedDerivedKey + encryptedData + nonce + browserFingerprint);
+        
+        if (expectedTag !== tag) {
+          throw new Error('Authentication tag verification failed');
+        }
+      } else {
+        // No browser fingerprint, verify with basic key
+        const expectedTag = simpleHash(derivedKey + encryptedData + nonce + '');
+        if (expectedTag !== tag) {
+          throw new Error('Authentication tag verification failed');
+        }
+      }
+    } catch (error) {
+      console.log('New format decryption failed, trying old format:', error.message);
+      // Fallback to old format (without nonce in key derivation)
+      try {
+        const oldDerivedKey = deriveKey(ENCRYPTION_KEY, salt);
+        decryptedText = simpleXorDecrypt(encryptedData, oldDerivedKey);
+        parsedData = JSON.parse(decryptedText);
+        
+        console.log('Successfully decrypted with old format');
+        
+        // Verify with old format
+        const expectedTag = simpleHash(oldDerivedKey + encryptedData);
+        if (expectedTag !== tag) {
+          throw new Error('Authentication tag verification failed');
+        }
+      } catch (oldError) {
+        console.log('Old format decryption also failed:', oldError.message);
+        throw new Error('Failed to decrypt payload');
+      }
     }
     
     // Validate the internal timestamp salt
