@@ -1,8 +1,6 @@
 // Frontend encryption utilities
 // Note: This file should be used on the client side
 
-import { generateBrowserFingerprint, generateBrowserChallenge } from './browser-security';
-
 // Frontend encryption key (should be set in environment variables)
 const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_FRONTEND_ENCRYPTION_KEY;
 
@@ -114,7 +112,7 @@ async function simpleHash(text: string): Promise<string> {
 /**
  * Encrypt payload for secure transmission to backend
  * Uses simple but effective encryption compatible with backend
- * Enhanced with nonce and browser fingerprinting for maximum security
+ * Enhanced with nonce for additional security against replay attacks
  */
 export async function encryptPayload(data: any): Promise<EncryptedPayload> {
   if (!ENCRYPTION_KEY) {
@@ -125,52 +123,31 @@ export async function encryptPayload(data: any): Promise<EncryptedPayload> {
   const salt = generateRandomHex(32);
   const nonce = generateSecureNonce();
   
-  // Generate browser fingerprint - very difficult to replicate externally (optional for backward compatibility)
-  let browserFingerprint = '';
-  let browserChallenge = { challenge: '', solution: '' };
-  
-  try {
-    browserFingerprint = await generateBrowserFingerprint();
-    browserChallenge = await generateBrowserChallenge();
-  } catch (error) {
-    console.log('Browser fingerprinting failed, using fallback:', error);
-    // Use fallback values for backward compatibility
-    browserFingerprint = generateRandomHex(16);
-    browserChallenge = { challenge: generateRandomHex(16), solution: generateRandomHex(16) };
-  }
-  
   // Generate timestamp salt for additional security  
   const timestampSalt = await simpleHash(ENCRYPTION_KEY + timestamp.toString());
   
   // Generate nonce-based salt for enhanced security
   const nonceSalt = await simpleHash(ENCRYPTION_KEY + nonce + timestamp.toString());
   
-  // Generate browser fingerprint salt
-  const browserSalt = await simpleHash(ENCRYPTION_KEY + browserFingerprint + timestamp.toString());
-  
-  // Add comprehensive security data
+  // Add timestamp, salt, and nonce to data for additional security
   const dataWithSecurity = {
     ...data,
     _timestamp: timestamp,
     _salt: timestampSalt,
     _nonce: nonce,
-    _nonceSalt: nonceSalt,
-    _browserFingerprint: browserFingerprint,
-    _browserSalt: browserSalt,
-    _browserChallenge: browserChallenge.challenge,
-    _browserSolution: browserChallenge.solution
+    _nonceSalt: nonceSalt
   };
 
   const jsonData = JSON.stringify(dataWithSecurity);
   
-  // Enhanced key derivation using nonce and browser fingerprint
-  const derivedKey = await simpleHash(ENCRYPTION_KEY + salt + nonce + browserFingerprint);
+  // Enhanced key derivation using nonce
+  const derivedKey = await simpleHash(ENCRYPTION_KEY + salt + nonce);
   
   // Simple XOR encryption
   const encryptedData = simpleXorEncrypt(jsonData, derivedKey);
   
-  // Generate authentication tag including nonce and browser fingerprint
-  const tag = await simpleHash(derivedKey + encryptedData + nonce + browserFingerprint);
+  // Generate authentication tag including nonce
+  const tag = await simpleHash(derivedKey + encryptedData + nonce);
 
   return {
     encryptedData: encryptedData,

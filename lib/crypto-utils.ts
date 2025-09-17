@@ -15,11 +15,6 @@ const PAYLOAD_SALT_SECRET = process.env.PAYLOAD_SALT_SECRET || '';   // Secret f
 const usedNonces = new Set<string>();
 const NONCE_EXPIRY_TIME = 10 * 60 * 1000; // 10 minutes
 
-// Store for browser fingerprints to detect automation
-const browserFingerprints = new Map<string, { count: number; lastSeen: number }>();
-const MAX_FINGERPRINT_REQUESTS = 5; // Max requests per fingerprint per hour
-const FINGERPRINT_RESET_TIME = 60 * 60 * 1000; // 1 hour
-
 interface EncryptedPayload {
   encryptedData: string;
   iv: string;
@@ -108,54 +103,6 @@ function validateNonce(nonce: string, timestamp: number): boolean {
   // Mark nonce as used
   markNonceAsUsed(nonce);
   return true;
-}
-
-/**
- * Validate browser fingerprint for automation detection
- */
-function validateBrowserFingerprint(fingerprint: string, challenge: string, solution: string): boolean {
-  try {
-    // Clean up old fingerprints
-    const now = Date.now();
-    const entries = Array.from(browserFingerprints.entries());
-    for (const [fp, data] of entries) {
-      if (now - data.lastSeen > FINGERPRINT_RESET_TIME) {
-        browserFingerprints.delete(fp);
-      }
-    }
-    
-    // Check if fingerprint exists and validate rate limiting
-    const existing = browserFingerprints.get(fingerprint);
-    if (existing) {
-      if (existing.count >= MAX_FINGERPRINT_REQUESTS) {
-        console.log('Browser fingerprint rate limit exceeded:', fingerprint);
-        return false;
-      }
-      existing.count++;
-      existing.lastSeen = now;
-    } else {
-      browserFingerprints.set(fingerprint, { count: 1, lastSeen: now });
-    }
-    
-    // Validate browser challenge
-    return validateBrowserChallenge(challenge, solution);
-  } catch (error) {
-    console.error('Browser fingerprint validation error:', error);
-    return false;
-  }
-}
-
-/**
- * Validate browser challenge
- */
-function validateBrowserChallenge(challenge: string, solution: string): boolean {
-  try {
-    const challengeData = JSON.parse(Buffer.from(challenge, 'base64').toString());
-    const expectedSolution = crypto.createHash('sha256').update(JSON.stringify(challengeData)).digest('hex');
-    return expectedSolution === solution;
-  } catch (error) {
-    return false;
-  }
 }
 
 /**
@@ -253,66 +200,25 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
       throw new Error('Encrypted payload expired');
     }
 
-    // Validate nonce for replay attack prevention (optional for backward compatibility)
-    try {
-      if (!validateNonce(nonce, timestamp)) {
-        console.log('Nonce validation failed, but allowing for backward compatibility');
-        // Don't throw error, just log for now during transition
-      }
-    } catch (error) {
-      console.log('Nonce validation error:', error);
-      // Don't throw error, just log for now during transition
+    // Validate nonce for replay attack prevention
+    if (!validateNonce(nonce, timestamp)) {
+      throw new Error('Invalid or reused nonce');
     }
 
-    // Try decryption with enhanced key derivation first (new format)
-    let decryptedText = '';
-    let parsedData: any = null;
-    let browserFingerprint = '';
+    // Enhanced key derivation using nonce
+    const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce);
     
-    try {
-      // First try with empty browser fingerprint (new format without fingerprint)
-      const derivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + '');
-      decryptedText = simpleXorDecrypt(encryptedData, derivedKey);
-      parsedData = JSON.parse(decryptedText);
-      browserFingerprint = parsedData._browserFingerprint || '';
-      
-      console.log('Successfully decrypted with new format, browserFingerprint:', browserFingerprint ? 'present' : 'absent');
-      
-      // If we got a browser fingerprint, re-derive key and verify
-      if (browserFingerprint) {
-        const enhancedDerivedKey = deriveKey(ENCRYPTION_KEY, salt + nonce + browserFingerprint);
-        const expectedTag = simpleHash(enhancedDerivedKey + encryptedData + nonce + browserFingerprint);
-        
-        if (expectedTag !== tag) {
-          throw new Error('Authentication tag verification failed');
-        }
-      } else {
-        // No browser fingerprint, verify with basic key
-        const expectedTag = simpleHash(derivedKey + encryptedData + nonce + '');
-        if (expectedTag !== tag) {
-          throw new Error('Authentication tag verification failed');
-        }
-      }
-    } catch (error) {
-      console.log('New format decryption failed, trying old format:', error instanceof Error ? error.message : String(error));
-      // Fallback to old format (without nonce in key derivation)
-      try {
-        const oldDerivedKey = deriveKey(ENCRYPTION_KEY, salt);
-        decryptedText = simpleXorDecrypt(encryptedData, oldDerivedKey);
-        parsedData = JSON.parse(decryptedText);
-        
-        console.log('Successfully decrypted with old format');
-        
-        // Verify with old format
-        const expectedTag = simpleHash(oldDerivedKey + encryptedData);
-        if (expectedTag !== tag) {
-          throw new Error('Authentication tag verification failed');
-        }
-      } catch (oldError) {
-        console.log('Old format decryption also failed:', oldError instanceof Error ? oldError.message : String(oldError));
-        throw new Error('Failed to decrypt payload');
-      }
+    // Verify authentication tag including nonce
+    const expectedTag = simpleHash(derivedKey + encryptedData + nonce);
+    
+    if (expectedTag !== tag) {
+      throw new Error('Authentication tag verification failed');
     }
+    
+    // Decrypt using simple XOR matching frontend
+    const decryptedText = simpleXorDecrypt(encryptedData, derivedKey);
+    
+    const parsedData = JSON.parse(decryptedText);
     
     // Validate the internal timestamp salt
     const expectedTimestampSalt = generateTimestampSalt(timestamp);
@@ -336,21 +242,8 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
       throw new Error('Nonce mismatch');
     }
 
-    // Validate browser fingerprint if present (optional for backward compatibility)
-    if (parsedData._browserFingerprint && parsedData._browserChallenge && parsedData._browserSolution) {
-      try {
-        if (!validateBrowserFingerprint(parsedData._browserFingerprint, parsedData._browserChallenge, parsedData._browserSolution)) {
-          console.log('Browser fingerprint validation failed, but allowing for backward compatibility');
-          // Don't throw error, just log for now during transition
-        }
-      } catch (error) {
-        console.log('Browser fingerprint validation error:', error);
-        // Don't throw error, just log for now during transition
-      }
-    }
-
     // Remove internal security fields
-    const { _salt, _timestamp, _nonce, _nonceSalt, _browserFingerprint, _browserSalt, _browserChallenge, _browserSolution, ...cleanData } = parsedData;
+    const { _salt, _timestamp, _nonce, _nonceSalt, ...cleanData } = parsedData;
 
     return {
       data: cleanData,
