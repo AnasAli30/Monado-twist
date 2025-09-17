@@ -887,7 +887,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
+        url: "https://farcaster.xyz/miniapps/efPuNxgasRTJ/recess"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -962,7 +962,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp3 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=flapbitrum.vercel.app"
+        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
       });
       if (!timeUntilMiniAppOpen3 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1220,7 +1220,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 )}
 
       {/* Loyal User Popup */}
-      {showLoyalUserPopup && (
+      {/* {showLoyalUserPopup && (
         <div className="popup-overlay" onClick={handleCloseLoyalPopup}>
           <div className="popup-content loyal-user" onClick={(e) => e.stopPropagation()}>
             <button className="popup-close-btn" onClick={handleCloseLoyalPopup}>
@@ -1300,7 +1300,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* PERFORMANCE OPTIMIZATION: Disabled WinNotifications - heavy Pusher connections */}
       {/* <WinNotifications /> */}

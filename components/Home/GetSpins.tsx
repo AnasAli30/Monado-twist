@@ -70,9 +70,9 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
          
 <div className="get-spins-card">
   <div className="get-spins-card-header">
-    <img src="images/wagmi.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
+    <img src="images/recess.png" alt="Chain Crush Rewards" className="get-spins-card-icon" />
     <div className="get-spins-card-title">
-      🚀 Play Wagmi & Earn <span style={{color:"#FFD700"}}>up to $50 Daily</span> in $ARB/$PEPE
+      🚀 Play Recess & Earn <span style={{color:"#FFD700"}}>up to 50M $RECESS</span>
     </div>
   </div>
   <button
@@ -109,7 +109,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play Flapbitrum and Earn upto 50$ $USDC</div>
+            <div className="get-spins-card-title"> Play Wagmi Blaster and Earn Daily upto 50$ $USDC</div>
           </div>
           <button
             className="get-spins-action-btn1"
