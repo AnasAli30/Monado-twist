@@ -283,7 +283,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.1,0.08,0.09,0.2,0.3];
+        const monValues = [0.01,0.008,0.009,0.02];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (1 - 0.5) + 0.5).toFixed(4);
@@ -304,12 +304,12 @@ export function SpinAndEarn() {
   };
 
   const segments: Segment[] = [
-    { text: "MON", value: 0, color: "#FFD700", probability: 0, degrees: 60 },  // Gold
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },  // Gold
     { text: "YAKI", value: 0, color: "#00E5FF", probability: 5, degrees: 60 },  // Bright Teal
-    { text: "MON", value: 0, color: "#FFD700", probability: 0, degrees: 60 },
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
     { text: "USDC", value: 0, color: "#B8860B", probability: 5, degrees: 60 },  // Dark Gold
-    { text: "MON", value: 0, color: "#FFD700", probability: 0, degrees: 60 },
-    { text: "", value: 0, color: "#004D40", probability: 90, degrees: 60 },  // Dark Teal - No Win
+    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
+    { text: "", value: 0, color: "#004D40", probability: 87, degrees: 60 },  // Dark Teal - No Win
   ];
 
   // Fetch spins and timer data from backend
