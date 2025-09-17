@@ -294,7 +294,7 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
         }
       }
     } catch (error) {
-      console.log('New format decryption failed, trying old format:', error.message);
+      console.log('New format decryption failed, trying old format:', error instanceof Error ? error.message : String(error));
       // Fallback to old format (without nonce in key derivation)
       try {
         const oldDerivedKey = deriveKey(ENCRYPTION_KEY, salt);
@@ -309,7 +309,7 @@ export function decryptPayload(encryptedPayload: EncryptedPayload): DecryptedPay
           throw new Error('Authentication tag verification failed');
         }
       } catch (oldError) {
-        console.log('Old format decryption also failed:', oldError.message);
+        console.log('Old format decryption also failed:', oldError instanceof Error ? oldError.message : String(oldError));
         throw new Error('Failed to decrypt payload');
       }
     }
