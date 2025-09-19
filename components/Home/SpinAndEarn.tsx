@@ -1038,7 +1038,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   };
 
   const handleFollowX = async () => {
-    await actions?.openUrl('https://x.com/ChainCrush_');
+    await actions?.openUrl('https://x.com/Chain_Crush');
     setAwaitingFollowXVerification(true);
     setResult('Verifying your X follow...');
     setTimeout(async () => {
