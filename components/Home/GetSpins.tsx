@@ -48,6 +48,23 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
+      <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <div className="get-spins-card-title"> Play Arb Jump and Earn Daily upto 50$ $USDC</div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp3}
+            disabled={!!timeUntilMiniAppOpen3}
+          >
+            {!timeUntilMiniAppOpen3 ? (
+              <span className="spin-badge1">+50$ $USDC / +2 Spins</span>
+            ) : (
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
+          </button>
+        </div>
+  
         <div className="get-spins-card">
   <div className="get-spins-card-header">
     <img src="images/chaincrush.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
@@ -87,8 +104,8 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     )}
   </button>
 </div>
-{/* 
-        <div className="get-spins-card">
+
+        {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play game and Earn upto 150 $USDC</div>
@@ -106,23 +123,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div> */}
 
-        <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play Wagmi Blaster and Earn Daily upto 50$ $USDC</div>
-          </div>
-          <button
-            className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp3}
-            disabled={!!timeUntilMiniAppOpen3}
-          >
-            {!timeUntilMiniAppOpen3 ? (
-              <span className="spin-badge1">+50$ $USDC / +2 Spins</span>
-            ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
-          </button>
-        </div>
-  
+        
     
         <div className="get-spins-card">
           <div className="get-spins-card-header">

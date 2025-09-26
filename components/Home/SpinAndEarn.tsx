@@ -962,7 +962,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp3 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
+        url: "https://farcaster.xyz/miniapps/fAd-0wlazOlZ/arbjump"
       });
       if (!timeUntilMiniAppOpen3 && fid) {
         const res = await fetchWithVerification('/api/spin', {
