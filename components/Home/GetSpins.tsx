@@ -69,7 +69,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   <div className="get-spins-card-header">
     <img src="images/chaincrush.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
     <div className="get-spins-card-title">
-      🎮 Play <b>Chain Crush</b> → Win up to <span style={{color: "#FFD700"}}>$50 Daily!</span>
+      🎮 Play <b>Chain Crush</b> → Win up to <span style={{color: "#FFD700"}}>$50 Daily! and 100$ weekly to top 20 players</span>
     </div>
   </div>
   <button
