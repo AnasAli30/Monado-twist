@@ -48,7 +48,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
-      <div className="get-spins-card">
+      {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play Arb Jump and Earn Daily upto 50$ $USDC</div>
@@ -63,7 +63,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             ) : (
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
           </button>
-        </div>
+        </div> */}
   
         <div className="get-spins-card">
   <div className="get-spins-card-header">
