@@ -216,7 +216,7 @@ export function SpinAndEarn() {
   // Show welcome popup on first visit
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasShownWelcome = localStorage.getItem('welcomePopupShown3');
+      const hasShownWelcome = localStorage.getItem('welcomePopupShown4');
       if (!hasShownWelcome) {
         setShowWelcomePopup(true);
       }
@@ -1075,13 +1075,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown3', 'true');
+    localStorage.setItem('welcomePopupShown4', 'true');
     handleOpenMiniApp1();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown3', 'true');
+    localStorage.setItem('welcomePopupShown4', 'true');
   };
 
   const handleClaimBoost = () => {
