@@ -1178,8 +1178,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
           Spin, Match & Win! 💎  
           Earn up to <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-            100 <img src="images/chaincrush.jpg" alt="" style={{ width: '35px', height: '35px', display: 'inline-block', verticalAlign: 'middle' }} /> $USDC
-          </strong> daily by just playing <b>Chain Crush</b>.
+            100 $USDC
+          </strong> daily by just playing <b>Wagmi Blaster</b>.
         </p>
       </div>
 
