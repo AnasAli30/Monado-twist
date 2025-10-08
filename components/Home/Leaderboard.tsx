@@ -13,6 +13,7 @@ interface LeaderboardEntry {
   rank: number;
   name: string;
   pfpUrl?: string;
+  displayRank: number;
 }
 
 interface PaginationInfo {
@@ -53,10 +54,16 @@ export function Leaderboard() {
       const res = await fetch(`/api/leaderboard?page=${page}&limit=${pagination.limit}`);
       const data = await res.json();
       
+      // Add rank property to each leader based on their position
+      const leadersWithRank = data.leaders.map((leader: any, idx: number) => ({
+        ...leader,
+        displayRank: page * pagination.limit + idx + 1
+      }));
+      
       if (page === 0) {
-        setLeaders(data.leaders);
+        setLeaders(leadersWithRank);
       } else {
-        setLeaders(prev => [...prev, ...data.leaders]);
+        setLeaders(prev => [...prev, ...leadersWithRank]);
       }
       
       setPagination(data.pagination);
@@ -207,8 +214,8 @@ Spin. Win. Repeat.${bestFriendsText}`;
                 onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}
               >
                 <div className="rank-section">
-                  <span className="rank-number">{pagination.page * pagination.limit + index + 1}</span>
-                  {pagination.page === 0 && index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
+                  <span className="rank-number">{entry.displayRank}</span>
+                  {entry.displayRank <= 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(entry.displayRank) }} />}
                 </div>
 
               <Image
@@ -236,12 +243,12 @@ Spin. Win. Repeat.${bestFriendsText}`;
                     <span>{parseFloat(entry.totalWinnings).toFixed(2)}</span>
                     <span className="mon-label">MON</span>
                   </div>
-                  {currentUserFid === entry.fid && (pagination.page * pagination.limit + index < 50) && (
+                  {currentUserFid === entry.fid && (entry.displayRank <= 50) && (
                   <button 
                     className="share-rank-btn" 
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleShare(pagination.page * pagination.limit + index + 1, entry.totalSpins, entry.totalWinnings);
+                      handleShare(entry.displayRank, entry.totalSpins, entry.totalWinnings);
                     }}
                   >
                     Share
