@@ -216,7 +216,7 @@ export function SpinAndEarn() {
   // Show welcome popup on first visit
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasShownWelcome = localStorage.getItem('welcomePopupShown4');
+      const hasShownWelcome = localStorage.getItem('welcomePopupShown5');
       if (!hasShownWelcome) {
         setShowWelcomePopup(true);
       }
@@ -1075,13 +1075,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown4', 'true');
+    localStorage.setItem('welcomePopupShown5', 'true');
     handleOpenMiniApp1();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown4', 'true');
+    localStorage.setItem('welcomePopupShown5', 'true');
   };
 
   const handleClaimBoost = () => {
@@ -1177,9 +1177,9 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         </h3>
         <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
           Spin, Match & Win! 💎  
-          Earn up to <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-            100 $USDC
-          </strong> daily by just playing <b>Wagmi Blaster</b>.
+          Earn <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
+            Daily Tokens
+          </strong> daily by just playing <b>Monad Realm</b>.
         </p>
       </div>
 
