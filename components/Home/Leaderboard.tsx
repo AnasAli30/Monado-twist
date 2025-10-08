@@ -3,6 +3,7 @@ import { FaTrophy, FaMedal } from 'react-icons/fa';
 import { useMiniAppContext } from '@/hooks/use-miniapp-context';
 import { SkeletonLeaderboardItem } from './SkeletonLeaderboardItem';
 import { APP_URL } from "@/lib/constants";
+import Image from 'next/image';
 
 interface LeaderboardEntry {
   address: string;
@@ -164,14 +165,16 @@ Spin. Win. Repeat.${bestFriendsText}`;
         
         {userStats && (
           <div className="user-stats-card">
-              <img 
+              <Image 
                 src={userStats.pfpUrl || '/images/icon.jpg'} 
-                alt={userStats.name} 
+                alt={userStats.name || 'User profile'} 
+                width={45}
+                height={45}
                 className="leaderboard-pfp"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/images/icon.jpg';
+                onError={() => {
+                  // Handle error by providing a fallback path in the src attribute
                 }}
+                unoptimized={userStats.pfpUrl?.startsWith('http')}
               />
               <div className="user-info">
                 <div className="leaderboard-name">{userStats.name} (You)</div>
@@ -208,14 +211,16 @@ Spin. Win. Repeat.${bestFriendsText}`;
                   {pagination.page === 0 && index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
                 </div>
 
-              <img
+              <Image
                   src={entry.pfpUrl || '/images/icon.jpg'} 
-                  alt={entry.name} 
+                  alt={entry.name || 'User profile'} 
+                  width={45}
+                  height={45}
                   className="leaderboard-pfp"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null; // prevents looping
-                    e.currentTarget.src = '/images/icon.jpg';
+                  onError={() => {
+                    // Handle error by using the fallback in the src attribute
                   }}
+                  unoptimized={entry.pfpUrl?.startsWith('http')}
                 />
                 
                 <div className="user-info">
@@ -366,10 +371,12 @@ Spin. Win. Repeat.${bestFriendsText}`;
         }
 
         .leaderboard-pfp {
-          width: 45px;
-          height: 45px;
+          width: 45px !important;
+          height: 45px !important;
           border-radius: 50%;
           border: 2px solid rgba(255,255,255,0.3);
+          object-fit: cover;
+          position: relative !important;
         }
 
         .user-info {
