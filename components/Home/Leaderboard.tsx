@@ -45,7 +45,7 @@ export function Leaderboard() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const fetchLeaderboard = async (page = 0) => {
+  const fetchLeaderboard = useCallback(async (page = 0) => {
     try {
       if (page === 0) setLoading(true);
       else setLoadingMore(true);
@@ -66,9 +66,9 @@ export function Leaderboard() {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [pagination.limit]);
 
-  const fetchUserStats = async () => {
+  const fetchUserStats = useCallback(async () => {
     if (currentUserFid) {
       try {
         const res = await fetch(`/api/user-stats?fid=${currentUserFid}`);
@@ -80,12 +80,12 @@ export function Leaderboard() {
         console.error('Error fetching user stats:', error);
       }
     }
-  };
+  }, [currentUserFid]);
 
   useEffect(() => {
     fetchLeaderboard(0);
     fetchUserStats();
-  }, [currentUserFid]);
+  }, [currentUserFid, fetchLeaderboard, fetchUserStats]);
   
   // Set up intersection observer for infinite scroll
   const lastLeaderElementRef = useCallback((node: HTMLDivElement | null) => {
@@ -100,7 +100,7 @@ export function Leaderboard() {
     }, { threshold: 0.5 });
     
     if (node) observerRef.current.observe(node);
-  }, [loading, loadingMore, pagination.hasMore, pagination.page]);
+  }, [loading, loadingMore, pagination.hasMore, pagination.page, fetchLeaderboard]);
 
   const handleShare = async (rank: number, totalSpins: number, totalWinnings: string) => {
     let bestFriendsText = '';
@@ -260,7 +260,7 @@ Spin. Win. Repeat.${bestFriendsText}`;
           
           {!loadingMore && !pagination.hasMore && leaders.length > 0 && (
             <div className="end-of-list">
-              End of leaderboard - You've seen all {pagination.total} players!
+              End of leaderboard - You&apos;ve seen all {pagination.total} players!
             </div>
           )}
         </div>

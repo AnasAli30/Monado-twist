@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaShareAlt, FaRocket, FaUserPlus, FaRetweet, FaTwitterSquare } from 'react-icons/fa';
+import Image from 'next/image';
 
 interface GetSpinsProps {
   timeUntilShare: string;
@@ -68,7 +69,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 
 <div className="get-spins-card">
   <div className="get-spins-card-header">
-    <img src="images/monad-realm.png" alt="Chain Crush Rewards" className="get-spins-card-icon" />
+    <Image src="/images/monad-realm.png" alt="Chain Crush Rewards" width={56} height={56} className="get-spins-card-icon" />
     <div className="get-spins-card-title">
       🎮 Play <b>Monad realm</b> → Win <span style={{color: "#FFD700"}}>token Daily! and 2500 $MON to top 20 players</span>
     </div>
