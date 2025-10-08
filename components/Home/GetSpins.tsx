@@ -66,6 +66,25 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 
         </div> */}
 
+<div className="get-spins-card">
+  <div className="get-spins-card-header">
+    <img src="images/monad-realm.png" alt="Chain Crush Rewards" className="get-spins-card-icon" />
+    <div className="get-spins-card-title">
+      🎮 Play <b>Monad realm</b> → Win <span style={{color: "#FFD700"}}>token Daily! and 2500 $MON to top 20 players</span>
+    </div>
+  </div>
+  <button
+    className="get-spins-action-btn"
+    onClick={handleOpenMiniApp1}
+    disabled={!!timeUntilMiniAppOpen1}
+  >
+    {!timeUntilMiniAppOpen1 ? (
+      <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
+    ) : (
+      `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
+    )}
+  </button>
+</div>
         
 <div className="get-spins-card">
           <div className="get-spins-card-header">
@@ -85,25 +104,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
   
-        <div className="get-spins-card">
-  <div className="get-spins-card-header">
-    <img src="images/chaincrush.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
-    <div className="get-spins-card-title">
-      🎮 Play <b>Chain Crush</b> → Win up to <span style={{color: "#FFD700"}}>$50 Daily! and 100$ weekly to top 20 players</span>
-    </div>
-  </div>
-  <button
-    className="get-spins-action-btn"
-    onClick={handleOpenMiniApp1}
-    disabled={!!timeUntilMiniAppOpen1}
-  >
-    {!timeUntilMiniAppOpen1 ? (
-      <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
-    ) : (
-      `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
-    )}
-  </button>
-</div>
+      
 
 
          

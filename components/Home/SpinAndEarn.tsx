@@ -283,7 +283,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues =[0.1,0.08,0.09,0.02];;
+        const monValues =[0.01,0.008,0.009,0.002];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (1 - 0.5) + 0.5).toFixed(4);
@@ -912,7 +912,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp1 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
+        url: "https://farcaster.xyz/miniapps/-T_OQBmVvoW2/monad-realm"
       });
       if (!timeUntilMiniAppOpen1 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -923,7 +923,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         const data = await res.json();
         if (res.ok) {
           setSpinsLeft(data.spinsLeft);
-          setResult("You got 2 extra spins for opening Chain Crush!");
+          setResult("You got 2 extra spins for opening Monad Realm!");
           setTimeUntilMiniAppOpen1('3h 0m');
         } else {
           setResult(data.error || "Failed to add spins.");
