@@ -9,6 +9,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { db } = await connectToDatabase();
     
+    // Parse pagination parameters
+    const page = parseInt(req.query.page as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const skip = page * limit;
+    
     const leaders = await db.collection('monad-users')
       .aggregate([
         // 1. Match users who have spun at least once
@@ -21,11 +26,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           $sort: { totalSpins: -1 }
         },
-        // 3. Limit the initial list to 200
+        // 3. Skip based on pagination
         {
-          $limit: 50
+          $skip: skip
         },
-        // 4. Look up their winnings data
+        // 4. Limit based on pagination
+        {
+          $limit: limit
+        },
+        // 5. Look up their winnings data
         {
           $lookup: {
             from: 'winnings',
@@ -34,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             as: 'winningsData'
           }
         },
-        // 5. Project the final fields and calculate total winnings
+        // 6. Project the final fields and calculate total winnings
         {
           $project: {
             _id: 0,
@@ -49,8 +58,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         }
       ]).toArray();
+      
+    // Get total count for pagination info
+    const totalCount = await db.collection('monad-users').countDocuments({
+      totalSpins: { $exists: true, $gt: 0 }
+    });
 
-    res.status(200).json(leaders);
+    res.status(200).json({
+      leaders,
+      pagination: {
+        total: totalCount,
+        page,
+        limit,
+        hasMore: skip + leaders.length < totalCount
+      }
+    });
   } catch (error) {
     console.error('Leaderboard error:', error);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });

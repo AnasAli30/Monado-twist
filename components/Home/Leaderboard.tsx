@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { FaTrophy, FaMedal } from 'react-icons/fa';
 import { useMiniAppContext } from '@/hooks/use-miniapp-context';
 import { SkeletonLeaderboardItem } from './SkeletonLeaderboardItem';
@@ -14,6 +14,13 @@ interface LeaderboardEntry {
   pfpUrl?: string;
 }
 
+interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
 interface UserStats {
   totalSpins: number;
   totalWinnings: number;
@@ -24,40 +31,75 @@ interface UserStats {
 export function Leaderboard() {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo>({ 
+    total: 0, 
+    page: 0, 
+    limit: 50, 
+    hasMore: true 
+  });
   const { actions, context } = useMiniAppContext();
   const currentUserFid = context?.user?.fid;
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const fetchLeaderboard = async (page = 0) => {
+    try {
+      if (page === 0) setLoading(true);
+      else setLoadingMore(true);
+      
+      const res = await fetch(`/api/leaderboard?page=${page}&limit=${pagination.limit}`);
+      const data = await res.json();
+      
+      if (page === 0) {
+        setLeaders(data.leaders);
+      } else {
+        setLeaders(prev => [...prev, ...data.leaders]);
+      }
+      
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    if (currentUserFid) {
+      try {
+        const res = await fetch(`/api/user-stats?fid=${currentUserFid}`);
+        if (res.ok) {
+          const data = await res.json();
+          setUserStats(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user stats:', error);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const res = await fetch('/api/leaderboard');
-        const data = await res.json();
-        setLeaders(data);
-      } catch (error) {
-        console.error('Error fetching leaderboard:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchUserStats = async () => {
-      if (currentUserFid) {
-        try {
-          const res = await fetch(`/api/user-stats?fid=${currentUserFid}`);
-          if (res.ok) {
-            const data = await res.json();
-            setUserStats(data);
-          }
-        } catch (error) {
-          console.error('Error fetching user stats:', error);
-        }
-      }
-    };
-
-    fetchLeaderboard();
+    fetchLeaderboard(0);
     fetchUserStats();
   }, [currentUserFid]);
+  
+  // Set up intersection observer for infinite scroll
+  const lastLeaderElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading || loadingMore) return;
+    
+    if (observerRef.current) observerRef.current.disconnect();
+    
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && pagination.hasMore) {
+        fetchLeaderboard(pagination.page + 1);
+      }
+    }, { threshold: 0.5 });
+    
+    if (node) observerRef.current.observe(node);
+  }, [loading, loadingMore, pagination.hasMore, pagination.page]);
 
   const handleShare = async (rank: number, totalSpins: number, totalWinnings: string) => {
     let bestFriendsText = '';
@@ -156,13 +198,14 @@ Spin. Win. Repeat.${bestFriendsText}`;
         <div className="leaderboard-list">
           {leaders.map((entry, index) => (
               <div 
-                key={entry.fid} 
+                key={entry.fid}
+                ref={index === leaders.length - 1 ? lastLeaderElementRef : null}
                 className={`leaderboard-item ${context?.user?.fid === entry.fid ? 'current-user' : ''}`}  
                 onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}
               >
                 <div className="rank-section">
-                  <span className="rank-number">{index + 1}</span>
-                  {index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
+                  <span className="rank-number">{pagination.page * pagination.limit + index + 1}</span>
+                  {pagination.page === 0 && index < 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(index + 1) }} />}
                 </div>
 
               <img
@@ -188,24 +231,33 @@ Spin. Win. Repeat.${bestFriendsText}`;
                     <span>{parseFloat(entry.totalWinnings).toFixed(2)}</span>
                     <span className="mon-label">MON</span>
                   </div>
-                  {currentUserFid === entry.fid && index < 50 && (
+                  {currentUserFid === entry.fid && (pagination.page * pagination.limit + index < 50) && (
                   <button 
                     className="share-rank-btn" 
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleShare(index + 1, entry.totalSpins, entry.totalWinnings);
+                      handleShare(pagination.page * pagination.limit + index + 1, entry.totalSpins, entry.totalWinnings);
                     }}
                   >
                     Share
                   </button>
                 )}
                 </div>
-               
-                  
               </div>
-              
-              
           ))}
+          
+          {loadingMore && (
+            <div className="loading-more">
+              <div className="loading-spinner-small"></div>
+              <span>Loading more...</span>
+            </div>
+          )}
+          
+          {!loadingMore && !pagination.hasMore && leaders.length > 0 && (
+            <div className="end-of-list">
+              End of leaderboard - You've seen all {pagination.total} players!
+            </div>
+          )}
         </div>
       )}
       </div>
@@ -442,6 +494,39 @@ Spin. Win. Repeat.${bestFriendsText}`;
         @keyframes rotation {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner-small {
+          width: 24px;
+          height: 24px;
+          border: 3px solid #FFF;
+          border-bottom-color: #f72585;
+          border-radius: 50%;
+          display: inline-block;
+          box-sizing: border-box;
+          animation: rotation 1s linear infinite;
+          margin-right: 10px;
+        }
+        
+        .loading-more {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 15px 0;
+          font-size: 0.9rem;
+          opacity: 0.8;
+          width: 100%;
+        }
+        
+        .end-of-list {
+          text-align: center;
+          padding: 20px 0;
+          font-size: 0.9rem;
+          opacity: 0.7;
+          width: 100%;
+          font-style: italic;
+          border-top: 1px dashed rgba(255,255,255,0.2);
+          margin-top: 15px;
         }
 
         .user-stats-card {
