@@ -304,7 +304,7 @@ console.log("Forbidden",cleanIP)
     
     // Validate amounts with strict limits and exact values for MON
     // const monValues = 
-    const validMonAmounts = [0.01,0.008,0.009,0.002];
+    const validMonAmounts = [0.2,0.5,0.3,0.1,0.09];
     const isValidMonAmount = validMonAmounts.includes(amount);
     
     if (!isValidMonAmount) {
