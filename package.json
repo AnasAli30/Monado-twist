@@ -12,7 +12,7 @@
   "dependencies": {
     "@farcaster/auth-client": "^0.3.0",
     "@farcaster/frame-node": "^0.0.22",
-    "@farcaster/frame-sdk": "0.0.36",
+    "@farcaster/frame-sdk": "^0.1.9",
     "@farcaster/frame-wagmi-connector": "^0.0.24",
     "@farcaster/miniapp-sdk": "^0.1.6",
     "@t3-oss/env-nextjs": "^0.13.4",
