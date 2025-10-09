@@ -86,6 +86,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             <div className="get-spins-card-title">
       🎮 Play <b>Chain Crush</b> → Win <span style={{color: "#FFD700"}}>token Daily! and upto 200 $ARB weekly</span>
     </div>
+    </div>
           <button
             className="get-spins-action-btn1"
             onClick={handleOpenMiniApp3}
@@ -97,7 +98,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
           </button>
 
-        </div>
+      
         </div>
 
 
