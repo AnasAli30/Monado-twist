@@ -98,6 +98,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
 
         </div>
+        </div>
 
 
 <div className="get-spins-card">
