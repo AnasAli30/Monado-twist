@@ -80,23 +80,25 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
       
-      {/* <div className="get-spins-card">
+      <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
-            <div className="get-spins-card-title"> Play Arb Jump and Earn Daily upto 50$ $USDC</div>
-          </div>
+            <div className="get-spins-card-title">
+      🎮 Play <b>Chain Crush</b> → Win <span style={{color: "#FFD700"}}>token Daily! and upto 200 $ARB weekly</span>
+    </div>
           <button
             className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp3}ee
+            onClick={handleOpenMiniApp3}
             disabled={!!timeUntilMiniAppOpen3}
           >
             {!timeUntilMiniAppOpen3 ? (
-              <span className="spin-badge1">+50$ $USDC / +2 Spins</span>
+              <span className="spin-badge1">+ 200 $ARB / +2 Spins</span>
             ) : (
               <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
           </button>
 
-        </div> */}
+        </div>
+
 
 <div className="get-spins-card">
   <div className="get-spins-card-header">
@@ -125,13 +127,13 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </div>
           <button
             className="get-spins-action-btn1"
-            onClick={handleOpenMiniApp1}
-            disabled={!!timeUntilMiniAppOpen1}
+            onClick={handleOpenMiniApp2}
+            disabled={!!timeUntilMiniAppOpen2}
           >
-            {!timeUntilMiniAppOpen1 ? (
+            {!timeUntilMiniAppOpen2 ? (
               <span className="spin-badge1">+150 $USDC / +5 Spins</span>
             ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen1}</span>
+              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen2}</span>
             )}
           </button>
         </div>

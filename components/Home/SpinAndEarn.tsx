@@ -942,7 +942,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp2 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/~/mini-apps/launch?domain=base-jump-five.vercel.app"
+        url: "https://farcaster.xyz/miniapps/q9eJI4VJb8Dl/wagmi-blaster"
       });
       if (!timeUntilMiniAppOpen2 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -967,7 +967,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp3 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/fAd-0wlazOlZ/arbjump"
+        url: "https://farcaster.xyz/miniapps/djk3nS-wYTQu/chain-crush"
       });
       if (!timeUntilMiniAppOpen3 && fid) {
         const res = await fetchWithVerification('/api/spin', {
