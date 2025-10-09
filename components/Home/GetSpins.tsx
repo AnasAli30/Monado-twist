@@ -13,6 +13,8 @@ interface GetSpinsProps {
   hasLikedAndRecast: boolean;
   hasFollowedX: boolean;
   awaitingFollowXVerification: boolean;
+  hasJoinedTelegram: boolean;
+  awaitingTelegramVerification: boolean;
   handleShare: (mon: string) => Promise<void>;
   handleOpenMiniApp: () => Promise<void>;
   handleOpenMiniApp1: () => Promise<void>;
@@ -22,6 +24,7 @@ interface GetSpinsProps {
   handleFollow: () => Promise<void>;
   handleLikeRecast: () => Promise<void>;
   handleFollowX: () => Promise<void>;
+  handleJoinTelegram: () => Promise<void>;
 }
 
 export const GetSpins: React.FC<GetSpinsProps> = ({
@@ -39,16 +42,44 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   hasLikedAndRecast,
   hasFollowedX,
   awaitingFollowXVerification,
+  hasJoinedTelegram,
+  awaitingTelegramVerification,
   handleShare,
   handleOpenMiniApp,
   handleFollow,
   handleLikeRecast,
   handleFollowX,
+  handleJoinTelegram,
 }) => {
   return (
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
+        {/* Telegram Join Card */}
+        <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <div className="get-spins-card-icon telegram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.504 1.201-.825 1.23-.752.063-1.32-.493-2.046-.965-1.137-.742-1.78-1.203-2.882-1.924-1.276-.833-.45-1.29.277-2.039.19-.196 3.482-3.183 3.543-3.453.007-.032.015-.152-.058-.215-.073-.064-.181-.04-.258-.024-.107.023-1.8 1.141-5.08 3.356-.48.33-.915.489-1.304.48-.429-.009-1.251-.242-1.865-.44-.752-.244-1.349-.373-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.322.024.466.143.12.1.153.235.166.363.032.365-.11.783-.115.817z"></path>
+              </svg>
+            </div>
+            <div className="get-spins-card-title">Join Our Telegram Channel</div>
+          </div>
+          <button
+            className="get-spins-action-btn"
+            onClick={handleJoinTelegram}
+            disabled={hasJoinedTelegram || awaitingTelegramVerification}
+          >
+            {!(hasJoinedTelegram || awaitingTelegramVerification) ? (
+              <span className="spin-badge">+2 Spins</span>
+            ) : hasJoinedTelegram ? (
+              'Already Joined'
+            ) : (
+              'Verifying...'
+            )}
+          </button>
+        </div>
+      
       {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -311,6 +342,9 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         }
         .get-spins-card-icon.recast {
           background: linear-gradient(135deg, #00BFA5 60%, #6C5CE7 100%);
+        }
+        .get-spins-card-icon.telegram {
+          background: linear-gradient(135deg, #0088cc 60%, #6C5CE7 100%);
         }
         .get-spins-card-title {
           font-size: 1.25rem;

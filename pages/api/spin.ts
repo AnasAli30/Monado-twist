@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Validate mode parameter to prevent injection attacks
   if (mode && !['add', 'follow', 'followX', 'buy', 'likeAndRecast', 
-                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2', 'miniAppOpen3'].includes(mode)) {
+                'miniAppOpen', 'miniAppOpen1', 'miniAppOpen2', 'miniAppOpen3', 'joinTelegram'].includes(mode)) {
     console.log("Invalid mode",req.body)
         return res.status(400).json({ error: 'Invalid mode' });
   }
@@ -319,6 +319,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     return res.status(200).json({ spinsLeft, lastMiniAppOpen3: now });
   }
+  
+  if (mode === "joinTelegram") {
+    if (user?.hasJoinedTelegram) {
+      console.log("Already joined Telegram",req.body)
+      return res.status(400).json({ error: "Already joined Telegram" });
+    }
+    spinsLeft += 2;
+    await users.updateOne(
+      { fid },
+      { $set: { spinsLeft, lastSpinReset, hasJoinedTelegram: true } },
+      { upsert: true }
+    );
+    return res.status(200).json({ spinsLeft, hasJoinedTelegram: true });
+  }
 
   if (checkOnly) {
     // Fetch fresh user data to get current spinsLeft
@@ -342,7 +356,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       follow: currentUser?.follow,
       likeAndRecast: currentUser?.likeAndRecast,
       envelopeClaimed: currentUser?.envelopeClaimed,
-      hasFollowedX: currentUser?.hasFollowedX
+      hasFollowedX: currentUser?.hasFollowedX,
+      hasJoinedTelegram: currentUser?.hasJoinedTelegram
     });
   }
 

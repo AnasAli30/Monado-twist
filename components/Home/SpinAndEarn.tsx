@@ -116,6 +116,8 @@ export function SpinAndEarn() {
   const [timeUntilMiniAppOpen3, setTimeUntilMiniAppOpen3] = useState<string>('');
   const [hasFollowedX, setHasFollowedX] = useState(false);
   const [awaitingFollowXVerification, setAwaitingFollowXVerification] = useState(false);
+  const [hasJoinedTelegram, setHasJoinedTelegram] = useState(false);
+  const [awaitingTelegramVerification, setAwaitingTelegramVerification] = useState(false);
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [showLoyalUserPopup, setShowLoyalUserPopup] = useState(false);
@@ -330,6 +332,9 @@ export function SpinAndEarn() {
           setHasLikedAndRecast(data.likeAndRecast || false);
           if (data.hasFollowedX) {
             setHasFollowedX(!!data.hasFollowedX);
+          }
+          if (data.hasJoinedTelegram) {
+            setHasJoinedTelegram(!!data.hasJoinedTelegram);
           }
           // Update timers
           if (data.lastSpinReset) {
@@ -1061,6 +1066,33 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         setHasFollowedX(true);
       }
       setAwaitingFollowXVerification(false);
+    }, 5000);
+  };
+  
+  const handleJoinTelegram = async () => {
+    await actions?.openUrl('https://t.me/monad_twist');
+    setAwaitingTelegramVerification(true);
+    setResult('Verifying your Telegram join...');
+    setTimeout(async () => {
+      if (fid) {
+        const res = await fetchWithVerification('/api/spin', {
+          method: 'POST',
+          body: JSON.stringify({ fid, mode: 'joinTelegram' }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSpinsLeft(data.spinsLeft);
+          setResult('You got 2 extra spins for joining Telegram! 🎁');
+          setHasJoinedTelegram(true);
+        } else {
+          setResult('Error granting spins. Please try again.');
+        }
+      } else {
+        setResult('You got 2 extra spins for joining Telegram! 🎁');
+        setHasJoinedTelegram(true);
+      }
+      setAwaitingTelegramVerification(false);
     }, 5000);
   };
 
@@ -2496,6 +2528,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           hasLikedAndRecast={hasLikedAndRecast}
           hasFollowedX={hasFollowedX}
           awaitingFollowXVerification={awaitingFollowXVerification}
+          hasJoinedTelegram={hasJoinedTelegram}
+          awaitingTelegramVerification={awaitingTelegramVerification}
           handleShare={handleShare}
           handleOpenMiniApp={handleOpenMiniApp}
           handleOpenMiniApp1={handleOpenMiniApp1}
@@ -2505,6 +2539,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           handleFollow={handleFollow}
           handleLikeRecast={handleLikeRecast}
           handleFollowX={handleFollowX}
+          handleJoinTelegram={handleJoinTelegram}
         />
       )}
       <div className="switch-bar">
