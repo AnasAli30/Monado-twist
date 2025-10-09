@@ -12,7 +12,7 @@
   "dependencies": {
     "@farcaster/auth-client": "^0.3.0",
     "@farcaster/frame-node": "^0.0.22",
-    "@farcaster/frame-sdk": "^0.0.61",
+    "@farcaster/frame-sdk": "^0.1.9",
     "@farcaster/frame-wagmi-connector": "^0.0.24",
     "@farcaster/miniapp-sdk": "^0.1.6",
     "@t3-oss/env-nextjs": "^0.13.4",
@@ -31,7 +31,6 @@
     "react-icons": "^5.5.0",
     "redis": "^5.0.1",
     "socket.io": "^4.8.1",
-    "telegraf": "^4.16.3",
     "viem": "^2.22.22",
     "wagmi": "^2.14.12",
     "zod": "^3.24.1"
