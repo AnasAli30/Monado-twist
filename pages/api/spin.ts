@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import crypto from 'crypto';
 
 const SPINS_PER_DAY = 10;
-const SPINS_PER_PURCHASE = 15;
+const SPINS_PER_PURCHASE = 5;
 
 // Use server-only environment variable - not exposed to browser
 const SERVER_SECRET_KEY = process.env.SERVER_SECRET_KEY || "";
