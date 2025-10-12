@@ -892,7 +892,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/efPuNxgasRTJ/recess"
+        url: "https://farcaster.xyz/miniapps/cFGpvpDI-nDJ/base-jump"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
