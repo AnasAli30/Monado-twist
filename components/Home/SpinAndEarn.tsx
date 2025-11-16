@@ -2527,9 +2527,9 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          background: rgba(18, 18, 45, 0.8);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           display: flex;
           align-items: flex-end;
           justify-content: center;
@@ -2543,17 +2543,20 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .daily-checkin-popup {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(0deg, rgba(122, 11, 122, 1) 0%, rgba(90, 45, 253, 1) 20%, rgba(108, 92, 231, 1) 50%);
           border-radius: 32px 32px 0 0;
-          padding: 32px 24px 24px;
+          padding: 32px 24px 28px;
           max-width: 500px;
           width: 100%;
           position: relative;
           overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-bottom: none;
           box-shadow: 
-            0 -20px 60px rgba(0, 0, 0, 0.5),
+            0 -20px 60px rgba(108, 92, 231, 0.5),
             0 0 0 1px rgba(255, 255, 255, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 0 80px rgba(247, 37, 133, 0.3);
           animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -2610,13 +2613,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
         .daily-checkin-icon-wrapper {
           display: inline-block;
-          background: linear-gradient(135deg, #FFD700, #FFA500);
+          background: linear-gradient(135deg, #f72585, #b5179e);
           border-radius: 50%;
           padding: 20px;
           margin-bottom: 16px;
           box-shadow: 
-            0 8px 30px rgba(255, 215, 0, 0.5),
-            0 0 0 8px rgba(255, 215, 0, 0.2);
+            0 8px 30px rgba(247, 37, 133, 0.6),
+            0 0 0 8px rgba(247, 37, 133, 0.2);
           animation: iconPulse 2s ease-in-out infinite;
         }
 
@@ -2624,14 +2627,14 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           0%, 100% {
             transform: scale(1);
             box-shadow: 
-              0 8px 30px rgba(255, 215, 0, 0.5),
-              0 0 0 8px rgba(255, 215, 0, 0.2);
+              0 8px 30px rgba(247, 37, 133, 0.6),
+              0 0 0 8px rgba(247, 37, 133, 0.2);
           }
           50% {
             transform: scale(1.05);
             box-shadow: 
-              0 12px 40px rgba(255, 215, 0, 0.7),
-              0 0 0 12px rgba(255, 215, 0, 0.3);
+              0 12px 40px rgba(247, 37, 133, 0.8),
+              0 0 0 12px rgba(247, 37, 133, 0.3);
           }
         }
 
@@ -2646,7 +2649,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           font-weight: 900;
           color: #fff;
           margin: 0 0 8px 0;
-          text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 0 20px rgba(247, 37, 133, 0.5);
           animation: titleSlideIn 0.8s ease-out 0.2s both;
         }
 
@@ -2670,12 +2673,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .daily-checkin-reward-box {
-          background: rgba(255, 255, 255, 0.15);
-          border-radius: 20px;
+          background: linear-gradient(145deg, rgba(0,0,0,0.25), rgba(0,0,0,0.4));
+          border-radius: 24px;
           padding: 24px;
           margin-bottom: 20px;
           text-align: center;
-          border: 2px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
           position: relative;
           z-index: 1;
           animation: rewardBoxZoom 0.8s ease-out 0.4s both;
@@ -2705,9 +2709,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         .daily-checkin-spins-number {
           font-size: 4rem;
           font-weight: 900;
-          color: #FFD700;
+          color: #ffe066;
           text-shadow: 
-            0 0 20px rgba(255, 215, 0, 0.8),
+            0 0 20px rgba(255, 224, 102, 0.8),
+            0 0 40px rgba(247, 37, 133, 0.4),
             0 4px 12px rgba(0, 0, 0, 0.4);
           line-height: 1;
           margin-bottom: 8px;
@@ -2735,13 +2740,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: linear-gradient(90deg, #FFD700, #FFA500);
-          color: #000;
+          background: linear-gradient(90deg, #f72585, #b5179e);
+          color: #fff;
           padding: 10px 20px;
           border-radius: 20px;
           font-weight: 800;
           font-size: 1rem;
-          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+          box-shadow: 0 4px 15px rgba(247, 37, 133, 0.6);
           animation: badgeShake 0.5s ease-in-out 1s;
         }
 
@@ -2755,10 +2760,12 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           display: flex;
           align-items: center;
           justify-content: space-around;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 16px;
+          background: linear-gradient(145deg, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+          border-radius: 24px;
           padding: 20px 16px;
           margin-bottom: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: inset 0 3px 8px rgba(0,0,0,0.3);
           position: relative;
           z-index: 1;
           animation: statsSlideIn 0.8s ease-out 0.5s both;
@@ -2786,13 +2793,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .daily-checkin-stat-icon.fire {
-          color: #FF6B6B;
-          filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.6));
+          color: #f97316;
+          filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
         }
 
         .daily-checkin-stat-icon.trophy {
-          color: #FFD700;
-          filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+          color: #ffe066;
+          filter: drop-shadow(0 0 8px rgba(255, 224, 102, 0.6));
         }
 
         .daily-checkin-stat-content {
@@ -2806,11 +2813,12 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           color: #fff;
           line-height: 1;
           margin-bottom: 4px;
+          text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .daily-checkin-stat-label {
           font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.8);
+          color: #e0d7ff;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 1px;
@@ -2854,20 +2862,19 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
         .daily-checkin-close-btn {
           width: 100%;
-          padding: 16px;
-          background: linear-gradient(90deg, #FFD700, #FFA500);
-          color: #000;
+          padding: 18px;
+          background: linear-gradient(180deg, #f72585, #b5179e);
+          color: #fff;
           border: none;
-          border-radius: 16px;
-          font-size: 1.2rem;
-          font-weight: 800;
+          border-bottom: 6px solid #8e0a71;
+          border-radius: 20px;
+          font-size: 1.3rem;
+          font-weight: 900;
           cursor: pointer;
           text-transform: uppercase;
           letter-spacing: 1px;
-          box-shadow: 
-            0 8px 25px rgba(255, 215, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-          transition: all 0.3s ease;
+          box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
+          transition: all 0.15s ease-out;
           position: relative;
           z-index: 1;
           animation: buttonSlideIn 0.8s ease-out 0.7s both;
@@ -2885,14 +2892,15 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         }
 
         .daily-checkin-close-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 
-            0 12px 35px rgba(255, 215, 0, 0.6),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 30px rgba(247, 37, 133, 0.6);
+          background: linear-gradient(180deg, #ff3a9a, #d12cb1);
         }
 
         .daily-checkin-close-btn:active {
-          transform: translateY(0);
+          transform: translateY(4px);
+          box-shadow: 0 3px 10px rgba(247, 37, 133, 0.5);
+          border-bottom-width: 2px;
         }
       `}</style>
       {/* PERFORMANCE OPTIMIZATION: Audio preloading - consider lazy loading */}
