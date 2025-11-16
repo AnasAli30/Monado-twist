@@ -95,6 +95,13 @@ export function SpinAndEarn() {
     }
     return false;
   });
+  const [bgMusicEnabled, setBgMusicEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('bgMusicEnabled');
+      return saved === 'true';
+    }
+    return false;
+  });
   const [totalMonWon, setTotalMonWon] = useState<number>(0);
   const [totalWins, setTotalWins] = useState<number>(() => {
     if (typeof window !== 'undefined') {
@@ -104,6 +111,7 @@ export function SpinAndEarn() {
     return 0;
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const loseAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -214,6 +222,11 @@ export function SpinAndEarn() {
   useEffect(() => {
     debouncedUpdateLocalStorage('isMuted', isMuted.toString());
   }, [isMuted, debouncedUpdateLocalStorage]);
+
+  // Save background music state to localStorage (debounced)
+  useEffect(() => {
+    debouncedUpdateLocalStorage('bgMusicEnabled', bgMusicEnabled.toString());
+  }, [bgMusicEnabled, debouncedUpdateLocalStorage]);
 
   // Show popup when spins reach 0
   useEffect(() => {
@@ -595,6 +608,30 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       audioRef.current.muted = !isMuted;
     }
   };
+
+  const toggleBgMusic = () => {
+    setBgMusicEnabled(!bgMusicEnabled);
+  };
+
+  // Background music control
+  useEffect(() => {
+    if (bgMusicRef.current) {
+      bgMusicRef.current.volume = 0.18; // 18% volume (sweet spot between 15-20%)
+      bgMusicRef.current.loop = true;
+      
+      if (bgMusicEnabled && !isMuted) {
+        // Start playing with user interaction
+        const playPromise = bgMusicRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log('Background music autoplay prevented:', error);
+          });
+        }
+      } else {
+        bgMusicRef.current.pause();
+      }
+    }
+  }, [bgMusicEnabled, isMuted]);
 
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
@@ -1872,6 +1909,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         justify-content: center;
           flex: 0 1 auto;
         }
+        .switch-bar .mute-button.music-active {
+          background: rgba(108, 92, 231, 0.3);
+          color: #fbbf24;
+        }
         .switch-bar button svg {
           font-size: 1.4rem;
         }
@@ -2910,6 +2951,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         preload="metadata"
         muted={isMuted}
       />
+      <audio
+        ref={bgMusicRef}
+        src="/audio/bg.mp3"
+        preload="auto"
+        muted={isMuted}
+        loop
+      />
       {winSounds.map((src, i) => (
         <audio
           key={src}
@@ -3099,6 +3147,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           <FaTrophy /> 
         </button>
       
+        <button
+          className={`mute-button ${bgMusicEnabled ? 'music-active' : ''}`}
+          onClick={toggleBgMusic}
+          title={bgMusicEnabled ? "Disable Background Music" : "Enable Background Music"}
+        >
+          {bgMusicEnabled ? '🎵' : '🎵'}
+        </button>
         <button
           className="mute-button"
           onClick={toggleMute}
