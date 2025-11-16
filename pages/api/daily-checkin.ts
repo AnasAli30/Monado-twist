@@ -59,12 +59,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Check origin
-  if (!isAllowedOrigin(req)) {
+  const { fid, randomKey, fusedKey, checkOnly } = req.method === 'POST' ? req.body : req.query;
+
+  // For GET requests (checkOnly), allow without strict origin check
+  // For POST requests (actual check-in), require origin verification
+  if (req.method === 'POST' && !isAllowedOrigin(req)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
-
-  const { fid, randomKey, fusedKey, checkOnly } = req.method === 'POST' ? req.body : req.query;
 
   if (!fid) {
     return res.status(400).json({ error: 'FID is required' });

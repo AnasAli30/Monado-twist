@@ -3,7 +3,7 @@ import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { monadTestnet } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
-import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaDice } from "react-icons/fa";
+import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaDice, FaCalendarCheck, FaFire, FaStar } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
 import { Leaderboard } from "@/components/Home/Leaderboard";
 import { Confetti } from './Confetti';
@@ -121,6 +121,13 @@ export function SpinAndEarn() {
   const [showNoSpinsPopup, setShowNoSpinsPopup] = useState(false);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [showLoyalUserPopup, setShowLoyalUserPopup] = useState(false);
+  const [showDailyCheckInPopup, setShowDailyCheckInPopup] = useState(false);
+  const [dailyCheckInData, setDailyCheckInData] = useState<{
+    streak: number;
+    spins: number;
+    bonus: boolean;
+    totalCheckIns: number;
+  } | null>(null);
 
   const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
   // Add this near the top of the component, after other state declarations
@@ -237,6 +244,69 @@ export function SpinAndEarn() {
       }
     }
   }, []);
+
+  // Auto daily check-in when user returns on a new day
+  useEffect(() => {
+    const autoCheckIn = async () => {
+      if (!fid) return;
+
+      try {
+        // Check if user can check in
+        const statusRes = await fetch(`/api/daily-checkin?fid=${fid}&checkOnly=true`);
+        const statusData = await statusRes.json();
+
+        if (statusRes.ok && statusData.canCheckIn) {
+          // Get last check-in date from localStorage
+          const lastCheckInDate = localStorage.getItem('lastAutoCheckInDate');
+          const today = new Date().toDateString();
+
+          // Only auto check-in once per day
+          if (lastCheckInDate !== today) {
+            // Perform auto check-in
+            const checkInRes = await fetchWithVerification('/api/daily-checkin', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ fid }),
+            });
+
+            const checkInData = await checkInRes.json();
+
+            if (checkInRes.ok) {
+              // Save today's date
+              localStorage.setItem('lastAutoCheckInDate', today);
+              
+              // Set popup data
+              setDailyCheckInData({
+                streak: checkInData.checkInStreak,
+                spins: checkInData.reward.spins,
+                bonus: checkInData.reward.bonus,
+                totalCheckIns: checkInData.totalCheckIns,
+              });
+
+              // Update spins left
+              setSpinsLeft(checkInData.newSpinsLeft);
+
+              // Show popup after a short delay
+              setTimeout(() => {
+                setShowDailyCheckInPopup(true);
+              }, 1500);
+
+              // Auto close after 5 seconds
+              setTimeout(() => {
+                setShowDailyCheckInPopup(false);
+              }, 6500);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Auto check-in error:', error);
+      }
+    };
+
+    autoCheckIn();
+  }, [fid]);
 
   useEffect(() => {
     // Sync user data to DB
@@ -1250,6 +1320,76 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     </div>
   </div>
 )}
+
+      {/* Daily Check-In Auto Popup */}
+      {showDailyCheckInPopup && dailyCheckInData && (
+        <div className="daily-checkin-popup-overlay">
+          <div className="daily-checkin-popup">
+            <div className="daily-checkin-confetti">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="daily-checkin-confetti-piece"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 2}s`,
+                    backgroundColor: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1'][Math.floor(Math.random() * 5)]
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="daily-checkin-header">
+              <div className="daily-checkin-icon-wrapper">
+                <FaCalendarCheck className="daily-checkin-icon" />
+              </div>
+              <h2 className="daily-checkin-title">Daily Check-In Complete!</h2>
+              <p className="daily-checkin-subtitle">Welcome back! 🎉</p>
+            </div>
+
+            <div className="daily-checkin-reward-box">
+              <div className="daily-checkin-spins">
+                <span className="daily-checkin-spins-number">+{dailyCheckInData.spins}</span>
+                <span className="daily-checkin-spins-label">Free Spins</span>
+              </div>
+              {dailyCheckInData.bonus && (
+                <div className="daily-checkin-bonus-badge">
+                  <FaStar /> Weekly Bonus! <FaStar />
+                </div>
+              )}
+            </div>
+
+            <div className="daily-checkin-stats">
+              <div className="daily-checkin-stat">
+                <FaFire className="daily-checkin-stat-icon fire" />
+                <div className="daily-checkin-stat-content">
+                  <span className="daily-checkin-stat-value">{dailyCheckInData.streak}</span>
+                  <span className="daily-checkin-stat-label">Day Streak</span>
+                </div>
+              </div>
+              <div className="daily-checkin-stat-divider"></div>
+              <div className="daily-checkin-stat">
+                <FaTrophy className="daily-checkin-stat-icon trophy" />
+                <div className="daily-checkin-stat-content">
+                  <span className="daily-checkin-stat-value">{dailyCheckInData.totalCheckIns}</span>
+                  <span className="daily-checkin-stat-label">Total Days</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="daily-checkin-message">
+              <p>Keep your streak going! Come back tomorrow for more rewards 🚀</p>
+            </div>
+
+            <button 
+              className="daily-checkin-close-btn"
+              onClick={() => setShowDailyCheckInPopup(false)}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Loyal User Popup */}
       {/* {showLoyalUserPopup && (
@@ -2379,6 +2519,381 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           font-style: italic;
           line-height: 1.3;
         }
+
+        /* Daily Check-In Auto Popup Styles */
+        .daily-checkin-popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          z-index: 2000;
+          animation: overlayFadeIn 0.3s ease-out;
+        }
+
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .daily-checkin-popup {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 32px 32px 0 0;
+          padding: 32px 24px 24px;
+          max-width: 500px;
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 
+            0 -20px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUpBounce {
+          0% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          60% {
+            transform: translateY(-10px);
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .daily-checkin-confetti {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .daily-checkin-confetti-piece {
+          position: absolute;
+          top: -10%;
+          width: 10px;
+          height: 10px;
+          animation: confettiFall 3s ease-in-out infinite;
+          opacity: 0.8;
+        }
+
+        @keyframes confettiFall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(500px) rotate(720deg);
+            opacity: 0;
+          }
+        }
+
+        .daily-checkin-header {
+          text-align: center;
+          margin-bottom: 24px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .daily-checkin-icon-wrapper {
+          display: inline-block;
+          background: linear-gradient(135deg, #FFD700, #FFA500);
+          border-radius: 50%;
+          padding: 20px;
+          margin-bottom: 16px;
+          box-shadow: 
+            0 8px 30px rgba(255, 215, 0, 0.5),
+            0 0 0 8px rgba(255, 215, 0, 0.2);
+          animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 
+              0 8px 30px rgba(255, 215, 0, 0.5),
+              0 0 0 8px rgba(255, 215, 0, 0.2);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 
+              0 12px 40px rgba(255, 215, 0, 0.7),
+              0 0 0 12px rgba(255, 215, 0, 0.3);
+          }
+        }
+
+        .daily-checkin-icon {
+          font-size: 3rem;
+          color: #fff;
+          display: block;
+        }
+
+        .daily-checkin-title {
+          font-size: 2rem;
+          font-weight: 900;
+          color: #fff;
+          margin: 0 0 8px 0;
+          text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          animation: titleSlideIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes titleSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .daily-checkin-subtitle {
+          font-size: 1.1rem;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-weight: 600;
+          animation: titleSlideIn 0.8s ease-out 0.3s both;
+        }
+
+        .daily-checkin-reward-box {
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 20px;
+          padding: 24px;
+          margin-bottom: 20px;
+          text-align: center;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          position: relative;
+          z-index: 1;
+          animation: rewardBoxZoom 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes rewardBoxZoom {
+          0% {
+            transform: scale(0.8);
+            opacity: 0;
+          }
+          60% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .daily-checkin-spins {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .daily-checkin-spins-number {
+          font-size: 4rem;
+          font-weight: 900;
+          color: #FFD700;
+          text-shadow: 
+            0 0 20px rgba(255, 215, 0, 0.8),
+            0 4px 12px rgba(0, 0, 0, 0.4);
+          line-height: 1;
+          margin-bottom: 8px;
+          animation: numberBounce 1s ease-in-out 0.6s both;
+        }
+
+        @keyframes numberBounce {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+        }
+
+        .daily-checkin-spins-label {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #fff;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+
+        .daily-checkin-bonus-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: linear-gradient(90deg, #FFD700, #FFA500);
+          color: #000;
+          padding: 10px 20px;
+          border-radius: 20px;
+          font-weight: 800;
+          font-size: 1rem;
+          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+          animation: badgeShake 0.5s ease-in-out 1s;
+        }
+
+        @keyframes badgeShake {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-5deg); }
+          75% { transform: rotate(5deg); }
+        }
+
+        .daily-checkin-stats {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 16px;
+          padding: 20px 16px;
+          margin-bottom: 20px;
+          position: relative;
+          z-index: 1;
+          animation: statsSlideIn 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes statsSlideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .daily-checkin-stat {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .daily-checkin-stat-icon {
+          font-size: 2rem;
+        }
+
+        .daily-checkin-stat-icon.fire {
+          color: #FF6B6B;
+          filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.6));
+        }
+
+        .daily-checkin-stat-icon.trophy {
+          color: #FFD700;
+          filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
+
+        .daily-checkin-stat-content {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .daily-checkin-stat-value {
+          font-size: 1.8rem;
+          font-weight: 900;
+          color: #fff;
+          line-height: 1;
+          margin-bottom: 4px;
+        }
+
+        .daily-checkin-stat-label {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.8);
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .daily-checkin-stat-divider {
+          width: 2px;
+          height: 40px;
+          background: linear-gradient(180deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.3) 50%, 
+            transparent 100%);
+        }
+
+        .daily-checkin-message {
+          text-align: center;
+          margin-bottom: 20px;
+          position: relative;
+          z-index: 1;
+          animation: messageSlideIn 0.8s ease-out 0.6s both;
+        }
+
+        @keyframes messageSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .daily-checkin-message p {
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.95);
+          margin: 0;
+          line-height: 1.5;
+          font-weight: 500;
+        }
+
+        .daily-checkin-close-btn {
+          width: 100%;
+          padding: 16px;
+          background: linear-gradient(90deg, #FFD700, #FFA500);
+          color: #000;
+          border: none;
+          border-radius: 16px;
+          font-size: 1.2rem;
+          font-weight: 800;
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          box-shadow: 
+            0 8px 25px rgba(255, 215, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+          transition: all 0.3s ease;
+          position: relative;
+          z-index: 1;
+          animation: buttonSlideIn 0.8s ease-out 0.7s both;
+        }
+
+        @keyframes buttonSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .daily-checkin-close-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 
+            0 12px 35px rgba(255, 215, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .daily-checkin-close-btn:active {
+          transform: translateY(0);
+        }
       `}</style>
       {/* PERFORMANCE OPTIMIZATION: Audio preloading - consider lazy loading */}
       <audio
@@ -2435,7 +2950,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           <div className="spin-ui-card">
           <EnvelopeReward setClaimed={setClaimed}  />
           { claimed && <div>
-            <div className="spin-ui-header">Monad TWIST</div>
+            <div className="spin-ui-header">MONAD TWIST</div>
            
            
             <div className="spin-ui-row">
