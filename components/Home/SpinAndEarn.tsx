@@ -105,6 +105,9 @@ export function SpinAndEarn() {
   });
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+  const clickNavRef = useRef<HTMLAudioElement | null>(null);
+  const clickSpinRef = useRef<HTMLAudioElement | null>(null);
+  const clickToggleRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const loseAudioRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
@@ -591,6 +594,12 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   };
 
   const toggleMute = () => {
+    // Play toggle sound before changing mute state
+    if (clickToggleRef.current && !isMuted) {
+      clickToggleRef.current.currentTime = 0;
+      clickToggleRef.current.play().catch(e => console.log('Toggle sound error:', e));
+    }
+    
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
     
@@ -600,6 +609,15 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     }
     if (bgMusicRef.current) {
       bgMusicRef.current.muted = newMutedState;
+    }
+    if (clickNavRef.current) {
+      clickNavRef.current.muted = newMutedState;
+    }
+    if (clickSpinRef.current) {
+      clickSpinRef.current.muted = newMutedState;
+    }
+    if (clickToggleRef.current) {
+      clickToggleRef.current.muted = newMutedState;
     }
   };
 
@@ -620,15 +638,35 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     }
   }, []); // Run once on mount
 
-  // Update background music mute state when isMuted changes
+  // Update all audio mute state when isMuted changes
   useEffect(() => {
     if (bgMusicRef.current) {
       bgMusicRef.current.muted = isMuted;
     }
+    if (clickNavRef.current) {
+      clickNavRef.current.muted = isMuted;
+    }
+    if (clickSpinRef.current) {
+      clickSpinRef.current.muted = isMuted;
+    }
+    if (clickToggleRef.current) {
+      clickToggleRef.current.muted = isMuted;
+    }
   }, [isMuted]);
+
+  // Helper function to play sound effects
+  const playSound = (audioRef: React.RefObject<HTMLAudioElement>) => {
+    if (audioRef.current && !isMuted) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.log('Sound play error:', e));
+    }
+  };
 
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
+    
+    // Play spin sound
+    playSound(clickSpinRef);
     
     // Check if on correct chain
     if (chainId !== monadTestnet.id) {
@@ -2948,6 +2986,24 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         muted={isMuted}
         loop
       />
+      <audio
+        ref={clickNavRef}
+        src="/audio/click-nav.mp3"
+        preload="auto"
+        muted={isMuted}
+      />
+      <audio
+        ref={clickSpinRef}
+        src="/audio/click-spin.mp3"
+        preload="auto"
+        muted={isMuted}
+      />
+      <audio
+        ref={clickToggleRef}
+        src="/audio/click-toggle.mp3"
+        preload="auto"
+        muted={isMuted}
+      />
       {winSounds.map((src, i) => (
         <audio
           key={src}
@@ -3106,7 +3162,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       <div className="switch-bar">
         <button
           className={view === 'spin' ? 'active' : ''}
-          onClick={() => setView('spin')}
+          onClick={() => {
+            playSound(clickNavRef);
+            setView('spin');
+          }}
         >
           <FaHome />
         </button>
@@ -3119,20 +3178,29 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         </button> */}
         <button
           className={view === 'getspins' ? 'active' : ''}
-          onClick={() => setView('getspins')}
+          onClick={() => {
+            playSound(clickNavRef);
+            setView('getspins');
+          }}
           title="Get Spins"
         >
           <FaTicketAlt />
         </button>
         <button
           className={view === 'wallet' ? 'active' : ''}
-          onClick={() => setView('wallet')}
+          onClick={() => {
+            playSound(clickNavRef);
+            setView('wallet');
+          }}
         >
           <FaWallet /> 
         </button>
         <button
           className={view === 'leaderboard' ? 'active' : ''}
-          onClick={() => setView('leaderboard')}
+          onClick={() => {
+            playSound(clickNavRef);
+            setView('leaderboard');
+          }}
         >
           <FaTrophy /> 
         </button>
