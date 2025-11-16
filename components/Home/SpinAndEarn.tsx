@@ -95,13 +95,6 @@ export function SpinAndEarn() {
     }
     return false;
   });
-  const [bgMusicEnabled, setBgMusicEnabled] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('bgMusicEnabled');
-      return saved === 'true';
-    }
-    return false;
-  });
   const [totalMonWon, setTotalMonWon] = useState<number>(0);
   const [totalWins, setTotalWins] = useState<number>(() => {
     if (typeof window !== 'undefined') {
@@ -222,11 +215,6 @@ export function SpinAndEarn() {
   useEffect(() => {
     debouncedUpdateLocalStorage('isMuted', isMuted.toString());
   }, [isMuted, debouncedUpdateLocalStorage]);
-
-  // Save background music state to localStorage (debounced)
-  useEffect(() => {
-    debouncedUpdateLocalStorage('bgMusicEnabled', bgMusicEnabled.toString());
-  }, [bgMusicEnabled, debouncedUpdateLocalStorage]);
 
   // Show popup when spins reach 0
   useEffect(() => {
@@ -603,35 +591,41 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   };
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    
+    // Control all audio elements
     if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
+      audioRef.current.muted = newMutedState;
+    }
+    if (bgMusicRef.current) {
+      bgMusicRef.current.muted = newMutedState;
     }
   };
 
-  const toggleBgMusic = () => {
-    setBgMusicEnabled(!bgMusicEnabled);
-  };
-
-  // Background music control
+  // Auto-start background music on component mount
   useEffect(() => {
     if (bgMusicRef.current) {
       bgMusicRef.current.volume = 0.18; // 18% volume (sweet spot between 15-20%)
       bgMusicRef.current.loop = true;
+      bgMusicRef.current.muted = isMuted;
       
-      if (bgMusicEnabled && !isMuted) {
-        // Start playing with user interaction
-        const playPromise = bgMusicRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.log('Background music autoplay prevented:', error);
-          });
-        }
-      } else {
-        bgMusicRef.current.pause();
+      // Auto-play background music
+      const playPromise = bgMusicRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Background music autoplay prevented, will start on first interaction:', error);
+        });
       }
     }
-  }, [bgMusicEnabled, isMuted]);
+  }, []); // Run once on mount
+
+  // Update background music mute state when isMuted changes
+  useEffect(() => {
+    if (bgMusicRef.current) {
+      bgMusicRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
@@ -1909,10 +1903,6 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         justify-content: center;
           flex: 0 1 auto;
         }
-        .switch-bar .mute-button.music-active {
-          background: rgba(108, 92, 231, 0.3);
-          color: #fbbf24;
-        }
         .switch-bar button svg {
           font-size: 1.4rem;
         }
@@ -3148,16 +3138,9 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         </button>
       
         <button
-          className={`mute-button ${bgMusicEnabled ? 'music-active' : ''}`}
-          onClick={toggleBgMusic}
-          title={bgMusicEnabled ? "Disable Background Music" : "Enable Background Music"}
-        >
-          {bgMusicEnabled ? '🎵' : '🎵'}
-        </button>
-        <button
           className="mute-button"
           onClick={toggleMute}
-          title={isMuted ? "Unmute" : "Mute"}
+          title={isMuted ? "Unmute All Sounds" : "Mute All Sounds"}
         >
           {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
