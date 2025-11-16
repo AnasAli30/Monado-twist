@@ -1205,7 +1205,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
       <div className="popup-message">
         <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
-          🎉 Welcome to <span style={{color:"#fff"}}>Monad TWIST</span> 🎰
+          🎉 Welcome to <span style={{color:"#fff"}}>MONAD TWIST</span> 🎰
         </h3>
         <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
           Spin, Match & Win! 💎  

@@ -1,6 +1,8 @@
-import React from 'react';
-import { FaShareAlt, FaRocket, FaUserPlus, FaRetweet, FaTwitterSquare } from 'react-icons/fa';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FaShareAlt, FaRocket, FaUserPlus, FaRetweet, FaTwitterSquare, FaCalendarCheck, FaFire, FaClock, FaStar } from 'react-icons/fa';
 import Image from 'next/image';
+import { useMiniAppContext } from '@/hooks/use-miniapp-context';
+import { fetchWithVerification } from '@/utils/keyVerification';
 
 interface GetSpinsProps {
   timeUntilShare: string;
@@ -27,6 +29,18 @@ interface GetSpinsProps {
   handleJoinTelegram: () => Promise<void>;
 }
 
+interface CheckInStatus {
+  canCheckIn: boolean;
+  lastCheckIn: Date | null;
+  checkInStreak: number;
+  totalCheckIns: number;
+  nextCheckInTime: Date | null;
+  nextReward: {
+    spins: number;
+    bonus: boolean;
+  };
+}
+
 export const GetSpins: React.FC<GetSpinsProps> = ({
   timeUntilShare,
   timeUntilMiniAppOpen,
@@ -51,12 +65,146 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   handleFollowX,
   handleJoinTelegram,
 }) => {
+  const { context } = useMiniAppContext();
+  const fid = context?.user?.fid;
+  
+  const [checkInStatus, setCheckInStatus] = useState<CheckInStatus | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [timeUntilNext, setTimeUntilNext] = useState<string>('');
+
+  // Fetch check-in status
+  const fetchCheckInStatus = useCallback(async () => {
+    if (!fid) return;
+
+    try {
+      const response = await fetch(`/api/daily-checkin?fid=${fid}&checkOnly=true`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setCheckInStatus(data);
+      }
+    } catch (error) {
+      console.error('Error fetching check-in status:', error);
+    }
+  }, [fid]);
+
+  useEffect(() => {
+    fetchCheckInStatus();
+  }, [fetchCheckInStatus]);
+
+  // Update countdown timer
+  useEffect(() => {
+    if (!checkInStatus?.nextCheckInTime) {
+      setTimeUntilNext('');
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const nextTime = new Date(checkInStatus.nextCheckInTime!).getTime();
+      const distance = nextTime - now;
+
+      if (distance < 0) {
+        setTimeUntilNext('Available now!');
+        fetchCheckInStatus();
+        return;
+      }
+
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeUntilNext(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [checkInStatus?.nextCheckInTime, fetchCheckInStatus]);
+
+  // Handle check-in
+  const handleCheckIn = async () => {
+    if (!fid || checking || !checkInStatus?.canCheckIn) return;
+
+    setChecking(true);
+
+    try {
+      const response = await fetchWithVerification('/api/daily-checkin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fid }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`Check-In Complete! +${data.reward.spins} Spins${data.reward.bonus ? ' (Weekly Bonus!)' : ''}`);
+        fetchCheckInStatus();
+      } else {
+        console.error('Check-in failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Error during check-in:', error);
+    } finally {
+      setChecking(false);
+    }
+  };
+
   return (
     <div className="get-spins-section">
       <h2 className="get-spins-title">Get Extra Spins</h2>
       <div className="get-spins-cards">
 
-      <div className="get-spins-card">
+        {/* Daily Check-In Compact Card */}
+        <div className="get-spins-card daily-checkin-card">
+          <div className="checkin-compact-header">
+            <div className="checkin-icon-wrapper">
+              <FaCalendarCheck className="checkin-icon" />
+            </div>
+            <div className="checkin-info">
+              <div className="checkin-title">Daily Check-In</div>
+              <div className="checkin-stats">
+                <div className="streak-mini">
+                  <FaFire className="fire-mini" />
+                  <span>{checkInStatus?.checkInStreak || 0}</span>
+                </div>
+                <div className="reward-mini">
+                  <FaStar className="star-mini" />
+                  <span>+{checkInStatus?.nextReward.spins || 1} Spins</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {checkInStatus?.canCheckIn ? (
+            <button
+              className="get-spins-action-btn checkin-btn-compact"
+              onClick={handleCheckIn}
+              disabled={checking}
+            >
+              {checking ? (
+                <>
+                  <FaClock className="spinning-icon" />
+                  Checking In...
+                </>
+              ) : (
+                <>
+                  <span className="spin-badge-checkin">✨ Check In Now</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="checkin-countdown-compact">
+              <FaClock className="clock-icon" />
+              <span className="countdown-text">{timeUntilNext}</span>
+            </div>
+          )}
+        </div>
+
+      {/* <div className="get-spins-card">
   <div className="get-spins-card-header">
     <img src="images/basejump.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
     <div className="get-spins-card-title">
@@ -74,10 +222,10 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
       <span style={{color:"black"}}>⏳ Opens in: {timeUntilMiniAppOpen}</span>
     )}
   </button>
-</div>
+</div> */}
 
 
-
+{/* 
       <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -97,7 +245,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
 
       
-        </div>
+        </div> */}
 
 
 <div className="get-spins-card">
@@ -120,7 +268,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   </button>
 </div>
         
-<div className="get-spins-card">
+{/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play game and Earn upto 150 $USDC</div>
@@ -137,7 +285,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             )}
           </button>
         </div>
-  
+   */}
       
 
 
@@ -192,7 +340,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         </div>
         
         {/* Monad Realm X Follow Card */}
-        <div className="get-spins-card">
+        {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <div className="get-spins-card-icon xprofile"><FaTwitterSquare /></div>
             <div className="get-spins-card-title">Follow on X</div>
@@ -210,7 +358,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               'Verifying...'
             )}
           </button>
-        </div>
+        </div> */}
         {/* Play Monad Realm Card */}
      
         
@@ -413,6 +561,165 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           box-shadow: 0 2px 8px #a084ee33;
           letter-spacing: 0.5px;
           display: inline-block;
+        }
+
+        /* Daily Check-In Compact Card Styles */
+        .daily-checkin-card {
+          background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.05));
+          border: 2px solid rgba(251, 191, 36, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .daily-checkin-card::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          right: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+          animation: pulse-light 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-light {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .checkin-compact-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .checkin-icon-wrapper {
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          border-radius: 16px;
+          padding: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+          flex-shrink: 0;
+        }
+
+        .checkin-icon {
+          font-size: 2rem;
+          color: #fff;
+        }
+
+        .checkin-info {
+          flex: 1;
+        }
+
+        .checkin-title {
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: #fff;
+          margin-bottom: 8px;
+          text-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .checkin-stats {
+          display: flex;
+          gap: 16px;
+          align-items: center;
+        }
+
+        .streak-mini, .reward-mini {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 6px 12px;
+          border-radius: 12px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #fff;
+        }
+
+        .fire-mini {
+          color: #f97316;
+          font-size: 1.1rem;
+        }
+
+        .star-mini {
+          color: #fbbf24;
+          font-size: 1.1rem;
+        }
+
+        .checkin-btn-compact {
+          background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+          margin-top: 16px;
+          position: relative;
+          z-index: 1;
+          animation: glow-checkin 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-checkin {
+          0%, 100% {
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.5);
+          }
+          50% {
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.8), 0 0 30px rgba(251, 191, 36, 0.4);
+          }
+        }
+
+        .checkin-btn-compact:hover:not(:disabled) {
+          background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 6px 25px rgba(251, 191, 36, 0.6);
+        }
+
+        .spin-badge-checkin {
+          background: #fff;
+          color: #f59e0b;
+          font-weight: 800;
+          font-size: 1rem;
+          border-radius: 8px;
+          width: 90%;
+          padding: 6px 14px;
+          margin-right: 6px;
+          box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+          letter-spacing: 0.5px;
+          display: inline-block;
+        }
+
+        .checkin-countdown-compact {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          background: rgba(0, 0, 0, 0.3);
+          padding: 14px;
+          border-radius: 12px;
+          margin-top: 16px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .clock-icon {
+          color: #9ca3af;
+          font-size: 1.2rem;
+        }
+
+        .countdown-text {
+          color: #fbbf24;
+          font-weight: 700;
+          font-size: 1.1rem;
+          text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .spinning-icon {
+          animation: spin-icon 1s linear infinite;
+        }
+
+        @keyframes spin-icon {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>

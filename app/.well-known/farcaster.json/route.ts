@@ -19,7 +19,7 @@ export async function GET() {
       tags: ["monad", "farcaster", "miniapp", "game","playtoearn"],
       primaryCategory: "games",
       buttonTitle: "Spin to Win",
-      splashImageUrl: `${APP_URL}/images/splash.png`,
+      splashImageUrl: `${APP_URL}/images/splash.jpg`,
       splashBackgroundColor: "#14051a",
       subtitle: "Monad Twist",
       description: "Win MON tokens by spinning the wheel",
