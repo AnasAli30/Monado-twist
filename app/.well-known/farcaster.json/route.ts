@@ -20,7 +20,7 @@ export async function GET() {
       primaryCategory: "games",
       buttonTitle: "Spin to Win",
       splashImageUrl: `${APP_URL}/images/splash.jpg`,
-      splashBackgroundColor: "#14051a",
+      splashBackgroundColor: "#ffffff",
       subtitle: "Monad Twist",
       description: "Win MON tokens by spinning the wheel",
       webhookUrl: `${APP_URL}/api/webhook`,
