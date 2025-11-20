@@ -82,7 +82,7 @@ Spin. Win. Withdraw. Repeat.
 `;
         actions.composeCast({
           text: castMessage,
-          embeds: [`${window.location.origin}`, `https://testnet.monadexplorer.com/tx/${hash}`],
+          embeds: [`${window.location.origin}`],
         }).catch(error => {
           console.error('Error casting:', error);
         });

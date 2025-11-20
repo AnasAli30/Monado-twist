@@ -544,7 +544,7 @@ export function SpinAndEarn() {
 Up to 50 MON up for grabs 🤑  
 Come play — it’s fun, it’s fast, and it’s free.  
 #BreakTheMonad 🎮💸`,
-        embeds: [`${window.location.origin}`,'https://chain-crush-black.vercel.app'],
+        embeds: [`${window.location.origin}`],
       });
       
       // Call backend to add spins
