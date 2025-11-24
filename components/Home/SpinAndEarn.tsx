@@ -227,14 +227,14 @@ export function SpinAndEarn() {
   }, [spinsLeft]);
 
   // Show welcome popup on first visit
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const hasShownWelcome = localStorage.getItem('welcomePopupShown5');
-      if (!hasShownWelcome) {
-        setShowWelcomePopup(true);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const hasShownWelcome = localStorage.getItem('welcomePopupShown5');
+  //     if (!hasShownWelcome) {
+  //       setShowWelcomePopup(true);
+  //     }
+  //   }
+  // }, []);
 
   // Show loyal user popup on first visit
   useEffect(() => {
