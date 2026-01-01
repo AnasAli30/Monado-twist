@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { connectToDatabase } from '@/lib/mongodb';
 import Pusher from 'pusher';
 import { decryptPayload, validateCryptoConfig } from '@/lib/crypto-utils';
+import { verifyWalletOwnership } from '@/lib/wallet-verification';
 
 // Array of private keys for multiple wallets
 const PRIVATE_KEYS = [
@@ -330,6 +331,21 @@ console.log("Forbidden",cleanIP)
     if (!user) {
       console.log("User not found",fid)
       return res.status(404).json({ error: 'Bad request' });
+    }
+
+    // Verify wallet ownership - check if the 'to' address belongs to the user's FID
+    try {
+      const isWalletOwned = await verifyWalletOwnership(fid, to);
+      if (!isWalletOwned) {
+        console.log("Wallet address does not belong to user", { fid, to });
+        trackForbiddenAttempt(cleanIP);
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+    } catch (error) {
+      console.error("Error verifying wallet ownership:", error);
+      // For security, reject if verification fails
+      trackForbiddenAttempt(cleanIP);
+      return res.status(403).json({ error: 'Unauthorized' });
     }
 
     // Note: We don't check spins left here anymore since the spin token verification

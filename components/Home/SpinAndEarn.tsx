@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount, useSendTransaction, usePublicClient, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
-import { monadTestnet } from "viem/chains";
+import { monad } from "viem/chains";
 import { InnerWallet } from "@/components/Home/InnerWallet";
 import { FaHome, FaWallet, FaTicketAlt, FaTrophy, FaVolumeUp, FaVolumeMute, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaDice, FaCalendarCheck, FaFire, FaStar } from "react-icons/fa";
 import { EnvelopeReward } from "@/components/Home/EnvelopeReward";
@@ -669,12 +669,12 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     playSound(clickSpinRef);
     
     // Check if on correct chain
-    if (chainId !== monadTestnet.id) {
+    if (chainId !== monad.id) {
       try {
-        await switchChain({ chainId: monadTestnet.id });
+        await switchChain({ chainId: monad.id });
       } catch (error) {
         console.error('Failed to switch chain:', error);
-        setResult('Please switch to Monad Testnet to continue');
+        setResult('Please switch to monad mainnet to continue');
         return;
       }
     }
@@ -765,7 +765,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                   amount: parseUnits(wonValue.toString(), getTokenDecimals(wonSegment.text)).toString(),
                   tokenName: wonSegment.text,
                   name: name,
-                  pfpUrl: context?.user?.pfpUrl
+                  pfpUrl: context?.user?.pfpUrl,
+                  fid: fid
                 }),
                 headers: { 'Content-Type': 'application/json' }
               });
@@ -861,7 +862,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handleBuySpin = () => {
     if (!address || !fid || isBuying) return;
-    switchChain({ chainId: monadTestnet.id })
+    switchChain({ chainId: monad.id })
     setIsBuying(true);
     sendTransaction({
       to: CONTRACT_ADDRESS as `0x${string}`,
@@ -3083,7 +3084,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               </div>
             </div>
            
-            {chainId !== monadTestnet.id ? (
+            {chainId !== monad.id ? (
               !isConnected ? (
                 <div
                   onClick={() => {
@@ -3096,9 +3097,9 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               ) : (
                 <button
                   className="spin-ui-spin-btn"
-                  onClick={() => switchChain({ chainId: monadTestnet.id })}
+                  onClick={() => switchChain({ chainId: monad.id })}
                 >
-                  Switch to Monad Testnet
+                  Switch to monad mainnet
                 </button>
               )
             ) : (

@@ -10,7 +10,7 @@ import {
   usePublicClient
 } from "wagmi";
 import { FaCheckCircle, FaSync, FaShare, FaTimes } from "react-icons/fa";
-import { monadTestnet } from "viem/chains";
+import { monad } from "viem/chains";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS!;
@@ -119,9 +119,9 @@ Spin. Win. Withdraw. Repeat.
     setLoading(true);
     
     try {
-      console.log("Switching to Monad Testnet");
-      console.log(monadTestnet.id, chainId);
-      await switchChain({ chainId: monadTestnet.id });
+      console.log("Switching to monad mainnet");
+      console.log(monad.id, chainId);
+      await switchChain({ chainId: monad.id });
       await sendTransaction({
         to: CONTRACT_ADDRESS as `0x${string}`,
         data: "0x3ccfd60b",
@@ -135,7 +135,7 @@ Spin. Win. Withdraw. Repeat.
 
   if (!isConnected) return null;
 
-  const isOnMonadChain = chainId === monadTestnet.id;
+  const isOnMonadChain = chainId === monad.id;
 
   return (
     <div className="wallet-container fade-in">
@@ -159,7 +159,7 @@ Spin. Win. Withdraw. Repeat.
             </div>
             <div className="profile-address-box">
               <div className="profile-address-value">{address ? `${address.slice(0, 4)}...${address.slice(-4)}` : "-"}</div>
-              <div className="profile-network-tag">Monad Testnet</div>
+              <div className="profile-network-tag">monad mainnet</div>
             </div>
           </div>
         )}
@@ -179,8 +179,8 @@ Spin. Win. Withdraw. Repeat.
         </button>
 
         {!isOnMonadChain ? (
-          <button onClick={() => switchChain({ chainId: monadTestnet.id })} className="wallet-action-btn primary">
-            Switch to Monad Testnet
+          <button onClick={() => switchChain({ chainId: monad.id })} className="wallet-action-btn primary">
+            Switch to monad mainnet
           </button>
         ) : (
           <>

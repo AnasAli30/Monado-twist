@@ -6,14 +6,14 @@ import { useSwitchChain } from "wagmi";
 import { useEffect } from "react";
 import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 import { useAccount } from "wagmi";
-import { monadTestnet } from "viem/chains";
+import { monad } from "viem/chains";
 import { WinNotifications } from "./WinNotifications";
 export default function Home() {
   const { actions,context } = useMiniAppContext();
   const { switchChain } = useSwitchChain();
   const {isConnected} = useAccount()
   useEffect(()=>{
-    switchChain({ chainId: monadTestnet.id })
+    switchChain({ chainId: monad.id })
     console.log(isConnected,actions)
     actions?.addFrame()
   },[isConnected,context])

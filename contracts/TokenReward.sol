@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract TokenReward is Ownable {
-    using ECDSA for bytes32;
-
+   using ECDSA for bytes32;
+    using MessageHashUtils for bytes32;
     // Mapping to track used signatures
     mapping(bytes => bool) public usedSignatures;
     
@@ -17,7 +17,7 @@ contract TokenReward is Ownable {
     event TokenRewarded(address indexed user, address indexed token, uint256 amount);
     event ServerSignerUpdated(address indexed newSigner);
 
-    constructor(address _serverSigner) {
+    constructor(address _serverSigner)Ownable(msg.sender) {
         serverSigner = _serverSigner;
     }
 

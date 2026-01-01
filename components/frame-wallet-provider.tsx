@@ -1,12 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { monadTestnet } from "wagmi/chains";
+import { monad } from "wagmi/chains";
 
 export const config = createConfig({
-  chains: [monadTestnet],
+  chains: [monad],
   transports: {
-    [monadTestnet.id]: http(),
+    [monad.id]: http(),
   },
   connectors: [farcasterFrame()],
 });

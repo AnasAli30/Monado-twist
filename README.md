@@ -19,7 +19,7 @@ Monad Twist is a modern, purple-themed "spin to earn" dApp built on Monad, featu
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS, wagmi, ethers, framer-motion, react-icons
 - **Backend**: Next.js API routes, MongoDB
 - **Smart Contract**: Solidity (WinnerVault)
-- **Wallets**: Monad testnet, wagmi hooks
+- **Wallets**: monad mainnet, wagmi hooks
 - **Farcaster**: MiniApp context for user identity
 
 ## Getting Started
@@ -52,12 +52,14 @@ WALLET_PRIVATE_KEY_1=your_private_key_1
 WALLET_PRIVATE_KEY_2=your_private_key_2
 # ...add more keys as needed
 ENVELOPE_PRIVATE_KEY=your_envelope_private_key
+NEYNAR_API_KEY=your_neynar_api_key
 ```
 
 - **WinnerVault**: Deploy the provided Solidity contract and use its address.
 - **MongoDB**: Use a MongoDB Atlas connection string or your own instance.
 - **Wallet Keys**: Used for backend transactions (multiple for load balancing).
 - **Envelope Key**: Used for first-time reward payouts.
+- **Neynar API Key**: Server-side API key for verifying user wallet ownership via Farcaster.
 
 ### 4. Run the Development Server
 

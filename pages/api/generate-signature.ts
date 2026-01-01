@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import Pusher from 'pusher';
 import { connectToDatabase } from '@/lib/mongodb';
 import { decryptPayload, validateCryptoConfig } from '@/lib/crypto-utils';
+import { verifyWalletOwnership } from '@/lib/wallet-verification';
 
 const SERVER_PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY_1;
 
@@ -363,8 +364,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log("Processing unencrypted payload (deprecated)");
     }
 
-    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl } = decryptedData;
-    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl });
+    const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl, fid } = decryptedData;
+    console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl, fid });
     
     // Additional logging for YAKI token requests
     if (tokenName === "YAKI") {
@@ -377,8 +378,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey) {
-      console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey)
+    if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey || !fid) {
+      console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey,fid)
       return res.status(400).json({ error: 'Bad request' });
     }
 
@@ -421,6 +422,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
       console.log("Invalid request signature",randomKey,fusedKey)
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Verify wallet ownership - check if the userAddress belongs to the user's FID
+    try {
+      const isWalletOwned = await verifyWalletOwnership(fid, userAddress);
+      if (!isWalletOwned) {
+        console.log("Wallet address does not belong to user", { fid, userAddress });
+        trackForbiddenAttempt(cleanIP);
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+    } catch (error) {
+      console.error("Error verifying wallet ownership:", error);
+      // For security, reject if verification fails
+      trackForbiddenAttempt(cleanIP);
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
