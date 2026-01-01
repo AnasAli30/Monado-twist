@@ -71,6 +71,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
   const [checkInStatus, setCheckInStatus] = useState<CheckInStatus | null>(null);
   const [checking, setChecking] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState<string>('');
+  const [bestFriends, setBestFriends] = useState<string[]>([]);
 
   // Fetch check-in status
   const fetchCheckInStatus = useCallback(async () => {
@@ -88,9 +89,27 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     }
   }, [fid]);
 
+  // Fetch best friends
+  const fetchBestFriends = useCallback(async () => {
+    if (!fid) return;
+
+    try {
+      const response = await fetch(`/api/best-friends?fid=${fid}`);
+      const data = await response.json();
+
+      if (response.ok && data.users) {
+        const friendUsernames = data.users.map((user: any) => user.username).filter(Boolean);
+        setBestFriends(friendUsernames);
+      }
+    } catch (error) {
+      console.error('Error fetching best friends:', error);
+    }
+  }, [fid]);
+
   useEffect(() => {
     fetchCheckInStatus();
-  }, [fetchCheckInStatus]);
+    fetchBestFriends();
+  }, [fetchCheckInStatus, fetchBestFriends]);
 
   // Update countdown timer
   useEffect(() => {
@@ -372,7 +391,12 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </div>
           <button
             className="get-spins-action-btn"
-            onClick={() => handleShare(' ')}
+            onClick={() => {
+              const friendMentions = bestFriends.length > 0
+                ? ' ' + bestFriends.slice(0, 3).map((username: string) => `@${username}`).join(' ')
+                : '';
+              handleShare(friendMentions);
+            }}
             disabled={!!timeUntilShare}
           >
             {!timeUntilShare ? (
