@@ -195,7 +195,7 @@
   resolved "https://registry.npmjs.org/@farcaster/frame-wagmi-connector/-/frame-wagmi-connector-1.0.0.tgz"
   integrity sha512-65zmI54PrJO88CYM3QrEXKgQIb+DD/h/U32tAaSRx+dT/AIG5w0tSQgON1zfLinNK8NYeBVRD40DBbR2vly3AQ==
 
-"@farcaster/miniapp-core@^0.3.6":
+"@farcaster/miniapp-core@^0.3.6", "@farcaster/miniapp-core@0.3.9":
   version "0.3.9"
   resolved "https://registry.npmjs.org/@farcaster/miniapp-core/-/miniapp-core-0.3.9.tgz"
   integrity sha512-7k2AHYycFABUEQFHGqsuZr6P6UQOE2WO4/Qj/kQ1ydKA8QjrWxO4HjiPfnTdvqH0xOKtdavbFOV5lK5bDLkemw==
@@ -223,7 +223,18 @@
     ox "^0.4.4"
     zod "^3.24.1"
 
-"@farcaster/miniapp-sdk@^0.2.0", "@farcaster/miniapp-sdk@0.2.1":
+"@farcaster/miniapp-sdk@^0.1.7", "@farcaster/miniapp-sdk@^0.2.0":
+  version "0.1.10"
+  resolved "https://registry.npmjs.org/@farcaster/miniapp-sdk/-/miniapp-sdk-0.1.10.tgz"
+  integrity sha512-ueoEAH3N7hIrV+L9pXdLJZpOY1GsOuwKN7MckouSEWY98H5A7KVajyGmGSDDVzjRWpu7Vndu4NZUHoOhF4nTOA==
+  dependencies:
+    "@farcaster/miniapp-core" "0.3.9"
+    "@farcaster/quick-auth" "^0.0.6"
+    comlink "^4.4.2"
+    eventemitter3 "^5.0.1"
+    ox "^0.4.4"
+
+"@farcaster/miniapp-sdk@0.2.1":
   version "0.2.1"
   resolved "https://registry.npmjs.org/@farcaster/miniapp-sdk/-/miniapp-sdk-0.2.1.tgz"
   integrity sha512-2SnDeOtDdlN1lGQt7UyH2jkrZRQDOkmhcrlzNWazYChyPh9XfV8+9fMS+Lr/E2pEws9Q40Xl9POrCzdpUC19lg==
