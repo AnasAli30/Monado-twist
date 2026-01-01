@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
+import { farcasterFrame } from "@farcaster/miniapp-wagmi-connector";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { monad } from "wagmi/chains";
 
