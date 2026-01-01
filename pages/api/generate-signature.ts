@@ -17,7 +17,9 @@ function getTokenAddressByName(tokenName: string): string {
     case "USDC":
       return process.env.NEXT_PUBLIC_USDC_TOKEN_ADDRESS as string;
     case "CHOG":
-      return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
+      return process.env.NEXT_PUBLIC_CHOG_TOKEN_ADDRESS as string;
+    case "GMONAD":
+      return process.env.NEXT_PUBLIC_GMONAD_TOKEN_ADDRESS as string;
     case "YAKI":
       return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
     case "WBTC":
@@ -46,6 +48,8 @@ function getTokenDecimals(tokenName: string): number {
       return 18;
     case "CHOG":
       return 18;
+    case "GMONAD":
+      return 18;
     default:
       return 18;
   }
@@ -69,7 +73,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
 
     // Convert to BigInt for precise integer arithmetic
     const bigAmount = ethers.toBigInt(amountStr);
-    
+
     // Guard against zero or negative values
     if (bigAmount <= BigInt(0)) {
       console.log("Invalid amount: zero or negative");
@@ -78,9 +82,9 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
 
     // Get token decimals
     const decimals = getTokenDecimals(tokenName);
-    
+
     console.log(`Token validation: ${tokenName}, raw amount: ${amountStr}, decimals: ${decimals}`);
-    
+
     // Validate based on raw integer amounts (in smallest units)
     switch (tokenName) {
       case "MON":
@@ -96,7 +100,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidMon = validMonAmounts.includes(bigAmount);
         console.log(`MON validation: ${isValidMon}, amount: ${bigAmount.toString()}`);
         return isValidMon;
-      
+
       case "USDC":
         // USDC should be between 0.005 and 0.01 (6 decimals)
         // In smallest units: 5000 to 10000
@@ -105,7 +109,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidUSDC = bigAmount >= minUSDC && bigAmount <= maxUSDC;
         console.log(`USDC validation: ${isValidUSDC}, amount: ${bigAmount.toString()}`);
         return isValidUSDC;
-        
+
       case "YAKI":
         // YAKI should be between 0.5 and 2.5 (18 decimals)
         // In smallest units: 500000000000000000 to 2500000000000000000
@@ -113,7 +117,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const maxYAKI = BigInt("1200000000000000000");
         const isValidYAKI = bigAmount >= minYAKI && bigAmount <= maxYAKI;
         console.log(`YAKI validation: ${isValidYAKI}, amount: ${bigAmount.toString()}, range: ${minYAKI.toString()} - ${maxYAKI.toString()}`);
-        
+
         // Additional debugging for YAKI
         if (!isValidYAKI) {
           console.log(`YAKI validation failed: amount ${bigAmount.toString()} is outside valid range`);
@@ -121,9 +125,9 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
           console.log(`Amount too small: ${bigAmount < minYAKI}`);
           console.log(`Amount too large: ${bigAmount > maxYAKI}`);
         }
-        
+
         return isValidYAKI;
-        
+
       case "WBTC":
         // WBTC should be between 0.000001 and 0.00001 (8 decimals)
         // In smallest units: 100 to 1000
@@ -132,7 +136,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidWBTC = bigAmount >= minWBTC && bigAmount <= maxWBTC;
         console.log(`WBTC validation: ${isValidWBTC}, amount: ${bigAmount.toString()}`);
         return isValidWBTC;
-        
+
       case "WSOL":
         // WSOL should be between 0.0001 and 0.001 (9 decimals)
         // In smallest units: 100000 to 1000000
@@ -141,7 +145,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidWSOL = bigAmount >= minWSOL && bigAmount <= maxWSOL;
         console.log(`WSOL validation: ${isValidWSOL}, amount: ${bigAmount.toString()}`);
         return isValidWSOL;
-        
+
       case "WETH":
         // WETH should be between 0.000001 and 0.00001 (18 decimals)
         // In smallest units: 1000000000000 to 10000000000000
@@ -150,7 +154,7 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidWETH = bigAmount >= minWETH && bigAmount <= maxWETH;
         console.log(`WETH validation: ${isValidWETH}, amount: ${bigAmount.toString()}`);
         return isValidWETH;
-        
+
       case "CHOG":
         // CHOG should be between 0.01 and 0.3 (18 decimals)
         // In smallest units: 10000000000000000 to 300000000000000000
@@ -159,7 +163,16 @@ function validateTokenAmount(tokenName: string, amount: string | number): boolea
         const isValidCHOG = bigAmount >= minCHOG && bigAmount <= maxCHOG;
         console.log(`CHOG validation: ${isValidCHOG}, amount: ${bigAmount.toString()}`);
         return isValidCHOG;
-        
+
+      case "GMONAD":
+        // GMONAD should be between 0.01 and 0.3 (18 decimals)
+        // In smallest units: 10000000000000000 to 300000000000000000
+        const minGMONAD = BigInt("10000000000000000");
+        const maxGMONAD = BigInt("300000000000000000");
+        const isValidGMONAD = bigAmount >= minGMONAD && bigAmount <= maxGMONAD;
+        console.log(`GMONAD validation: ${isValidGMONAD}, amount: ${bigAmount.toString()}`);
+        return isValidGMONAD;
+
       default:
         console.log(`Unknown token: ${tokenName}`);
         return false;
@@ -181,35 +194,35 @@ const pusher = new Pusher({
 // Verify request keys with two-part verification
 function verifyRequest(randomKey: string, clientFusedKey: string): boolean {
   if (!randomKey || !clientFusedKey) return false;
-  
+
   // 1. Verify request is recent by checking timestamp in randomKey
   const parts = randomKey.split('_');
   if (parts.length !== 2) return false;
-  
+
   const timestamp = parseInt(parts[1], 10);
   const now = Date.now();
   const fiveMinutes = 5 * 60 * 1000;
-  
+
   // Reject requests older than 5 minutes to prevent replay attacks
   if (isNaN(timestamp) || now - timestamp > fiveMinutes) {
     return false;
   }
-  
+
   // 2. First verify with the public salt that frontend also has
   const publicVerificationString = randomKey + PUBLIC_KEY_SALT;
-  
+
   // 3. Get the first-level hash that the client created
   const clientHash = ethers.keccak256(ethers.toUtf8Bytes(publicVerificationString));
-  
+
   // 4. First verification - client must have correct PUBLIC_KEY_SALT
   if (clientHash !== clientFusedKey) {
     return false;
   }
-  
+
   // 5. Second verification - server-side only check with SERVER_SECRET_KEY
   // Even if someone reverse engineers the client code, they can't forge this part
   const serverHash = ethers.keccak256(ethers.toUtf8Bytes(clientHash + SERVER_SECRET_KEY));
-  
+
   // 6. Server-side enhanced verification using the secret key
   return serverHash.length > 0; // Always true if we got this far
 }
@@ -228,20 +241,20 @@ const blockedIPs = new Map<string, number>(); // IP -> block timestamp
 // Check if an IP is blocked
 function isIPBlocked(ip: string): boolean {
   const blockTimestamp = blockedIPs.get(ip);
-  
+
   // If IP is not in the blocklist
   if (!blockTimestamp) return false;
-  
+
   const now = Date.now();
   const blockDuration = 24 * 60 * 60 * 1000; // 24 hours block
-  
+
   // Check if block period is over
   if (now - blockTimestamp > blockDuration) {
     // Block period expired, remove from blocklist
     blockedIPs.delete(ip);
     return false;
   }
-  
+
   // IP is still blocked
   return true;
 }
@@ -251,9 +264,9 @@ function trackForbiddenAttempt(ip: string): void {
   const now = Date.now();
   const trackingWindow = 10 * 60 * 1000; // 10 minutes
   const maxForbiddenAttempts = 2; // Block after 2 forbidden attempts
-  
+
   const record = forbiddenAttemptsMap.get(ip) || { count: 0, timestamp: now };
-  
+
   // Reset if window has passed
   if (now - record.timestamp > trackingWindow) {
     record.count = 1;
@@ -261,12 +274,12 @@ function trackForbiddenAttempt(ip: string): void {
     forbiddenAttemptsMap.set(ip, record);
     return;
   }
-  
+
   // Increment count
   record.count++;
   record.timestamp = now;
   forbiddenAttemptsMap.set(ip, record);
-  
+
   // Block IP if threshold exceeded
   if (record.count >= maxForbiddenAttempts) {
     blockedIPs.set(ip, now);
@@ -280,13 +293,13 @@ function checkRateLimit(ip: string): boolean {
   if (isIPBlocked(ip)) {
     return false; // Blocked IPs are automatically rate limited
   }
-  
+
   const now = Date.now();
   const rateWindow = 60 * 1000; // 1 minute
   const maxRequests = 5;
-  
+
   const record = rateLimitMap.get(ip) || { count: 0, timestamp: now };
-  
+
   // Reset if window has passed
   if (now - record.timestamp > rateWindow) {
     record.count = 1;
@@ -294,14 +307,14 @@ function checkRateLimit(ip: string): boolean {
     rateLimitMap.set(ip, record);
     return true;
   }
-  
+
   // Check if under limit
   if (record.count < maxRequests) {
     record.count++;
     rateLimitMap.set(ip, record);
     return true;
   }
-  
+
   return false;
 }
 
@@ -309,16 +322,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Extract client IP first for tracking
   const clientIp = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
   const cleanIP = clientIp.split(',')[0].trim();
-  
+
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
-    console.log("Blocked IP",cleanIP)
+    console.log("Blocked IP", cleanIP)
     return res.status(403).json({ error: 'Unauthorized' });
   }
 
   // Check method
   if (req.method !== 'POST') {
-    console.log("Method not allowed",cleanIP)
+    console.log("Method not allowed", cleanIP)
     return res.status(405).json({ error: 'Unauthorized' });
   }
 
@@ -326,15 +339,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!isAllowedOrigin(req)) {
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
-    console.log("Forbidden",cleanIP)
+    console.log("Forbidden", cleanIP)
     return res.status(403).json({ error: 'Unauthorized' });
   }
-  
+
   // Check rate limit
   if (!checkRateLimit(cleanIP)) {
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
-    console.log("Too many requests",cleanIP)
+    console.log("Too many requests", cleanIP)
     return res.status(429).json({ error: 'Unauthorized' });
   }
 
@@ -366,7 +379,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { userAddress, tokenAddress, amount, tokenName, name, randomKey, fusedKey, pfpUrl, fid } = decryptedData;
     console.log('Request params:', { userAddress, tokenAddress, amount, tokenName, pfpUrl, fid });
-    
+
     // Additional logging for YAKI token requests
     if (tokenName === "YAKI") {
       console.log(`[YAKI] Request received:`, {
@@ -379,7 +392,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (!userAddress || !tokenAddress || !amount || !tokenName || !randomKey || !fusedKey || !fid) {
-      console.log("Missing required parameters",userAddress,tokenAddress,amount,tokenName,randomKey,fusedKey,fid)
+      console.log("Missing required parameters", userAddress, tokenAddress, amount, tokenName, randomKey, fusedKey, fid)
       return res.status(400).json({ error: 'Bad request' });
     }
 
@@ -387,19 +400,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log("Server configuration error")
       return res.status(500).json({ error: 'Internal error' });
     }
-    
+
     // Verify token address matches the expected address for the token name
     const expectedTokenAddress = getTokenAddressByName(tokenName);
     if (expectedTokenAddress.toLowerCase() !== tokenAddress.toLowerCase()) {
-      console.log("Token address mismatch", {expected: expectedTokenAddress, received: tokenAddress, tokenName});
+      console.log("Token address mismatch", { expected: expectedTokenAddress, received: tokenAddress, tokenName });
       trackForbiddenAttempt(cleanIP);
       return res.status(400).json({ error: 'Bad request' });
     }
-    
+
     // Verify amount is within expected range for the token type
     const isValidAmount = validateTokenAmount(tokenName, amount);
     if (!isValidAmount) {
-      console.log(`[${tokenName}] Invalid token amount validation failed`, {tokenName, amount, userAddress});
+      console.log(`[${tokenName}] Invalid token amount validation failed`, { tokenName, amount, userAddress });
       trackForbiddenAttempt(cleanIP);
       return res.status(400).json({ error: 'Bad request' });
     }
@@ -421,7 +434,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!verifyRequest(randomKey, fusedKey)) {
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
-      console.log("Invalid request signature",randomKey,fusedKey)
+      console.log("Invalid request signature", randomKey, fusedKey)
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -444,13 +457,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { db } = await connectToDatabase();
 
     // Check if this key has been used before - use randomKey for uniqueness
-    const usedKey = await db.collection('used-keys').findOne({ 
+    const usedKey = await db.collection('used-keys').findOne({
       randomKey: randomKey
     });
 
     if (usedKey) {
-      console.log("Key already used",randomKey)
-          return res.status(401).json({ error: 'Unauthorized' });
+      console.log("Key already used", randomKey)
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     // Store the used key with enhanced security audit information
@@ -483,15 +496,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const signature = await wallet.signMessage(ethers.getBytes(messageHash));
 
     // Emit win event to Pusher
-    try{
-    await pusher.trigger('Monad-spin', 'win', {
-      name: name,
-      address: userAddress,
-      amount: amount,
-      token: tokenName,
-      pfpUrl: pfpUrl
-    });
-    }catch(error){
+    try {
+      await pusher.trigger('Monad-spin', 'win', {
+        name: name,
+        address: userAddress,
+        amount: amount,
+        token: tokenName,
+        pfpUrl: pfpUrl
+      });
+    } catch (error) {
       console.error('Error triggering win event:', error);
     }
     res.status(200).json({ signature });

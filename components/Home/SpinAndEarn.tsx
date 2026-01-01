@@ -366,6 +366,8 @@ export function SpinAndEarn() {
         return +(Math.random() * (0.3 - 0.01) + 0.01).toFixed(3);
       case "USDC":
         return +(Math.random() * (0.01 - 0.005) + 0.005).toFixed(5);
+      case "GMONAD":
+        return +(Math.random() * (0.3 - 0.01) + 0.01).toFixed(3);
       default:
         return 0;
     }
@@ -373,10 +375,10 @@ export function SpinAndEarn() {
 
   const segments: Segment[] = [
     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },  // Gold
-    { text: "YAKI", value: 0, color: "#00E5FF", probability: 5, degrees: 60 },  // Bright Teal
+    { text: "CHOG", value: 0, color: "#00E5FF", probability: 5, degrees: 60 },  // Bright Teal
     { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
     { text: "USDC", value: 0, color: "#B8860B", probability: 5, degrees: 60 },  // Dark Gold
-    { text: "MON", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
+    { text: "GMONAD", value: 0, color: "#FFD700", probability: 1, degrees: 60 },
     { text: "", value: 0, color: "#004D40", probability: 87, degrees: 60 },  // Dark Teal - No Win
   ];
 
@@ -898,6 +900,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         return "/images/weth.png";
       case "CHOG":
         return "/images/chog.png";
+      case "GMONAD":
+        return "/images/gmonad.png";
       case "USDC":
         return "/images/usdc.png";
       case "":
@@ -955,7 +959,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       case "USDC":
         return process.env.NEXT_PUBLIC_USDC_TOKEN_ADDRESS as string;
       case "CHOG":
-        return process.env.NEXT_PUBLIC_OWL_TOKEN_ADDRESS as string;
+        return process.env.NEXT_PUBLIC_CHOG_TOKEN_ADDRESS as string;
       case "YAKI":
         return process.env.NEXT_PUBLIC_YAKI_TOKEN_ADDRESS as string;
       case "WBTC":
@@ -964,6 +968,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         return process.env.NEXT_PUBLIC_WSOL_TOKEN_ADDRESS as string;
       case "WETH":
         return process.env.NEXT_PUBLIC_WETH_TOKEN_ADDRESS as string;
+      case "GMONAD":
+        return process.env.NEXT_PUBLIC_GMONAD_TOKEN_ADDRESS as string;
       default:
         return "";
     }

@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { fid, targetFid } = req.query;
-    const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+    const neynarApiKey = process.env.NEYNAR_API_KEY_MAIN;
 
     if (!fid) {
         return res.status(400).json({ error: 'Missing fid' });
