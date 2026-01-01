@@ -12,7 +12,6 @@
   "dependencies": {
     "@farcaster/auth-client": "^0.3.0",
     "@farcaster/frame-node": "^0.0.36",
-    "@farcaster/frame-sdk": "^0.1.12",
     "@farcaster/frame-wagmi-connector": "^1.0.0",
     "@farcaster/miniapp-sdk": "^0.2.0",
     "@farcaster/miniapp-wagmi-connector": "^1.0.0",
