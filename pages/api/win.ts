@@ -48,35 +48,35 @@ function getRandomWallet() {
 // Verify request keys with two-part verification
 function verifyRequest(randomKey: string, clientFusedKey: string): boolean {
   if (!randomKey || !clientFusedKey) return false;
-  
+
   // 1. Verify request is recent by checking timestamp in randomKey
   const parts = randomKey.split('_');
   if (parts.length !== 2) return false;
-  
+
   const timestamp = parseInt(parts[1], 10);
   const now = Date.now();
   const fiveMinutes = 5 * 60 * 1000;
-  
+
   // Reject requests older than 5 minutes to prevent replay attacks
   if (isNaN(timestamp) || now - timestamp > fiveMinutes) {
     return false;
   }
-  
+
   // 2. First verify with the public salt that frontend also has
   const publicVerificationString = randomKey + PUBLIC_KEY_SALT;
-  
+
   // 3. Get the first-level hash that the client created
   const clientHash = ethers.keccak256(ethers.toUtf8Bytes(publicVerificationString));
-  
+
   // 4. First verification - client must have correct PUBLIC_KEY_SALT
   if (clientHash !== clientFusedKey) {
     return false;
   }
-  
+
   // 5. Second verification - server-side only check with SERVER_SECRET_KEY
   // Even if someone reverse engineers the client code, they can't forge this part
   const serverHash = ethers.keccak256(ethers.toUtf8Bytes(clientHash + SERVER_SECRET_KEY));
-  
+
   // 6. Server-side enhanced verification using the secret key
   // This is an additional check that's not sent to the client
   // It prevents someone from just copying the client code and using it
@@ -97,20 +97,20 @@ const blockedIPs = new Map<string, number>(); // IP -> block timestamp
 // Check if an IP is blocked
 function isIPBlocked(ip: string): boolean {
   const blockTimestamp = blockedIPs.get(ip);
-  
+
   // If IP is not in the blocklist
   if (!blockTimestamp) return false;
-  
+
   const now = Date.now();
   const blockDuration = 24 * 60 * 60 * 1000; // 24 hours block
-  
+
   // Check if block period is over
   if (now - blockTimestamp > blockDuration) {
     // Block period expired, remove from blocklist
     blockedIPs.delete(ip);
     return false;
   }
-  
+
   // IP is still blocked
   return true;
 }
@@ -120,9 +120,9 @@ function trackForbiddenAttempt(ip: string): void {
   const now = Date.now();
   const trackingWindow = 10 * 60 * 1000; // 10 minutes
   const maxForbiddenAttempts = 2; // Block after 2 forbidden attempts
-  
+
   const record = forbiddenAttemptsMap.get(ip) || { count: 0, timestamp: now };
-  
+
   // Reset if window has passed
   if (now - record.timestamp > trackingWindow) {
     record.count = 1;
@@ -130,12 +130,12 @@ function trackForbiddenAttempt(ip: string): void {
     forbiddenAttemptsMap.set(ip, record);
     return;
   }
-  
+
   // Increment count
   record.count++;
   record.timestamp = now;
   forbiddenAttemptsMap.set(ip, record);
-  
+
   // Block IP if threshold exceeded
   if (record.count >= maxForbiddenAttempts) {
     blockedIPs.set(ip, now);
@@ -149,13 +149,13 @@ function checkRateLimit(ip: string): boolean {
   if (isIPBlocked(ip)) {
     return false; // Blocked IPs are automatically rate limited
   }
-  
+
   const now = Date.now();
   const rateWindow = 60 * 1000; // 1 minute
   const maxRequests = 5;
-  
+
   const record = rateLimitMap.get(ip) || { count: 0, timestamp: now };
-  
+
   // Reset if window has passed
   if (now - record.timestamp > rateWindow) {
     record.count = 1;
@@ -163,14 +163,14 @@ function checkRateLimit(ip: string): boolean {
     rateLimitMap.set(ip, record);
     return true;
   }
-  
+
   // Check if under limit
   if (record.count < maxRequests) {
     record.count++;
     rateLimitMap.set(ip, record);
     return true;
   }
-  
+
   return false;
 }
 
@@ -178,15 +178,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Extract client IP first for tracking
   const clientIp = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
   const cleanIP = clientIp.split(',')[0].trim();
-  
+
   // Check if IP is blocked
   if (isIPBlocked(cleanIP)) {
     return res.status(403).json({ error: 'Unauthorized' });
   }
-  
+
   // Check method
   if (req.method !== 'POST') {
-    console.log("Method not allowed",cleanIP)
+    console.log("Method not allowed", cleanIP)
     return res.status(405).json({ error: 'Unauthorized' });
   }
 
@@ -194,15 +194,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!isAllowedOrigin(req)) {
     // Track forbidden attempt
     trackForbiddenAttempt(cleanIP);
-console.log("Forbidden",cleanIP)
+    console.log("Forbidden", cleanIP)
     return res.status(403).json({ error: 'Unauthorized' });
   }
-  console.log("Allowed origin",cleanIP)
+  console.log("Allowed origin", cleanIP)
   // Check rate limit
   if (!checkRateLimit(cleanIP)) {
     // Excessive rate could also be suspicious
     trackForbiddenAttempt(cleanIP);
-    console.log("Too many requests",cleanIP)
+    console.log("Too many requests", cleanIP)
     return res.status(429).json({ error: 'Unauthorized' });
   }
 
@@ -238,7 +238,7 @@ console.log("Forbidden",cleanIP)
     if (!verifyRequest(randomKey, fusedKey)) {
       // Track forbidden attempt - invalid signatures are highly suspicious
       trackForbiddenAttempt(cleanIP);
-      console.log("Invalid request signature",randomKey,fusedKey) 
+      console.log("Invalid request signature", randomKey, fusedKey)
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
@@ -279,13 +279,13 @@ console.log("Forbidden",cleanIP)
 
     // Validate parameters
     if (!to || !amount || !fid) {
-      console.log("Missing required parameters",to,amount,fid)
+      console.log("Missing required parameters", to, amount, fid)
       return res.status(400).json({ error: 'Bad request' });
     }
-    
+
     // Validate input types
     if (typeof to !== 'string' || typeof fid !== 'number' || typeof amount !== 'number') {
-      console.log("Invalid parameter types",to,amount,fid)
+      console.log("Invalid parameter types", to, amount, fid)
       return res.status(400).json({ error: 'Bad request' });
     }
 
@@ -302,34 +302,34 @@ console.log("Forbidden",cleanIP)
       console.log("Amount has too many decimal places", decimalPlaces);
       return res.status(400).json({ error: 'Bad request' });
     }
-    
+
     // Validate amounts with strict limits and exact values for MON
     // const monValues = 
-    const validMonAmounts =[0.02,0.05,0.03,0.01,0.009];
+    const validMonAmounts = [2, 5, 3, 1, 0.9];
     const isValidMonAmount = validMonAmounts.includes(amount);
-    
+
     if (!isValidMonAmount) {
       console.log("Invalid MON amount", amount);
       return res.status(400).json({ error: 'Bad request' });
     }
 
     // Database already connected above for spin token verification
-    
+
     // Check if this win has already been processed (replay attack protection)
-    const existingWin = await db.collection('winnings').findOne({ 
+    const existingWin = await db.collection('winnings').findOne({
       fid: fid,
-      randomKey: randomKey 
+      randomKey: randomKey
     });
-    
+
     if (existingWin) {
       console.log("Win already processed", fid, randomKey);
       return res.status(400).json({ error: 'Win already processed' });
     }
-    
+
     // Check if user exists
     const user = await db.collection('monad-users').findOne({ fid: fid });
     if (!user) {
-      console.log("User not found",fid)
+      console.log("User not found", fid)
       return res.status(404).json({ error: 'Bad request' });
     }
 
@@ -353,7 +353,7 @@ console.log("Forbidden",cleanIP)
 
     // Validate Ethereum address format
     if (!ethers.isAddress(to)) {
-      console.log("Invalid Ethereum address",to)
+      console.log("Invalid Ethereum address", to)
       return res.status(400).json({ error: 'Bad request' });
     }
 
@@ -365,7 +365,7 @@ console.log("Forbidden",cleanIP)
     let amountInWei;
     try {
       amountInWei = ethers.parseEther(amountStr);
-      
+
       // Validate the converted amount is reasonable
       if (amountInWei <= BigInt(0)) {
         console.log("Invalid wei amount", amountInWei.toString());
@@ -379,7 +379,7 @@ console.log("Forbidden",cleanIP)
     // Send transaction
     const tx = await contract.depositFor(to, amountInWei, { value: amountInWei });
     await tx.wait();
-console.log("success",user,amount)
+    console.log("success", user, amount)
 
     // Save winning record to MongoDB with enhanced security tracking
     await db.collection('winnings').insertOne({

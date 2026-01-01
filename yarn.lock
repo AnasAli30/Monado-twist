@@ -168,6 +168,15 @@
     ox "^0.4.4"
     zod "^3.24.1"
 
+"@farcaster/frame-core@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.npmjs.org/@farcaster/frame-core/-/frame-core-0.1.4.tgz"
+  integrity sha512-eKRSsMxibOR/Wo9LDJaEwyKviUtk09GHksVZ5Hy/YdFp/vtqpX64eLr7dZWsI6NY/qzxlsbBZJn6+ybdx0hi0g==
+  dependencies:
+    "@solana/web3.js" "^1.98.2"
+    ox "^0.4.4"
+    zod "^3.24.1"
+
 "@farcaster/frame-node@^0.0.22":
   version "0.0.22"
   resolved "https://registry.npmjs.org/@farcaster/frame-node/-/frame-node-0.0.22.tgz"
@@ -178,12 +187,13 @@
     ox "^0.4.4"
     zod "^3.24.1"
 
-"@farcaster/frame-sdk@^0.0.36":
-  version "0.0.36"
-  resolved "https://registry.npmjs.org/@farcaster/frame-sdk/-/frame-sdk-0.0.36.tgz"
-  integrity sha512-UjcM3J67xlQSZN5o279toY2Abr4We3nmzNctmohQQVksgSopYbT29T/vfWOFUJSKAsT5Z4fYgb6J0KUornCuBQ==
+"@farcaster/frame-sdk@^0.0.36", "@farcaster/frame-sdk@^0.0.55":
+  version "0.0.55"
+  resolved "https://registry.npmjs.org/@farcaster/frame-sdk/-/frame-sdk-0.0.55.tgz"
+  integrity sha512-fPkXGh2nFkZtnYk8SuXjKOKX1qmwwKHUiQ6jZfc4DBiziMFI9CvLMTon1GQCt0PK0FsW2OSXWmfWxeODiCArSQ==
   dependencies:
-    "@farcaster/frame-core" "0.0.33"
+    "@farcaster/frame-core" "0.1.4"
+    "@farcaster/quick-auth" "^0.0.5"
     comlink "^4.4.2"
     eventemitter3 "^5.0.1"
     ox "^0.4.4"
@@ -212,6 +222,14 @@
     comlink "^4.4.2"
     eventemitter3 "^5.0.1"
     ox "^0.4.4"
+
+"@farcaster/quick-auth@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.npmjs.org/@farcaster/quick-auth/-/quick-auth-0.0.5.tgz"
+  integrity sha512-Z8hWz/7c33zlmII2AJHja/Wz0C03mm2o+CEBtBylmiun1wC4FMgx1Fal699VQvBUG1lpcJ662WxuRNxKogktDw==
+  dependencies:
+    jose "^5.2.3"
+    zod "^3.25.1"
 
 "@farcaster/quick-auth@^0.0.6":
   version "0.0.6"
@@ -2679,6 +2697,11 @@ damerau-levenshtein@^1.0.8:
   resolved "https://registry.npmjs.org/damerau-levenshtein/-/damerau-levenshtein-1.0.8.tgz"
   integrity sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==
 
+data-uri-to-buffer@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz"
+  integrity sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==
+
 data-view-buffer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/data-view-buffer/-/data-view-buffer-1.0.2.tgz"
@@ -3464,6 +3487,14 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
+fetch-blob@^3.1.2, fetch-blob@^3.1.4:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/fetch-blob/-/fetch-blob-3.2.0.tgz"
+  integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
+  dependencies:
+    node-domexception "^1.0.0"
+    web-streams-polyfill "^3.0.3"
+
 fflate@^0.7.3:
   version "0.7.4"
   resolved "https://registry.npmjs.org/fflate/-/fflate-0.7.4.tgz"
@@ -3548,6 +3579,13 @@ form-data@^4.0.0, form-data@^4.0.4:
     es-set-tostringtag "^2.1.0"
     hasown "^2.0.2"
     mime-types "^2.1.12"
+
+formdata-polyfill@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.npmjs.org/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz"
+  integrity sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==
+  dependencies:
+    fetch-blob "^3.1.2"
 
 framer-motion@^12.11.0:
   version "12.11.0"
@@ -4533,17 +4571,38 @@ node-addon-api@^2.0.0:
   resolved "https://registry.npmjs.org/node-addon-api/-/node-addon-api-2.0.2.tgz"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
 
+node-domexception@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/node-domexception/-/node-domexception-1.0.0.tgz"
+  integrity sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==
+
 node-fetch-native@^1.6.7:
   version "1.6.7"
   resolved "https://registry.npmjs.org/node-fetch-native/-/node-fetch-native-1.6.7.tgz"
   integrity sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q==
 
-node-fetch@^2.6.1, node-fetch@^2.7.0:
+node-fetch@^2.6.1:
   version "2.7.0"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
   dependencies:
     whatwg-url "^5.0.0"
+
+node-fetch@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz"
+  integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
+  dependencies:
+    whatwg-url "^5.0.0"
+
+node-fetch@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-3.3.2.tgz"
+  integrity sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==
+  dependencies:
+    data-uri-to-buffer "^4.0.0"
+    fetch-blob "^3.1.4"
+    formdata-polyfill "^4.0.10"
 
 node-gyp-build@^4.2.0, node-gyp-build@^4.3.0:
   version "4.8.4"
@@ -6136,6 +6195,11 @@ wagmi@^2.14.12, wagmi@>=2.0.0:
     "@wagmi/connectors" "6.2.0"
     "@wagmi/core" "2.22.1"
     use-sync-external-store "1.4.0"
+
+web-streams-polyfill@^3.0.3:
+  version "3.3.3"
+  resolved "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz"
+  integrity sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==
 
 webextension-polyfill@^0.10.0, "webextension-polyfill@>=0.10.0 <1.0":
   version "0.10.0"
