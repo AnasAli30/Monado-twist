@@ -20,9 +20,9 @@ interface GetSpinsProps {
   handleShare: (mon: string) => Promise<void>;
   handleOpenMiniApp: () => Promise<void>;
   handleOpenMiniApp1: () => Promise<void>;
-  handleOpenMiniApp2:()=>Promise<void>;
-  handleOpenMiniApp3:()=>Promise<void>;
-  timeUntilMiniAppOpen3:string;
+  handleOpenMiniApp2: () => Promise<void>;
+  handleOpenMiniApp3: () => Promise<void>;
+  timeUntilMiniAppOpen3: string;
   handleFollow: () => Promise<void>;
   handleLikeRecast: () => Promise<void>;
   handleFollowX: () => Promise<void>;
@@ -67,7 +67,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 }) => {
   const { context } = useMiniAppContext();
   const fid = context?.user?.fid;
-  
+
   const [checkInStatus, setCheckInStatus] = useState<CheckInStatus | null>(null);
   const [checking, setChecking] = useState(false);
   const [timeUntilNext, setTimeUntilNext] = useState<string>('');
@@ -79,7 +79,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
     try {
       const response = await fetch(`/api/daily-checkin?fid=${fid}&checkOnly=true`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setCheckInStatus(data);
       }
@@ -178,7 +178,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
               </div>
             </div>
           </div>
-          
+
           {checkInStatus?.canCheckIn ? (
             <button
               className="get-spins-action-btn checkin-btn-compact"
@@ -204,7 +204,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           )}
         </div>
 
-      {/* <div className="get-spins-card">
+        {/* <div className="get-spins-card">
   <div className="get-spins-card-header">
     <img src="images/basejump.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
     <div className="get-spins-card-title">
@@ -225,7 +225,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 </div> */}
 
 
-{/* 
+        {/* 
       <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -248,27 +248,27 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         </div> */}
 
 
-<div className="get-spins-card">
-  <div className="get-spins-card-header">
-    <Image src="/images/monad-realm.png" alt="Chain Crush Rewards" width={56} height={56} className="get-spins-card-icon" />
-    <div className="get-spins-card-title">
-      🎮 Play <b>Monad realm</b> → Win <span style={{color: "#FFD700"}}>token Daily! and 2500 $MON to top 20 players</span>
-    </div>
-  </div>
-  <button
-    className="get-spins-action-btn"
-    onClick={handleOpenMiniApp1}
-    disabled={!!timeUntilMiniAppOpen1}
-  >
-    {!timeUntilMiniAppOpen1 ? (
-      <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
-    ) : (
-      `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
-    )}
-  </button>
-</div>
-        
-{/* <div className="get-spins-card">
+        {/* <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <Image src="/images/monad-realm.png" alt="Chain Crush Rewards" width={56} height={56} className="get-spins-card-icon" />
+            <div className="get-spins-card-title">
+              🎮 Play <b>Monad realm</b> → Win <span style={{ color: "#FFD700" }}>token Daily! and 2500 $MON to top 20 players</span>
+            </div>
+          </div>
+          <button
+            className="get-spins-action-btn"
+            onClick={handleOpenMiniApp1}
+            disabled={!!timeUntilMiniAppOpen1}
+          >
+            {!timeUntilMiniAppOpen1 ? (
+              <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
+            ) : (
+              `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
+            )}
+          </button>
+        </div> */}
+
+        {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
             <div className="get-spins-card-title"> Play game and Earn upto 150 $USDC</div>
@@ -286,10 +286,10 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
    */}
-      
 
 
-         
+
+
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <div className="get-spins-card-icon telegram">
@@ -313,12 +313,12 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             )}
           </button>
         </div>
-      
 
 
 
-        
-    
+
+
+
         <div className="get-spins-card">
           <div className="get-spins-card-header">
             <div className="get-spins-card-icon recast"><FaRetweet /></div>
@@ -338,7 +338,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             )}
           </button>
         </div>
-        
+
         {/* Monad Realm X Follow Card */}
         {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
@@ -360,10 +360,10 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div> */}
         {/* Play Monad Realm Card */}
-     
-        
 
-        
+
+
+
         {/* Share Card */}
         <div className="get-spins-card">
           <div className="get-spins-card-header">
@@ -403,7 +403,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           </button>
         </div>
         {/* Like & Recast Card */}
-        
+
       </div>
       <style jsx>{`
         .get-spins-section {
