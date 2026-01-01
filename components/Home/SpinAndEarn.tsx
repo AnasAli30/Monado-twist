@@ -60,12 +60,12 @@ function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
 
 export function SpinAndEarn() {
   const [follow, SetFollow] = useState(false);
-  const { address, chainId ,isConnected} = useAccount();
-  const { context ,actions} = useMiniAppContext();
+  const { address, chainId, isConnected } = useAccount();
+  const { context, actions } = useMiniAppContext();
   const fid = context?.user?.fid;
   const name = context?.user?.username;
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
-  const { switchChain } = useSwitchChain(); 
+  const { switchChain } = useSwitchChain();
   const [totalSpins, setTotalSpins] = useState<number>(() => {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
@@ -74,7 +74,7 @@ export function SpinAndEarn() {
     }
     return 0;
   });
-  const { sendTransaction, isPending: isConfirming ,data} = useSendTransaction();
+  const { sendTransaction, isPending: isConfirming, data } = useSendTransaction();
   const publicClient = usePublicClient();
   const [buyTxHash, setBuyTxHash] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -133,8 +133,7 @@ export function SpinAndEarn() {
     totalCheckIns: number;
   } | null>(null);
 
-  const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
-  // Add this near the top of the component, after other state declarations
+
   const { writeContract, data: claimData, reset: resetClaim } = useContractWrite();
 
   const { isLoading: isClaiming, isSuccess: isClaimSuccess } = useWaitForTransactionReceipt({
@@ -142,20 +141,13 @@ export function SpinAndEarn() {
   });
 
   async function isUserFollower(userFid: number): Promise<boolean> {
-    const options = {
-      method: 'GET',
-      headers: {
-        'x-api-key': neynarApiKey || '',
-        'x-neynar-experimental': 'false'
-      }
-    };
-  
     try {
-      const res = await fetch('https://api.neynar.com/v2/farcaster/followers?limit=100&fid=249702', options);
-      const data = await res.json();
-      if (!data.users) return false;
-      // Check if any follower's fid matches the userFid
-      return data.users.some((f: any) => f.user.fid === userFid);
+      const res = await fetch(`/api/check-follower?fid=${userFid}`);
+      if (res.ok) {
+        const data = await res.json();
+        return data.isFollowing;
+      }
+      return false;
     } catch (err) {
       console.error('Error checking follower:', err);
       return false;
@@ -280,7 +272,7 @@ export function SpinAndEarn() {
             if (checkInRes.ok) {
               // Save today's date
               localStorage.setItem('lastAutoCheckInDate', today);
-              
+
               // Set popup data
               setDailyCheckInData({
                 streak: checkInData.checkInStreak,
@@ -337,9 +329,9 @@ export function SpinAndEarn() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dataToUpdate),
         })
-        .then(res => res.json())
-        .then(data => console.log('Sync result:', data.message))
-        .catch(err => console.error('Failed to sync user data:', err));
+          .then(res => res.json())
+          .then(data => console.log('Sync result:', data.message))
+          .catch(err => console.error('Failed to sync user data:', err));
       }
     }
   }, [fid, context?.user?.pfpUrl]);
@@ -359,7 +351,7 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues =[0.02,0.05,0.03,0.01,0.009];
+        const monValues = [0.02, 0.05, 0.03, 0.01, 0.009];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (1 - 0.5) + 0.5).toFixed(4);
@@ -496,10 +488,10 @@ export function SpinAndEarn() {
   const getRandomSegment = () => {
     const random = Math.random() * 100;
     let cumulativeProbability = 0;
-    
+
     // Filter out segments with probability > 0 for actual spins
     const validSegments = segments.filter(segment => segment.probability > 0);
-    
+
     // Process segments in order (no sorting needed)
     for (const segment of validSegments) {
       cumulativeProbability += segment.probability;
@@ -507,7 +499,7 @@ export function SpinAndEarn() {
         return segment;
       }
     }
-    
+
     // If no segment is selected (shouldn't happen), return the last valid segment
     return validSegments[validSegments.length - 1];
   };
@@ -515,22 +507,22 @@ export function SpinAndEarn() {
   const getRandomSpin = () => {
     // Get random segment based on probability
     const selectedSegment = getRandomSegment();
-    
+
     // Find segment index
     const segmentIndex = segments.findIndex(s => s.value === selectedSegment.value);
-    
+
     // Calculate starting angle of the segment
     let startAngle = 0;
     for (let i = 0; i < segmentIndex; i++) {
       startAngle += segments[i].degrees;
     }
-    
+
     // Random position within the segment
     const randomDegreeWithinSegment = Math.random() * selectedSegment.degrees;
-    
+
     // Calculate final position (add 5-10 full rotations)
     const fullRotations = (5 + Math.random() * 5) * 360;
-    
+
     return fullRotations + (360 - (startAngle + randomDegreeWithinSegment));
   };
 
@@ -546,7 +538,7 @@ Come play — it’s fun, it’s fast, and it’s free.
 #BreakTheMonad 🎮💸`,
         embeds: [`${window.location.origin}`],
       });
-      
+
       // Call backend to add spins
       if (fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -571,25 +563,41 @@ Come play — it’s fun, it’s fast, and it’s free.
   const handleShareWin = async () => {
     if (!wonSegment || wonValue <= 0) return;
 
+    let bestFriendsText = '';
+    if (fid) {
+      try {
+        const res = await fetch(`/api/best-friends?fid=${fid}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.users && data.users.length > 0) {
+            const mentions = data.users.map((user: { username: string }) => `@${user.username}`).join(' ');
+            bestFriendsText = `\n\njoin the fun ${mentions}`;
+          }
+        }
+      } catch (err) {
+        console.error('Could not fetch best friends', err);
+      }
+    }
+
     const message = `YO I just won ${wonValue} ${wonSegment.text} for FREE on Monad Twist 😱💸
 Spin the wheel, touch grass later — it’s addictive af 🎰
-#BreakTheMonad 🚀`;
+#BreakTheMonad 🚀${bestFriendsText}`;
     const userImg = context?.user?.pfpUrl || `${window.location.origin}/images/icon.jpg`;
     const username = context?.user?.username || "";
     const totalSpins = parseInt(localStorage.getItem('totalSpins') || '0', 10);
     const totalWins = parseInt(localStorage.getItem('totalWins') || '0', 10);
-    const winPercentage = (totalWins / totalSpins) * 100;     
+    const winPercentage = (totalWins / totalSpins) * 100;
     const tokenImg = getTokenImage(wonSegment.text);
     try {
-        await actions?.composeCast?.({ 
-            text: message,
-            embeds: [`${window.location.origin}`],  
-            // embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`],  
-        });
-        handleClosePopup();
+      await actions?.composeCast?.({
+        text: message,
+        embeds: [`${window.location.origin}`],
+        // embeds: [`${window.location.origin}/?wonValue=${wonValue}&wonText=${encodeURIComponent(wonSegment.text)}&userImg=${encodeURIComponent(userImg)}&tokenImg=${encodeURIComponent(tokenImg)}&username=${encodeURIComponent(username)}&winPercentage=${encodeURIComponent(winPercentage)}&totalSpins=${encodeURIComponent(totalSpins)}`],  
+      });
+      handleClosePopup();
     } catch (error) {
-        console.error("Error sharing win:", error);
-        setResult("Sharing failed. Please try again.");
+      console.error("Error sharing win:", error);
+      setResult("Sharing failed. Please try again.");
     }
   };
 
@@ -599,10 +607,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       clickToggleRef.current.currentTime = 0;
       clickToggleRef.current.play().catch(e => console.log('Toggle sound error:', e));
     }
-    
+
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
-    
+
     // Control all audio elements
     if (audioRef.current) {
       audioRef.current.muted = newMutedState;
@@ -627,7 +635,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       bgMusicRef.current.volume = 0.18; // 18% volume (sweet spot between 15-20%)
       bgMusicRef.current.loop = true;
       bgMusicRef.current.muted = isMuted;
-      
+
       // Auto-play background music
       const playPromise = bgMusicRef.current.play();
       if (playPromise !== undefined) {
@@ -664,10 +672,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handleSpin = async () => {
     if (isSpinning || !fid || spinsLeft === null || spinsLeft <= 0) return;
-    
+
     // Play spin sound
     playSound(clickSpinRef);
-    
+
     // Check if on correct chain
     if (chainId !== monad.id) {
       try {
@@ -700,7 +708,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       const pointerAngle = (540 - ((rotation + newRotation) % 360)) % 360;
       let currentAngle = 0;
       let wonSegment = segments[0];
-      
+
       // Only consider segments with positive probability
       const validSegments = segments.filter(segment => segment.probability > 0);
       for (const segment of validSegments) {
@@ -712,7 +720,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       }
 
       let wonValue = getRandomValue(wonSegment.text);
-      
+
       if (audioRef.current && !isMuted) {
         audioRef.current.volume = 0.2;
         audioRef.current.currentTime = 0;
@@ -770,13 +778,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 }),
                 headers: { 'Content-Type': 'application/json' }
               });
-              
+
               if (!signatureRes.ok) {
                 throw new Error('Failed to get signature');
               }
-              
+
               const { signature } = await signatureRes.json();
-              
+
               // Call smart contract to claim reward using wagmi
               writeContract({
                 abi: [
@@ -827,16 +835,16 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   useEffect(() => {
     const confirm = async () => {
       if (!data || !publicClient) return;
-  
+
       try {
         console.log(data);
         const receipt = await publicClient.waitForTransactionReceipt({ hash: data });
         console.log("Confirmed:", receipt);
-  
+
         const spinRes = await fetchWithVerification('/api/spin', {
           method: 'POST',
-          body: JSON.stringify({ 
-            fid, 
+          body: JSON.stringify({
+            fid,
             mode: 'buy',
             amount: 1, // 1 MON for 8 spins
             address,
@@ -844,7 +852,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           }),
           headers: { 'Content-Type': 'application/json' }
         });
-  
+
         const response = await spinRes.json();
         setSpinsLeft(response.spinsLeft);
         setResult("Successfully bought spins! 🎁");
@@ -855,10 +863,10 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
         setIsBuying(false);
       }
     };
-  
+
     confirm();
   }, [data]);
-  
+
 
   const handleBuySpin = () => {
     if (!address || !fid || isBuying) return;
@@ -870,7 +878,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       value: ethers.parseEther("1"),
     });
   };
-  
+
   // SVG wheel constants
   const size = 370;
   const center = size / 2;
@@ -908,21 +916,21 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     const labelAngle = startAngle + segment.degrees / 2;
     const labelRadius = radius - 14; // Near the edge
     const labelPos = polarToCartesian(center, center, labelRadius, labelAngle);
-    
+
     // Calculate icon position (slightly above the text)
     const iconRadius = radius - 35; // Position icon above the text
     const iconPos = polarToCartesian(center, center, iconRadius, labelAngle);
-    
+
     const el = (
       <g key={i}>
         <path d={path} fill={segment.color} stroke="#1a1a2e" strokeWidth="2" />
         <image
-          x={iconPos.x-18}
-          y={iconPos.y -15}
+          x={iconPos.x - 18}
+          y={iconPos.y - 15}
           width="35"
           height="35"
           href={getTokenImage(segment.text)}
-          transform={`rotate(${labelAngle + 180}, ${iconPos.x}, ${iconPos.y })`}
+          transform={`rotate(${labelAngle + 180}, ${iconPos.x}, ${iconPos.y})`}
         />
         {/* <text
           x={labelPos.x}
@@ -981,7 +989,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const isWinSuccess = result ? (result.includes('won') || result.includes('reward') || result.includes('claimed')) : false;
   const isNoWin = result ? result.includes('😢') || result.includes('No win') : false;
   const isBoughtSpins = result === "Successfully bought spins! 🎁";
-  
+
   useEffect(() => {
     if (isWinSuccess && !isMuted) {
       const soundToPlay = winAudioRefs.current[Math.floor(Math.random() * winAudioRefs.current.length)];
@@ -1000,8 +1008,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
     }
   }, [isWinSuccess, isNoWin, isMuted]);
 
-  const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3' , '/audio/win-4.mp3', '/audio/win-5.mp3', '/audio/win-6.mp3'];
-  const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3', '/audio/lose-3.mp3', '/audio/lose-4.mp3', '/audio/lose-5.mp3', '/audio/lose-6.mp3' , '/audio/lose-7.mp3'];
+  const winSounds = ['/audio/win-1.mp3', '/audio/win-2.mp3', '/audio/win-3.mp3', '/audio/win-4.mp3', '/audio/win-5.mp3', '/audio/win-6.mp3'];
+  const loseSounds = ['/audio/lose-1.mp3', '/audio/lose-2.mp3', '/audio/lose-3.mp3', '/audio/lose-4.mp3', '/audio/lose-5.mp3', '/audio/lose-6.mp3', '/audio/lose-7.mp3'];
 
   // Handlers for GetSpins
   // const handleOpenMiniApp = async () => {
@@ -1208,7 +1216,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
       setAwaitingFollowXVerification(false);
     }, 5000);
   };
-  
+
   const handleJoinTelegram = async () => {
     await actions?.openUrl('https://t.me/monad_twist');
     setAwaitingTelegramVerification(true);
@@ -1275,13 +1283,12 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           {isWinSuccess && <Confetti />}
           {isNoWin && <CryingEmoji />}
           <div
-            className={`popup-content result ${
-              isSuccessPopup
-                ? 'success'
-                : result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')
+            className={`popup-content result ${isSuccessPopup
+              ? 'success'
+              : result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')
                 ? 'error'
                 : 'info'
-            }`}
+              }`}
             onClick={(e) => e.stopPropagation()}
           >
             <button className="popup-close-btn" onClick={handleClosePopup}>
@@ -1289,15 +1296,15 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             </button>
             <div className="popup-icon">
               {isBoughtSpins ? (
-                  <FaTicketAlt className="popup-ticket-icon" />
-                ) : isWinSuccess && wonSegment ? (
-                  <img src={getTokenImage(wonSegment.text)} alt={wonSegment.text} className="popup-token-img" />
-                ) : isSuccessPopup ? (
-                  <FaCheckCircle />
-                ) : (result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) ? (
-                  <FaTimesCircle />
-                ) : (
-                  <FaInfoCircle />
+                <FaTicketAlt className="popup-ticket-icon" />
+              ) : isWinSuccess && wonSegment ? (
+                <img src={getTokenImage(wonSegment.text)} alt={wonSegment.text} className="popup-token-img" />
+              ) : isSuccessPopup ? (
+                <FaCheckCircle />
+              ) : (result.includes('😢') || result.includes('Failed') || result.includes('failed') || result.includes('No win') || result.includes('Please')) ? (
+                <FaTimesCircle />
+              ) : (
+                <FaInfoCircle />
               )}
             </div>
             <div className="popup-message">
@@ -1333,63 +1340,63 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
       {/* Welcome Popup */}
       {showWelcomePopup && (
-  <div className="popup-overlay" onClick={handlePlayLater}>
-    <div className="popup-content welcome" onClick={(e) => e.stopPropagation()}>
-      <button className="popup-close-btn" onClick={handlePlayLater}>
-        &times;
-      </button>
+        <div className="popup-overlay" onClick={handlePlayLater}>
+          <div className="popup-content welcome" onClick={(e) => e.stopPropagation()}>
+            <button className="popup-close-btn" onClick={handlePlayLater}>
+              &times;
+            </button>
 
-      <div className="popup-icon">
-        <FaDice style={{ color: '#FFD700', fontSize: '4rem' }} />
-      </div>
+            <div className="popup-icon">
+              <FaDice style={{ color: '#FFD700', fontSize: '4rem' }} />
+            </div>
 
-      <div className="popup-message">
-        <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
-          🎉 Welcome to <span style={{color:"#fff"}}>MONAD TWIST</span> 🎰
-        </h3>
-        <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
-          Spin, Match & Win! 💎  
-          Earn <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-            Daily Tokens
-          </strong> daily by just playing <b>Monad Realm</b>.
-        </p>
-      </div>
+            <div className="popup-message">
+              <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
+                🎉 Welcome to <span style={{ color: "#fff" }}>MONAD TWIST</span> 🎰
+              </h3>
+              <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
+                Spin, Match & Win! 💎
+                Earn <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
+                  Daily Tokens
+                </strong> daily by just playing <b>Monad Realm</b>.
+              </p>
+            </div>
 
-      <div className="popup-actions">
-        <button
-          className="popup-action-btn play-now"
-          style={{
-            background: 'linear-gradient(90deg, #ff9900, #ff0000)',
-            color: '#fff',
-            fontWeight: '700',
-            fontSize: '1.1rem',
-            padding: '12px 18px',
-            borderRadius: '10px',
-            boxShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
-            animation: 'pulse 1.5s infinite'
-          }}
-          onClick={handlePlayNow}
-        >
-          🚀 Play Now & Claim +5 Free Spins
-        </button>
+            <div className="popup-actions">
+              <button
+                className="popup-action-btn play-now"
+                style={{
+                  background: 'linear-gradient(90deg, #ff9900, #ff0000)',
+                  color: '#fff',
+                  fontWeight: '700',
+                  fontSize: '1.1rem',
+                  padding: '12px 18px',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
+                  animation: 'pulse 1.5s infinite'
+                }}
+                onClick={handlePlayNow}
+              >
+                🚀 Play Now & Claim +5 Free Spins
+              </button>
 
-        <button
-          className="popup-action-btn play-later"
-          style={{
-            background: '#f2f2f2',
-            color: '#444',
-            fontWeight: '600',
-            padding: '10px 16px',
-            borderRadius: '8px'
-          }}
-          onClick={handlePlayLater}
-        >
-          Maybe Later
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              <button
+                className="popup-action-btn play-later"
+                style={{
+                  background: '#f2f2f2',
+                  color: '#444',
+                  fontWeight: '600',
+                  padding: '10px 16px',
+                  borderRadius: '8px'
+                }}
+                onClick={handlePlayLater}
+              >
+                Maybe Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Daily Check-In Auto Popup */}
       {showDailyCheckInPopup && dailyCheckInData && (
@@ -1451,7 +1458,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               <p>Keep your streak going! Come back tomorrow for more rewards 🚀</p>
             </div>
 
-            <button 
+            <button
               className="daily-checkin-close-btn"
               onClick={() => setShowDailyCheckInPopup(false)}
             >
@@ -1597,8 +1604,8 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           top: -${size / 2.1}px;
           left: 50%;
           transform: translateX(-50%);
-          width: ${size+5}px;
-          height: ${size+5}px;
+          width: ${size + 5}px;
+          height: ${size + 5}px;
           border-radius: 50%;
           background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
           box-shadow: 
@@ -3049,86 +3056,86 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             </svg>
             <div className="pointer"></div>
           </div>
-          
+
           <div className="spin-ui-card">
-          <EnvelopeReward setClaimed={setClaimed}  />
-          { claimed && <div>
-            <div className="spin-ui-header">MONAD TWIST</div>
-           
-           
-            <div className="spin-ui-row">
-              <div className="spin-ui-box">
-                <div className="spin-ui-label">Spins Remaining</div>
-                <div className="spin-ui-value">
-                  {spinsLeft !== null ? spinsLeft : "-"} <FaTicketAlt style={{ color: '#ffe066', fontSize: 28, marginLeft: 2 }} />
+            <EnvelopeReward setClaimed={setClaimed} />
+            {claimed && <div>
+              <div className="spin-ui-header">MONAD TWIST</div>
+
+
+              <div className="spin-ui-row">
+                <div className="spin-ui-box">
+                  <div className="spin-ui-label">Spins Remaining</div>
+                  <div className="spin-ui-value">
+                    {spinsLeft !== null ? spinsLeft : "-"} <FaTicketAlt style={{ color: '#ffe066', fontSize: 28, marginLeft: 2 }} />
+                  </div>
+                </div>
+                <div className="spin-ui-box">
+                  <div className="spin-ui-label">Total Spins</div>
+                  <div className="spin-ui-value">{totalSpins}</div>
                 </div>
               </div>
-              <div className="spin-ui-box">
-                <div className="spin-ui-label">Total Spins</div>
-                <div className="spin-ui-value">{totalSpins}</div>
-              </div>
-            </div>
-            <div className="spin-ui-row">
-              <div className="spin-ui-box">
-                <div className="spin-ui-label">Total MON Won</div>
-                <div className="spin-ui-value">
-                  {totalMonWon.toFixed(2)}
-                  <img src="/images/mon.png" alt="MON" style={{ width: 28, height: 28, marginLeft: 4 }} />
+              <div className="spin-ui-row">
+                <div className="spin-ui-box">
+                  <div className="spin-ui-label">Total MON Won</div>
+                  <div className="spin-ui-value">
+                    {totalMonWon.toFixed(2)}
+                    <img src="/images/mon.png" alt="MON" style={{ width: 28, height: 28, marginLeft: 4 }} />
+                  </div>
+                </div>
+                <div className="spin-ui-box">
+                  <div className="spin-ui-label">Win Rate</div>
+                  <div className="spin-ui-value">
+                    {totalSpins > 0 ? ((totalWins / totalSpins) * 100).toFixed(0) : 0}%
+                  </div>
                 </div>
               </div>
-              <div className="spin-ui-box">
-                <div className="spin-ui-label">Win Rate</div>
-                <div className="spin-ui-value">
-                  {totalSpins > 0 ? ((totalWins / totalSpins) * 100).toFixed(0) : 0}%
-                </div>
-              </div>
-            </div>
-           
-            {chainId !== monad.id ? (
-              !isConnected ? (
-                <div
-                  onClick={() => {
-                    window.open('https://farcaster.xyz/~/mini-apps/launch?domain=Monad-twist.vercel.app');
-                  }}
-                  className='spin-ui-spin-btn'
-                >
-                  Open in Farcaster
-                </div>
+
+              {chainId !== monad.id ? (
+                !isConnected ? (
+                  <div
+                    onClick={() => {
+                      window.open('https://farcaster.xyz/~/mini-apps/launch?domain=Monad-twist.vercel.app');
+                    }}
+                    className='spin-ui-spin-btn'
+                  >
+                    Open in Farcaster
+                  </div>
+                ) : (
+                  <button
+                    className="spin-ui-spin-btn"
+                    onClick={() => switchChain({ chainId: monad.id })}
+                  >
+                    Switch to monad mainnet
+                  </button>
+                )
               ) : (
                 <button
                   className="spin-ui-spin-btn"
-                  onClick={() => switchChain({ chainId: monad.id })}
+                  onClick={handleSpin}
+                  disabled={isSpinning || spinsLeft === null || spinsLeft <= 0}
                 >
-                  Switch to monad mainnet
+                  {isSpinning ? "Spinning..." : spinsLeft === null ? "Loading..." : spinsLeft <= 0 ? "No Spins Left" : "SPIN NOW"}
+                  {spinsLeft === 0 && timeUntilReset && (
+                    <div className="timer-text">Resets in: {timeUntilReset}</div>
+                  )}
                 </button>
-              )
-            ) : (
-              <button
-                className="spin-ui-spin-btn"
-                onClick={handleSpin}
-                disabled={isSpinning || spinsLeft === null || spinsLeft <= 0}
-              >
-                {isSpinning ? "Spinning..." : spinsLeft === null ? "Loading..." : spinsLeft <= 0 ? "No Spins Left" : "SPIN NOW"}
-                {spinsLeft === 0 && timeUntilReset && (
-                  <div className="timer-text">Resets in: {timeUntilReset}</div>
-                )}
-              </button>
-            )}
-             {spinsLeft === 0 && (
-              <button
-                className="buy-spin-btn"
-                onClick={handleBuySpin}
-                disabled={isBuying || isConfirming || !address}
-              >
-                {isBuying || isConfirming ? "Processing..." : "Buy 5 Spin (1 MON)"}
-              </button>
-            )} 
+              )}
+              {spinsLeft === 0 && (
+                <button
+                  className="buy-spin-btn"
+                  onClick={handleBuySpin}
+                  disabled={isBuying || isConfirming || !address}
+                >
+                  {isBuying || isConfirming ? "Processing..." : "Buy 5 Spin (1 MON)"}
+                </button>
+              )}
             </div>}
 
-            
+
           </div>
-      
-      
+
+
         </>
       ) : view === 'wallet' ? (
         <InnerWallet />
@@ -3194,7 +3201,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             setView('wallet');
           }}
         >
-          <FaWallet /> 
+          <FaWallet />
         </button>
         <button
           className={view === 'leaderboard' ? 'active' : ''}
@@ -3203,9 +3210,9 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
             setView('leaderboard');
           }}
         >
-          <FaTrophy /> 
+          <FaTrophy />
         </button>
-      
+
         <button
           className="mute-button"
           onClick={toggleMute}
@@ -3214,7 +3221,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
           {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
       </div>
-      
+
       {/* No Spins Popup */}
       <NoSpinsPopup
         isVisible={showNoSpinsPopup}

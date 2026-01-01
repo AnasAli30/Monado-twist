@@ -35,11 +35,11 @@ export function Leaderboard() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [pagination, setPagination] = useState<PaginationInfo>({ 
-    total: 0, 
-    page: 0, 
-    limit: 50, 
-    hasMore: true 
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    total: 0,
+    page: 0,
+    limit: 50,
+    hasMore: true
   });
   const { actions, context } = useMiniAppContext();
   const currentUserFid = context?.user?.fid;
@@ -50,22 +50,22 @@ export function Leaderboard() {
     try {
       if (page === 0) setLoading(true);
       else setLoadingMore(true);
-      
+
       const res = await fetch(`/api/leaderboard?page=${page}&limit=${pagination.limit}`);
       const data = await res.json();
-      
+
       // Add rank property to each leader based on their position
       const leadersWithRank = data.leaders.map((leader: any, idx: number) => ({
         ...leader,
         displayRank: page * pagination.limit + idx + 1
       }));
-      
+
       if (page === 0) {
         setLeaders(leadersWithRank);
       } else {
         setLeaders(prev => [...prev, ...leadersWithRank]);
       }
-      
+
       setPagination(data.pagination);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
@@ -93,41 +93,37 @@ export function Leaderboard() {
     fetchLeaderboard(0);
     fetchUserStats();
   }, [currentUserFid, fetchLeaderboard, fetchUserStats]);
-  
+
   // Set up intersection observer for infinite scroll
   const lastLeaderElementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading || loadingMore) return;
-    
+
     if (observerRef.current) observerRef.current.disconnect();
-    
+
     observerRef.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && pagination.hasMore) {
         fetchLeaderboard(pagination.page + 1);
       }
     }, { threshold: 0.5 });
-    
+
     if (node) observerRef.current.observe(node);
   }, [loading, loadingMore, pagination.hasMore, pagination.page, fetchLeaderboard]);
 
   const handleShare = async (rank: number, totalSpins: number, totalWinnings: string) => {
     let bestFriendsText = '';
-    const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+
 
     // Get the current user's profile image
     const userImg = userStats?.pfpUrl || `${APP_URL}/images/icon.jpg`;
 
-    if (currentUserFid && neynarApiKey) {
+    if (currentUserFid) {
       try {
-        const options = {
-          method: 'GET',
-          headers: { 'x-api-key': neynarApiKey },
-        };
-        const res = await fetch(`https://api.neynar.com/v2/farcaster/user/best_friends/?limit=3&fid=${currentUserFid}`, options);
+        const res = await fetch(`/api/best-friends?fid=${currentUserFid}`);
         if (res.ok) {
           const data = await res.json();
           if (data.users && data.users.length > 0) {
             const mentions = data.users.map((user: { username: string }) => `@${user.username}`).join(' ');
-            bestFriendsText = `\n\join the fun ${mentions}`;
+            bestFriendsText = `\n\njoin the fun ${mentions}`;
           }
         }
       } catch (err) {
@@ -154,7 +150,7 @@ Spin. Win. Repeat.${bestFriendsText}`;
   };
 
   const getMedalColor = (rank: number) => {
-    switch(rank) {
+    switch (rank) {
       case 1: return '#FFD700'; // Gold
       case 2: return '#C0C0C0'; // Silver
       case 3: return '#CD7F32'; // Bronze
@@ -165,52 +161,52 @@ Spin. Win. Repeat.${bestFriendsText}`;
   return (
     <div className="leaderboard-container fade-in">
       <div className="leaderboard-card">
-      <div className="leaderboard-header">
+        <div className="leaderboard-header">
           <FaTrophy />
-        <h2>Top Winners</h2>
-      </div>
-        
+          <h2>Top Winners</h2>
+        </div>
+
         {userStats && (
           <div className="user-stats-card">
-              <Image 
-                src={userStats.pfpUrl || '/images/icon.jpg'} 
-                alt={userStats.name || 'User profile'} 
-                width={45}
-                height={45}
-                className="leaderboard-pfp"
-                onError={() => {
-                  // Handle error by providing a fallback path in the src attribute
-                }}
-                unoptimized={userStats.pfpUrl?.startsWith('http')}
-              />
-              <div className="user-info">
-                <div className="leaderboard-name">{userStats.name} (You)</div>
+            <Image
+              src={userStats.pfpUrl || '/images/icon.jpg'}
+              alt={userStats.name || 'User profile'}
+              width={45}
+              height={45}
+              className="leaderboard-pfp"
+              onError={() => {
+                // Handle error by providing a fallback path in the src attribute
+              }}
+              unoptimized={userStats.pfpUrl?.startsWith('http')}
+            />
+            <div className="user-info">
+              <div className="leaderboard-name">{userStats.name} (You)</div>
+            </div>
+            <div className="stats-section">
+              <div className="spins-section">
+                {userStats.totalSpins} Spins
               </div>
-              <div className="stats-section">
-                <div className="spins-section">
-                  {userStats.totalSpins} Spins
-                </div>
-                <div className="winnings-section">
-                  <span>{userStats.totalWinnings.toFixed(2)}</span>
-                  <span className="mon-label">MON</span>
-                </div>
+              <div className="winnings-section">
+                <span>{userStats.totalWinnings.toFixed(2)}</span>
+                <span className="mon-label">MON</span>
               </div>
+            </div>
           </div>
         )}
-      
-      {loading ? (
+
+        {loading ? (
           <div className="skeleton-list">
             {Array.from({ length: 8 }).map((_, index) => (
               <SkeletonLeaderboardItem key={index} />
             ))}
           </div>
-      ) : (
-        <div className="leaderboard-list">
-          {leaders.map((entry, index) => (
-              <div 
+        ) : (
+          <div className="leaderboard-list">
+            {leaders.map((entry, index) => (
+              <div
                 key={entry.fid}
                 ref={index === leaders.length - 1 ? lastLeaderElementRef : null}
-                className={`leaderboard-item ${context?.user?.fid === entry.fid ? 'current-user' : ''}`}  
+                className={`leaderboard-item ${context?.user?.fid === entry.fid ? 'current-user' : ''}`}
                 onClick={() => actions?.viewProfile({ fid: entry?.fid || 0 })}
               >
                 <div className="rank-section">
@@ -218,9 +214,9 @@ Spin. Win. Repeat.${bestFriendsText}`;
                   {entry.displayRank <= 3 && <FaMedal className="medal-icon" style={{ color: getMedalColor(entry.displayRank) }} />}
                 </div>
 
-              <Image
-                  src={entry.pfpUrl || '/images/icon.jpg'} 
-                  alt={entry.name || 'User profile'} 
+                <Image
+                  src={entry.pfpUrl || '/images/icon.jpg'}
+                  alt={entry.name || 'User profile'}
                   width={45}
                   height={45}
                   className="leaderboard-pfp"
@@ -229,14 +225,14 @@ Spin. Win. Repeat.${bestFriendsText}`;
                   }}
                   unoptimized={entry.pfpUrl?.startsWith('http')}
                 />
-                
+
                 <div className="user-info">
                   <div className="leaderboard-name">{entry.name || 'Anonymous'}</div>
                   <div className="leaderboard-address">{entry.address ? `${entry.address.slice(0, 6)}...${entry.address.slice(-4)}` : 'No address yet'}</div>
                 </div>
 
                 <div className="stats-section">
-                { entry.totalSpins > 0 && <div className="spins-section">
+                  {entry.totalSpins > 0 && <div className="spins-section">
                     {entry.totalSpins} Spins
                   </div>}
                   <div className="winnings-section">
@@ -244,34 +240,34 @@ Spin. Win. Repeat.${bestFriendsText}`;
                     <span className="mon-label">MON</span>
                   </div>
                   {currentUserFid === entry.fid && (entry.displayRank <= 50) && (
-                  <button 
-                    className="share-rank-btn" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShare(entry.displayRank, entry.totalSpins, entry.totalWinnings);
-                    }}
-                  >
-                    Share
-                  </button>
-                )}
+                    <button
+                      className="share-rank-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(entry.displayRank, entry.totalSpins, entry.totalWinnings);
+                      }}
+                    >
+                      Share
+                    </button>
+                  )}
                 </div>
               </div>
-          ))}
-          
-          {loadingMore && (
-            <div className="loading-more">
-              <div className="loading-spinner-small"></div>
-              <span>Loading more...</span>
-            </div>
-          )}
-          
-          {!loadingMore && !pagination.hasMore && leaders.length > 0 && (
-            <div className="end-of-list">
-              End of leaderboard - You&apos;ve seen all {pagination.total} players!
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+
+            {loadingMore && (
+              <div className="loading-more">
+                <div className="loading-spinner-small"></div>
+                <span>Loading more...</span>
+              </div>
+            )}
+
+            {!loadingMore && !pagination.hasMore && leaders.length > 0 && (
+              <div className="end-of-list">
+                End of leaderboard - You&apos;ve seen all {pagination.total} players!
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <style>{`
