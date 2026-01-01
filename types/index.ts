@@ -4,3 +4,8 @@ export interface SafeAreaInsets {
   left?: number;
   right?: number;
 }
+
+export interface FrameNotificationDetails {
+  url: string;
+  token: string;
+}

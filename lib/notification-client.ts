@@ -1,18 +1,18 @@
 import { getUserNotificationDetails } from "@/lib/notifications";
 import {
-  FrameNotificationDetails,
   type SendNotificationRequest,
   sendNotificationResponseSchema,
-} from "@farcaster/frame-sdk";
+} from "@farcaster/miniapp-sdk";
+import { FrameNotificationDetails } from "@/types";
 import { env } from "./env";
 
 const appUrl = env.NEXT_PUBLIC_URL || "";
 
 type SendFrameNotificationResult =
   | {
-      state: "error";
-      error: unknown;
-    }
+    state: "error";
+    error: unknown;
+  }
   | { state: "no_token" }
   | { state: "rate_limit" }
   | { state: "success" };
