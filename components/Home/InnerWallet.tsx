@@ -16,8 +16,8 @@ import { useMiniAppContext } from "@/hooks/use-miniapp-context";
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WINNER_VAULT_ADDRESS!;
 
 const abi = parseAbi([
-    "function balances(address) view returns (uint256)"
-  ]);
+  "function balances(address) view returns (uint256)"
+]);
 const ABI = [
   "function balances(address) view returns (uint256)",
   "function withdraw()"
@@ -45,11 +45,11 @@ export function InnerWallet() {
   });
 
   useEffect(() => {
-    if (data) { 
-        console.log(data);
-        const formatted = ethers.formatEther(data as BigNumberish);
-        setBalance(formatted);
-        animateCountUp(0, parseFloat(formatted));
+    if (data) {
+      console.log(data);
+      const formatted = ethers.formatEther(data as BigNumberish);
+      setBalance(formatted);
+      animateCountUp(0, parseFloat(formatted));
     }
   }, [data]);
 
@@ -74,7 +74,7 @@ export function InnerWallet() {
       });
 
       // Automatically cast the success message
-      
+
       if (actions?.composeCast) {
         const castMessage = `🎉WITHDREW ${displayBalance} MON 🔥
 Monad Twist ain’t a game — it’s a cheat code 💸
@@ -117,7 +117,7 @@ Spin. Win. Withdraw. Repeat.
 
   const withdraw = async () => {
     setLoading(true);
-    
+
     try {
       console.log("Switching to monad mainnet");
       console.log(monad.id, chainId);
@@ -143,10 +143,10 @@ Spin. Win. Withdraw. Repeat.
         {context?.user && (
           <div className="profile-section">
             <div className="profile-details">
-              <img 
-                src={pfpUrl} 
-                alt={`${name}'s profile picture`} 
-                className="profile-picture" 
+              <img
+                src={pfpUrl}
+                alt={`${name}'s profile picture`}
+                className="profile-picture"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = '/images/icon.jpg';
@@ -169,8 +169,8 @@ Spin. Win. Withdraw. Repeat.
           <div className="balance-amount">{displayBalance} MON</div>
         </div>
 
-        <button 
-          onClick={handleRefresh} 
+        <button
+          onClick={handleRefresh}
           disabled={refreshing}
           className="refresh-button"
         >
@@ -185,16 +185,16 @@ Spin. Win. Withdraw. Repeat.
         ) : (
           <>
             <button onClick={withdraw} disabled={loading || isPending || balance === "0"} className="wallet-action-btn primary">
-              {isPending ?  "Withdrawing..." : "Withdraw Balance"}
+              {isPending ? "Withdrawing..." : "Withdraw Balance"}
             </button>
-            
-        {hash && (
-          <div className="success-message">
-            <FaCheckCircle />
-            <p>Withdrawal submitted! </p>
-            <a href={`https://testnet.monadexplorer.com/tx/${hash}`} target="_blank" rel="noopener noreferrer">View on Explorer</a>
-          </div>
-        )}
+
+            {hash && (
+              <div className="success-message">
+                <FaCheckCircle />
+                <p>Withdrawal submitted! </p>
+                <a href={`https://monadscan.com/tx/${hash}`} target="_blank" rel="noopener noreferrer">View on Explorer</a>
+              </div>
+            )}
             <div className="withdrawal-note">
               <p><strong>Note:</strong> Having trouble with the withdrawal? Close and reopen the mini app, wait 15 seconds, and give it another try.</p>
               <p>Still having issues?</p>
@@ -203,7 +203,7 @@ Spin. Win. Withdraw. Repeat.
           </>
         )}
 
-        
+
         {error && <div className="error-message">{error.message}</div>}
       </div>
 
