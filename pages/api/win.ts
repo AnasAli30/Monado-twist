@@ -305,7 +305,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Validate amounts with strict limits and exact values for MON
     // const monValues = 
-    const validMonAmounts = [0.2, 0.5, 0.3, 0.1, 0.9];
+    const validMonAmounts = [0.2, 0.5, 0.3, 0.1, 0.9, 1];
     const isValidMonAmount = validMonAmounts.includes(amount);
 
     if (!isValidMonAmount) {
