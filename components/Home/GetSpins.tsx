@@ -225,7 +225,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 
         <div className="get-spins-card">
           <div className="get-spins-card-header">
-            <img src="images/root.jpg" alt="Free NFT Mint" className="get-spins-card-icon" />
+            <img src="images/root.png" alt="Free NFT Mint" className="get-spins-card-icon" />
             <div className="get-spins-card-title">
               🎨 Mint Free NFT + Claim gift box <span style={{ color: "#FFD700" }}>Limited Supply Available!</span>
             </div>
