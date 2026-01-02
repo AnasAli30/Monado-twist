@@ -196,7 +196,22 @@ export async function verifyWalletOwnership(
       error
     );
 
-    // If we have cached data (even if stale), use it as fallback
+    // Check if this is a "user not found" error
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('User not found in Neynar')) {
+      console.error(`Rejecting request: FID ${fid} does not exist in Neynar`);
+      // If we have cached data (even if stale), use it as fallback
+      if (cached) {
+        console.warn(
+          `Using stale cache for non-existent FID ${fid} (cached data available)`
+        );
+        return cached.wallets.includes(normalizedAddress);
+      }
+      // No user found in Neynar and no cache - explicitly reject
+      return false;
+    }
+
+    // For other errors (API issues, network problems, etc.)
     if (cached) {
       console.warn(
         `Using stale cache due to API error for FID ${fid}`

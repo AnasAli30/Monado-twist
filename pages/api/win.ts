@@ -302,7 +302,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log("Amount has too many decimal places", decimalPlaces);
       return res.status(400).json({ error: 'Bad request' });
     }
-
+    try {
+      const isWalletOwned = await verifyWalletOwnership(fid, to);
+      console.log("isWalletOwned", isWalletOwned)
+      console.log("fid", fid)
+      console.log("to", to)
+      if (!isWalletOwned) {
+        console.log("Wallet address does not belong to user", { fid, to });
+        trackForbiddenAttempt(cleanIP);
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+    } catch (error) {
+      console.error("Error verifying wallet ownership:", error);
+      // For security, reject if verification fails
+      trackForbiddenAttempt(cleanIP);
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
     // Validate amounts with strict limits and exact values for MON
     // const monValues = 
     const validMonAmounts = [0.0002, 0.0005, 0.0003, 0.0001, 0.009, 0.0001];
@@ -334,22 +349,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Verify wallet ownership - check if the 'to' address belongs to the user's FID
-    try {
-      const isWalletOwned = await verifyWalletOwnership(fid, to);
-      console.log("isWalletOwned", isWalletOwned)
-      console.log("fid", fid)
-      console.log("to", to)
-      if (!isWalletOwned) {
-        console.log("Wallet address does not belong to user", { fid, to });
-        trackForbiddenAttempt(cleanIP);
-        return res.status(403).json({ error: 'Unauthorized' });
-      }
-    } catch (error) {
-      console.error("Error verifying wallet ownership:", error);
-      // For security, reject if verification fails
-      trackForbiddenAttempt(cleanIP);
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
+  
 
     // Note: We don't check spins left here anymore since the spin token verification
     // already ensures that a valid spin occurred. The spin count is decremented in spin.ts
