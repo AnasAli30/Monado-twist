@@ -351,7 +351,9 @@ export function SpinAndEarn() {
   const getRandomValue = (token: string): number => {
     switch (token) {
       case "MON":
-        const monValues = [0.2, 0.5, 0.3, 0.1, 0.9, 1];
+        // const validMonAmounts = [0.02, 0.05, 0.03, 0.01, 0.9, 0.01];
+
+        const monValues = [0.02, 0.05, 0.03, 0.01, 0.9, 0.01];
         return monValues[Math.floor(Math.random() * monValues.length)];
       case "YAKI":
         return +(Math.random() * (1 - 0.5) + 0.5).toFixed(4);
