@@ -184,12 +184,16 @@ export async function verifyWalletOwnership(
 
     // Cache is stale or doesn't exist, fetch from Neynar
     const wallets = await fetchUserWalletsFromNeynar(fid);
+    
+    console.log(`[Neynar] Fetched ${wallets.length} wallet(s) for FID ${fid}`);
 
     // Cache the wallets for future use
     await cacheUserWallets(fid, wallets);
 
     // Check if the wallet address is in the fetched wallets
-    return wallets.includes(normalizedAddress);
+    const isVerified = wallets.includes(normalizedAddress);
+    console.log(`[Wallet Verification] FID ${fid}, Address ${normalizedAddress}: ${isVerified ? '✓ VERIFIED' : '✗ NOT FOUND'}`);
+    return isVerified;
   } catch (error) {
     console.error(
       `Error verifying wallet ownership for FID ${fid}, address ${walletAddress}:`,
