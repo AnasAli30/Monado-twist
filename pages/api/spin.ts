@@ -232,14 +232,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log("Already liked and recasted",req.body)
       return res.status(400).json({ error: "lol" });
     }
-    spinsLeft += 1;
-    await users.updateOne(
-      { fid },
-      { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
-      { upsert: true }
-    );
-    console.log("MiniApp cooldown active",req.body)
-    return res.status(200).json({ spinsLeft });
+    return res.status(400).json({ error: "lol" });
+    // spinsLeft += 1;
+    // await users.updateOne(
+    //   { fid },
+    //   { $set: { spinsLeft, lastSpinReset, likeAndRecast: true } },
+    //   { upsert: true }
+    // );
+    // console.log("MiniApp cooldown active",req.body)
+    // return res.status(200).json({ spinsLeft });
   }
 
   if (mode === "miniAppOpen") {
