@@ -29,28 +29,30 @@ async function fetchUserWalletsFromNeynar(fid: number): Promise<string[]> {
   }
 
   try {
+    console.log(`[Neynar] Fetching wallets for FID: ${fid}`);
     const response = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk/?fids=${fid}`,
+      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
       {
         method: 'GET',
         headers: {
-          'x-api-key': NEYNAR_API_KEY,
-          'x-neynar-experimental': 'false',
+          'accept': 'application/json',
+          'api_key': NEYNAR_API_KEY,
         },
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Neynar API error: ${response.status} - ${errorText}`);
+      console.error(`[Neynar] API error: ${response.status} - ${errorText}`);
       throw new Error(`Neynar API returned ${response.status}`);
     }
 
     const data: NeynarUserResponse = await response.json();
+    console.log(`[Neynar] Response received for FID ${fid}:`, JSON.stringify(data, null, 2));
 
     if (!data.users || data.users.length === 0) {
-      console.warn(`No user found for FID: ${fid}`);
-      return [];
+      console.error(`No user found in Neynar for FID: ${fid}`);
+      throw new Error(`User not found in Neynar for FID: ${fid}`);
     }
 
     const user = data.users[0];

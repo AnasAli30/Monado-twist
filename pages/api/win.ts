@@ -336,6 +336,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Verify wallet ownership - check if the 'to' address belongs to the user's FID
     try {
       const isWalletOwned = await verifyWalletOwnership(fid, to);
+      console.log("isWalletOwned", isWalletOwned)
+      console.log("fid", fid)
+      console.log("to", to)
       if (!isWalletOwned) {
         console.log("Wallet address does not belong to user", { fid, to });
         trackForbiddenAttempt(cleanIP);
