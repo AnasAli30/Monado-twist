@@ -223,48 +223,48 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           )}
         </div>
 
-        {/* <div className="get-spins-card">
-  <div className="get-spins-card-header">
-    <img src="images/basejump.jpg" alt="Chain Crush Rewards" className="get-spins-card-icon" />
-    <div className="get-spins-card-title">
-      🚀 Play Base Jump & Earn <span style={{color:"#FFD700"}}>Daily Rewards tokens upto 10$</span>
-    </div>
-  </div>
-  <button
-    className="get-spins-action-btn1"
-    onClick={handleOpenMiniApp}
-    disabled={!!timeUntilMiniAppOpen}
-  >
-    {!timeUntilMiniAppOpen ? (
-      <span className="spin-badge1">🔥 +3 Free Spins – Start Winning Now</span>
-    ) : (
-      <span style={{color:"black"}}>⏳ Opens in: {timeUntilMiniAppOpen}</span>
-    )}
-  </button>
-</div> */}
-
-
-        {/* 
-      <div className="get-spins-card">
+        <div className="get-spins-card">
           <div className="get-spins-card-header">
-            <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
+            <img src="images/root.jpg" alt="Free NFT Mint" className="get-spins-card-icon" />
             <div className="get-spins-card-title">
-      🎮 Play <b>Chain Crush</b> → Win <span style={{color: "#FFD700"}}>token Daily! and upto 200 $ARB weekly</span>
-    </div>
-    </div>
+              🎨 Mint Free NFT + Claim gift box <span style={{ color: "#FFD700" }}>Limited Supply Available!</span>
+            </div>
+          </div>
+          <button
+            className="get-spins-action-btn1"
+            onClick={handleOpenMiniApp}
+            disabled={!!timeUntilMiniAppOpen}
+          >
+            {!timeUntilMiniAppOpen ? (
+              <span className="spin-badge1">Mint Free NFT Now / +3 spins</span>
+            ) : (
+              <span style={{ color: "black" }}>⏳ Opens in: {timeUntilMiniAppOpen}</span>
+            )}
+          </button>
+        </div>
+
+
+
+        <div className="get-spins-card">
+          <div className="get-spins-card-header">
+            <img src="images/party.png" alt="AI Friend Frame NFT" className="get-spins-card-icon" />
+            <div className="get-spins-card-title">
+              🤖✨ Mint Your <b>AI-Generated Friend Frame</b> → <span style={{ color: "#FFD700" }}>FREE NFT -  Limited Supply! 🔥</span>
+            </div>
+          </div>
           <button
             className="get-spins-action-btn1"
             onClick={handleOpenMiniApp3}
             disabled={!!timeUntilMiniAppOpen3}
           >
             {!timeUntilMiniAppOpen3 ? (
-              <span className="spin-badge1">+ 200 $ARB / +2 Spins</span>
+              <span className="spin-badge1">Mint NOW / +2 Spins</span>
             ) : (
-              <span style={{color:"black"}}> Available in:{timeUntilMiniAppOpen3}</span>            )}
+              <span style={{ color: "black" }}>⏳ Available in: {timeUntilMiniAppOpen3}</span>)}
           </button>
 
-      
-        </div> */}
+
+        </div>
 
 
         {/* <div className="get-spins-card">

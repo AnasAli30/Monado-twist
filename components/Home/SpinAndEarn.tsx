@@ -1046,7 +1046,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/cFGpvpDI-nDJ/base-jump"
+        url: "https://farcaster.xyz/miniapps/vkQ_LmRgvix6/roots-of-you"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1121,7 +1121,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp3 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/djk3nS-wYTQu/chain-crush"
+        url: "https://farcaster.xyz/miniapps/Msv27pssuYPE/party-frame"
       });
       if (!timeUntilMiniAppOpen3 && fid) {
         const res = await fetchWithVerification('/api/spin', {
