@@ -244,7 +244,6 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           >
             {!timeUntilMiniAppOpen ? (
               <span className="spin-badge taskpay-badge">
-                <FaRocket style={{ marginRight: 6 }} />
                 Start Quests Now / +5 spin
               </span>
             ) : (
