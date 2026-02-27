@@ -225,17 +225,16 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
 
 
         <div className="get-spins-card taskpay-card">
-          <div className="get-spins-card-header">
-            <Image src="/images/taskpay.png" alt="Taskpay Quests" width={56} height={56} className="get-spins-card-icon" />
-            <div className="get-spins-card-title">
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <FaRocket />
-                <span>
-                  Now earn more by doing quests on <b>Taskpay</b> –
-                  <span style={{ color: "#4ade80", fontWeight: 700 }}> $60 pool live</span>. 
-                  Complete quests before the timer runs out to boost your rewards.
-                </span>
-              </span>
+          <div className="get-spins-card-header taskpay-header">
+            <Image src="/images/taskpay.png" alt="Taskpay Quests" width={44} height={44} className="get-spins-card-icon taskpay-icon" />
+            <div className="get-spins-card-title taskpay-title">
+              <div className="taskpay-line">
+                <span>Taskpay</span>
+              </div>
+              <div className="taskpay-subtitle">
+                Earn more by completing quests –
+                <span className="taskpay-pool"> $60 pool live</span>.
+              </div>
             </div>
           </div>
           <button
@@ -246,7 +245,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
             {!timeUntilMiniAppOpen ? (
               <span className="spin-badge taskpay-badge">
                 <FaRocket style={{ marginRight: 6 }} />
-                Start Taskpay Quests Now
+                Start Quests Now / +5 spin
               </span>
             ) : (
               `Unlocks in: ${timeUntilMiniAppOpen}`
@@ -462,9 +461,10 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           transition: box-shadow 0.2s, transform 0.2s;
         }
         .get-spins-card.taskpay-card {
-          background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.28), transparent 55%),
-                      radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.28), transparent 55%);
-          border-color: rgba(59, 130, 246, 0.55);
+          padding: 16px 14px 14px 14px;
+          background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.26), transparent 55%),
+                      radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.22), transparent 55%);
+          border-color: rgba(59, 130, 246, 0.6);
         }
         .get-spins-card:hover {
           box-shadow: 0 8px 32px rgba(108, 92, 231, 0.18);
@@ -476,6 +476,9 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           align-items: center;
           gap: 18px;
         //   margin-bottom: 18px;
+        }
+        .get-spins-card-header.taskpay-header {
+          gap: 10px;
         }
         .get-spins-card-icon {
           font-size: 2.6rem;
@@ -507,10 +510,36 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         .get-spins-card-icon.telegram {
           background: linear-gradient(135deg, #0088cc 60%, #6C5CE7 100%);
         }
+        .get-spins-card-icon.taskpay-icon {
+          border-radius: 14px;
+          overflow: hidden;
+          background: #020617;
+        }
         .get-spins-card-title {
           font-size: 1.25rem;
           font-weight: 700;
           color: #fff;
+        }
+        .get-spins-card-title.taskpay-title {
+          font-size: 1rem;
+          font-weight: 600;
+        }
+        .taskpay-line {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 4px;
+        }
+        .taskpay-line :global(svg) {
+          font-size: 0.9rem;
+        }
+        .taskpay-subtitle {
+          font-size: 0.85rem;
+          opacity: 0.9;
+        }
+        .taskpay-pool {
+          color: #4ade80;
+          font-weight: 700;
         }
         .get-spins-action-btn {
           background: linear-gradient(90deg, #a084ee 0%, #6C5CE7 100%);
@@ -574,6 +603,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           background: linear-gradient(90deg, #22c55e 0%, #3b82f6 100%);
           box-shadow: 0 4px 18px rgba(34, 197, 94, 0.65);
           animation: glow-taskpay 1.6s ease-in-out infinite;
+          padding: 10px 0;
         }
         .taskpay-cta-btn:hover:not(:disabled) {
           background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);

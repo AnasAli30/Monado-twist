@@ -221,7 +221,7 @@ export function SpinAndEarn() {
   // Show Taskpay quest popup on first visit
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const hasShownTaskpay = localStorage.getItem('taskpayPopupShown');
+      const hasShownTaskpay = localStorage.getItem('taskpayPopupShown7');
       if (!hasShownTaskpay) {
         setShowWelcomePopup(true);
       }
@@ -1263,13 +1263,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('taskpayPopupShown', 'true');
+    localStorage.setItem('taskpayPopupShown7', 'true');
     handleOpenMiniApp();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('taskpayPopupShown', 'true');
+    localStorage.setItem('taskpayPopupShown7', 'true');
   };
 
   const handleClaimBoost = () => {
@@ -1354,17 +1354,24 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
               &times;
             </button>
 
-            <div className="popup-icon">
-              <FaDice style={{ color: '#FFD700', fontSize: '4rem' }} />
-            </div>
-
             <div className="popup-message">
               <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
-                Taskpay Quests are Live
+                Taskpay is Live
               </h3>
-              <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
-                Now you can earn more by completing quests on <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>Taskpay</strong>.
-                There is already a <strong style={{ color: '#34d399', fontSize: '1.1rem' }}>$60 prize pool</strong> live – finish quests before the time is up to maximize your rewards.
+              <p
+                style={{
+                  margin: '0 0 20px 0',
+                  fontSize: '1.1rem',
+                  lineHeight: '1.7',
+                  fontWeight: 500,
+                  color: '#e5e7eb'
+                }}
+              >
+                Turn your time into rewards with quests on{' '}
+                <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>Taskpay</strong>.
+                <br />
+                A <strong style={{ color: '#4ade80', fontSize: '1.1rem' }}>$60 prize pool</strong> is already live –
+                complete quests before they expire to secure a bigger share.
               </p>
             </div>
 
@@ -1383,21 +1390,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 }}
                 onClick={handlePlayNow}
               >
-                Open Taskpay Quests Now
-              </button>
-
-              <button
-                className="popup-action-btn play-later"
-                style={{
-                  background: '#f2f2f2',
-                  color: '#444',
-                  fontWeight: '600',
-                  padding: '10px 16px',
-                  borderRadius: '8px'
-                }}
-                onClick={handlePlayLater}
-              >
-                Maybe Later
+                Open Taskpay Now / +5 spin
               </button>
             </div>
           </div>
