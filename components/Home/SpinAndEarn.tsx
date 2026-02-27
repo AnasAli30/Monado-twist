@@ -218,15 +218,15 @@ export function SpinAndEarn() {
     }
   }, [spinsLeft]);
 
-  // Show welcome popup on first visit
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined') {
-  //     const hasShownWelcome = localStorage.getItem('welcomePopupShown5');
-  //     if (!hasShownWelcome) {
-  //       setShowWelcomePopup(true);
-  //     }
-  //   }
-  // }, []);
+  // Show Taskpay quest popup on first visit
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasShownTaskpay = localStorage.getItem('taskpayPopupShown');
+      if (!hasShownTaskpay) {
+        setShowWelcomePopup(true);
+      }
+    }
+  }, []);
 
   // Show loyal user popup on first visit
   useEffect(() => {
@@ -1048,7 +1048,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/vkQ_LmRgvix6/roots-of-you"
+        url: "https://farcaster.xyz/miniapps/yfZqr7DiqHjC/taskpay"
       });
       if (!timeUntilMiniAppOpen && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1123,7 +1123,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
   const handleOpenMiniApp3 = async () => {
     try {
       await sdk.actions.openMiniApp({
-        url: "https://farcaster.xyz/miniapps/Msv27pssuYPE/party-frame"
+        url: "https://farcaster.xyz/miniapps/sNwuM7c9-6px/the-vinyls"
       });
       if (!timeUntilMiniAppOpen3 && fid) {
         const res = await fetchWithVerification('/api/spin', {
@@ -1263,13 +1263,13 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
   const handlePlayNow = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown5', 'true');
-    handleOpenMiniApp1();
+    localStorage.setItem('taskpayPopupShown', 'true');
+    handleOpenMiniApp();
   };
 
   const handlePlayLater = () => {
     setShowWelcomePopup(false);
-    localStorage.setItem('welcomePopupShown5', 'true');
+    localStorage.setItem('taskpayPopupShown', 'true');
   };
 
   const handleClaimBoost = () => {
@@ -1360,13 +1360,11 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
 
             <div className="popup-message">
               <h3 style={{ margin: '0 0 15px 0', fontSize: '1.6rem', fontWeight: '800', color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
-                🎉 Welcome to <span style={{ color: "#fff" }}>MONAD TWIST</span> 🎰
+                Taskpay Quests are Live
               </h3>
               <p style={{ margin: '0 0 20px 0', fontSize: '1.15rem', lineHeight: '1.6', fontWeight: '500' }}>
-                Spin, Match & Win! 💎
-                Earn <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-                  Daily Tokens
-                </strong> daily by just playing <b>Monad Realm</b>.
+                Now you can earn more by completing quests on <strong style={{ color: '#FFD700', fontSize: '1.2rem' }}>Taskpay</strong>.
+                There is already a <strong style={{ color: '#34d399', fontSize: '1.1rem' }}>$60 prize pool</strong> live – finish quests before the time is up to maximize your rewards.
               </p>
             </div>
 
@@ -1385,7 +1383,7 @@ Spin the wheel, touch grass later — it’s addictive af 🎰
                 }}
                 onClick={handlePlayNow}
               >
-                🚀 Play Now & Claim +5 Free Spins
+                Open Taskpay Quests Now
               </button>
 
               <button

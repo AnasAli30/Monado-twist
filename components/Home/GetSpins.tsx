@@ -223,25 +223,36 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           )}
         </div>
 
-        <div className="get-spins-card">
+
+        <div className="get-spins-card taskpay-card">
           <div className="get-spins-card-header">
-            <img src="images/root.png" alt="Free NFT Mint" className="get-spins-card-icon" />
+            <Image src="/images/taskpay.png" alt="Taskpay Quests" width={56} height={56} className="get-spins-card-icon" />
             <div className="get-spins-card-title">
-              🎨 Mint Free NFT + Claim gift box <span style={{ color: "#FFD700" }}>Limited Supply Available!</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <FaRocket />
+                <span>
+                  Now earn more by doing quests on <b>Taskpay</b> –
+                  <span style={{ color: "#4ade80", fontWeight: 700 }}> $60 pool live</span>. 
+                  Complete quests before the timer runs out to boost your rewards.
+                </span>
+              </span>
             </div>
           </div>
           <button
-            className="get-spins-action-btn1"
+            className="get-spins-action-btn taskpay-cta-btn"
             onClick={handleOpenMiniApp}
             disabled={!!timeUntilMiniAppOpen}
           >
             {!timeUntilMiniAppOpen ? (
-              <span className="spin-badge1">Mint Free NFT Now / +3 spins</span>
+              <span className="spin-badge taskpay-badge">
+                <FaRocket style={{ marginRight: 6 }} />
+                Start Taskpay Quests Now
+              </span>
             ) : (
-              <span style={{ color: "black" }}>⏳ Opens in: {timeUntilMiniAppOpen}</span>
+              `Unlocks in: ${timeUntilMiniAppOpen}`
             )}
           </button>
-        </div>
+        </div> 
 
 
 
@@ -249,7 +260,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           <div className="get-spins-card-header">
             <img src="images/party.png" alt="AI Friend Frame NFT" className="get-spins-card-icon" />
             <div className="get-spins-card-title">
-              🤖✨ Mint Your <b>AI-Generated Friend Frame</b> → <span style={{ color: "#FFD700" }}>FREE NFT -  Limited Supply! 🔥</span>
+              🤖✨ Mint Your <b>Vinyls</b> → <span style={{ color: "#FFD700" }}>FREE FOR MONAD TWIST USER -  1000 Supply Only! 🔥</span>
             </div>
           </div>
           <button
@@ -267,26 +278,7 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
         </div>
 
 
-        {/* <div className="get-spins-card">
-          <div className="get-spins-card-header">
-            <Image src="/images/monad-realm.png" alt="Chain Crush Rewards" width={56} height={56} className="get-spins-card-icon" />
-            <div className="get-spins-card-title">
-              🎮 Play <b>Monad realm</b> → Win <span style={{ color: "#FFD700" }}>token Daily! and 2500 $MON to top 20 players</span>
-            </div>
-          </div>
-          <button
-            className="get-spins-action-btn"
-            onClick={handleOpenMiniApp1}
-            disabled={!!timeUntilMiniAppOpen1}
-          >
-            {!timeUntilMiniAppOpen1 ? (
-              <span className="spin-badge">🔥 Claim +5 Free Spins Now</span>
-            ) : (
-              `⏳ Unlocks in: ${timeUntilMiniAppOpen1}`
-            )}
-          </button>
-        </div> */}
-
+   
         {/* <div className="get-spins-card">
           <div className="get-spins-card-header">
             <img src="images/usdc.png" alt="Monad Realm" className="get-spins-card-icon" />
@@ -469,6 +461,11 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           border: 1.5px solid rgba(172, 148, 255, 0.18);
           transition: box-shadow 0.2s, transform 0.2s;
         }
+        .get-spins-card.taskpay-card {
+          background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.28), transparent 55%),
+                      radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.28), transparent 55%);
+          border-color: rgba(59, 130, 246, 0.55);
+        }
         .get-spins-card:hover {
           box-shadow: 0 8px 32px rgba(108, 92, 231, 0.18);
           transform: translateY(-2px) scale(1.025);
@@ -572,6 +569,30 @@ export const GetSpins: React.FC<GetSpinsProps> = ({
           box-shadow: 0 2px 8px #a084ee33;
           letter-spacing: 0.5px;
           display: inline-block;
+        }
+        .taskpay-cta-btn {
+          background: linear-gradient(90deg, #22c55e 0%, #3b82f6 100%);
+          box-shadow: 0 4px 18px rgba(34, 197, 94, 0.65);
+          animation: glow-taskpay 1.6s ease-in-out infinite;
+        }
+        .taskpay-cta-btn:hover:not(:disabled) {
+          background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 6px 24px rgba(59, 130, 246, 0.75);
+        }
+        .spin-badge.taskpay-badge {
+          background: #0f172a;
+          color: #bbf7d0;
+          border: 1px solid rgba(52, 211, 153, 0.6);
+          box-shadow: 0 0 18px rgba(34, 197, 94, 0.6);
+        }
+        @keyframes glow-taskpay {
+          0%, 100% {
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.5);
+          }
+          50% {
+            box-shadow: 0 6px 26px rgba(59, 130, 246, 0.9);
+          }
         }
         .spin-badge1 {
           background: #9dff00;
