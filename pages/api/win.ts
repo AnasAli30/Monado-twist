@@ -322,7 +322,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // const monValues = 
     // const monValues = [0.02, 0.05, 0.03, 0.01, 0.1, 0.01];
 
-    const validMonAmounts = [0.002, 0.005, 0.003, 0.001, 0.001, 0.001];
+    const validMonAmounts =  [0.02, 0.5, 0.03, 1, 0.001, 0.8];
+
     const isValidMonAmount = validMonAmounts.includes(amount);
 
     if (!isValidMonAmount) {
